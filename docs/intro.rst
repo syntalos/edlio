@@ -37,7 +37,7 @@ Collections, Groups and Datasets
 
 EDL distinguishes three fundamental organizational units for sorting data: **Collections**,
 **Groups** and **Datasets**.
-Each one of these units is represented on the filesystem by a directory containing a `manifest.toml`
+Each one of these units is represented on the filesystem by a directory containing a ``manifest.toml``
 file in the `TOML <https://github.com/toml-lang/toml>`_ markup language which describes the unit type
 and additional metadata about is contents.
 
@@ -63,8 +63,8 @@ Metadata
 --------
 
 Metadata is stored in the `TOML <https://github.com/toml-lang/toml>`_ text-based human-readable markup language.
-Fields that are generic and specified in EDL are stored in `manifest.toml` files in each directory, while the
-experimenter can define and add arbitrary custom metadata in a separate `attributes.toml` file to describe a group,
+Fields that are generic and specified in EDL are stored in ``manifest.toml`` files in each directory, while the
+experimenter can define and add arbitrary custom metadata in a separate ``attributes.toml`` file to describe a group,
 collection or dataset.
 
 Data
