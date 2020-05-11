@@ -1,2 +1,3 @@
-Sphinx>=2.4
+sphinx>=2.4
+pygments>=2.6
 jupyter_sphinx_theme
