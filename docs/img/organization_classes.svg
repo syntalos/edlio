@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:export-ydpi="199.86789"
+   inkscape:export-xdpi="199.86789"
+   inkscape:export-filename="/home/matthias/Development/edlio/docs/img/organization_classes.png"
+   width="64.57708mm"
+   height="43.84396mm"
+   viewBox="0 0 64.57708 43.84396"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0rc1 (09960d6f05, 2020-04-09)"
+   sodipodi:docname="organization_classes.svg">
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1562"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       lpeversion="0" />
+    <inkscape:path-effect
+       lpeversion="0"
+       only_selected="false"
+       apply_with_weight="true"
+       apply_no_weight="true"
+       helper_size="0"
+       steps="2"
+       weight="33.333333"
+       is_visible="true"
+       id="path-effect1433"
+       effect="bspline" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1336"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       lpeversion="0" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1205"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       lpeversion="0" />
+    <inkscape:path-effect
+       lpeversion="0"
+       only_selected="false"
+       apply_with_weight="true"
+       apply_no_weight="true"
+       helper_size="0"
+       steps="2"
+       weight="33.333333"
+       is_visible="true"
+       id="path-effect1136"
+       effect="bspline" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect5930"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       lpeversion="0" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect6925"
+       is_visible="true"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       lpeversion="0" />
+    <marker
+       inkscape:stockid="EmptyTriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker8785-3-1-8-5-3-35-4-2-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path8682-1-1-6-6-7-6-9-0-9"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(0.8,0,0,0.8,-4.8,0)" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker8785-3-1-8-5-3-6-3-2-0-2"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="EmptyTriangleOutL">
+      <path
+         transform="matrix(0.8,0,0,0.8,-4.8,0)"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path8682-1-1-6-6-7-0-9-7-7-2"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyTriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker8785-3-1-8-5-3-6-3-2-0-2-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path8682-1-1-6-6-7-0-9-7-7-2-9"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(0.8,0,0,0.8,-4.8,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     fit-margin-bottom="1"
+     fit-margin-right="1"
+     fit-margin-left="1"
+     fit-margin-top="1"
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.919596"
+     inkscape:cx="80.235472"
+     inkscape:cy="128.03387"
+     inkscape:document-units="mm"
+     inkscape:current-layer="g925-2"
+     inkscape:document-rotation="0"
+     showgrid="true"
+     inkscape:window-width="2560"
+     inkscape:window-height="1373"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       originy="-35.841664"
+       originx="-29.227084"
+       id="grid885"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-29.227084,-35.841667)"
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8785-3-1-8-5-3-6-3-2-0-2)"
+       d="m 75.40625,42.333333 c 0,0 3.96875,0 3.96875,0 0,2.94335 0,6.86812 0,8.83005"
+       id="path5577-8-2-8-6-7-5-1-6"
+       inkscape:connector-curvature="0"
+       inkscape:path-effect="#path-effect1433"
+       inkscape:original-d="M 75.40625,42.333333 H 79.375 c 0,0 2.65e-4,6.86812 0,8.83005"
+       sodipodi:nodetypes="ccc" />
+    <path
+       sodipodi:nodetypes="ccc"
+       inkscape:original-d="m 47.625,42.333333 h -3.96875 c 0,0 2.65e-4,6.86812 0,8.83005"
+       inkscape:path-effect="#path-effect1562"
+       inkscape:connector-curvature="0"
+       id="path5577-8-2-8-6-7-5-1-6-7"
+       d="m 47.625,42.333333 c 0,0 -3.96875,0 -3.96875,0 0,2.94335 0,6.86812 0,8.83005"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8785-3-1-8-5-3-6-3-2-0-2-8)" />
+    <g
+       transform="translate(0.33235931,-0.5549825)"
+       id="g1105">
+      <g
+         id="g883">
+        <rect
+           style="fill:#e6e6e6;fill-opacity:1;stroke:#101114;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+           id="rect2752-9"
+           width="27.78125"
+           height="10.583329"
+           x="47.292641"
+           y="37.596649"
+           ry="2.6458333" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="61.124527"
+           y="42.412071"
+           id="text2756-2"><tspan
+             sodipodi:role="line"
+             x="61.124527"
+             y="42.412071"
+             style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+             id="tspan2758-2">Object</tspan></text>
+        <text
+           id="text2756-2-3"
+           y="45.912907"
+           x="61.248882"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           xml:space="preserve"><tspan
+             id="tspan2758-2-6"
+             style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+             y="45.912907"
+             x="61.248882"
+             sodipodi:role="line">A directory with metadata</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(24.14486,-8.4924822)"
+       id="g1067">
+      <g
+         id="g925"
+         transform="translate(-6.6145842,22.489583)">
+        <rect
+           ry="2.6458333"
+           y="37.596649"
+           x="47.292641"
+           height="10.583329"
+           width="27.78125"
+           id="rect2752-9-5"
+           style="fill:#dcf6fd;fill-opacity:1;stroke:#101114;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
+        <text
+           id="text2756-2-35"
+           y="41.353752"
+           x="61.176914"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           xml:space="preserve"><tspan
+             id="tspan2758-2-62"
+             style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+             y="41.353752"
+             x="61.176914"
+             sodipodi:role="line">Group</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="61.174267"
+           y="44.193138"
+           id="text2756-2-3-9"><tspan
+             sodipodi:role="line"
+             x="61.174267"
+             y="44.193138"
+             style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+             id="tspan917">Can contain other groups</tspan><tspan
+             id="tspan970"
+             sodipodi:role="line"
+             x="61.174267"
+             y="46.838974"
+             style="text-align:center;text-anchor:middle;stroke-width:0.264583px">or datasets</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g925-2"
+       transform="translate(17.530276,30.305647)">
+      <rect
+         ry="2.6458333"
+         y="37.596649"
+         x="47.292641"
+         height="10.583329"
+         width="27.78125"
+         id="rect2752-9-5-7"
+         style="fill:#dcf6fd;fill-opacity:1;stroke:#101114;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
+      <text
+         id="text2756-2-35-0"
+         y="41.353752"
+         x="61.211838"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           id="tspan2758-2-62-9"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+           y="41.353752"
+           x="61.211838"
+           sodipodi:role="line">Collection</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="61.155746"
+         y="44.193138"
+         id="text2756-2-3-9-3"><tspan
+           sodipodi:role="line"
+           x="61.155746"
+           y="44.193138"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+           id="tspan917-0">Root hierarchy element, can</tspan><tspan
+           sodipodi:role="line"
+           x="61.155746"
+           y="46.838974"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+           id="tspan962">contain groups or datasets</tspan></text>
+    </g>
+    <g
+       id="g925-6"
+       transform="translate(-16.865557,13.997101)">
+      <rect
+         ry="2.6458333"
+         y="37.596649"
+         x="47.028061"
+         height="10.583328"
+         width="28.310417"
+         id="rect2752-9-5-2"
+         style="fill:#c9f7d3;fill-opacity:1;stroke:#101114;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
+      <text
+         id="text2756-2-35-6"
+         y="41.353752"
+         x="61.053886"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           id="tspan2758-2-62-1"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+           y="41.353752"
+           x="61.053886"
+           sodipodi:role="line">Dataset</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;line-height:125%;font-family:Lato;-inkscape-font-specification:Lato;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="61.196499"
+         y="44.193138"
+         id="text2756-2-3-9-8"><tspan
+           id="tspan970-9"
+           sodipodi:role="line"
+           x="61.196499"
+           y="44.193138"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px">Contains raw or processed</tspan><tspan
+           sodipodi:role="line"
+           x="61.196499"
+           y="46.838974"
+           style="text-align:center;text-anchor:middle;stroke-width:0.264583px"
+           id="tspan1007">data. Leaf of directory tree.</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8785-3-1-8-5-3-35-4-2-5)"
+       d="m 79.375,62.177083 c 0,1.763889 0,3.527865 0,5.291667"
+       id="path5577-8-2-8-6-7-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:original-d="m 79.375,62.177083 c 0,0 2.65e-4,3.527865 0,5.291667"
+       inkscape:path-effect="#path-effect1336" />
+  </g>
+</svg>

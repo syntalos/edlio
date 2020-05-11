@@ -6,6 +6,8 @@ Experiment Directory Layout
    :caption: Contents:
 
    intro.rst
+   metadata.rst
+   dataformats.rst
 
 
 
