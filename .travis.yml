@@ -1,0 +1,26 @@
+# Travis CI config for EDLIO
+
+language: python
+dist: focal
+sudo: required
+
+python:
+  - "3.7"
+  - "3.8"
+  - "nightly"
+
+matrix:
+  allow_failures:
+    - python: "nightly"
+
+install:
+ - pip install flake8 pytest
+ - pip install -r requirements.txt
+ - pip install -r docs/requirements.txt
+
+script:
+  - ./setup.py build
+  - ./setup.py install --single-version-externally-managed --root=/tmp
+  - pytest
+  - rm -rf build/
+  - flake8 ./
