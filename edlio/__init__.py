@@ -19,3 +19,41 @@
 
 __appname__ = "edlio"
 __version__ = "0.0.1"
+
+import os
+import toml
+from .unit import EDLError
+from .group import EDLGroup
+from .collection import EDLCollection
+from .dataset import EDLDataset
+
+
+__all__ = ['EDLError',
+           'EDLGroup',
+           'EDLCollection',
+           'EDLDataset',
+           'load']
+
+
+def load(path):
+    '''Open an EDL unit via its filesystem path'''
+
+    mf_path = os.path.join(path, 'manifest.toml')
+    if not os.path.isfile(mf_path):
+        raise EDLError('This directory is no valid EDL unit.')
+
+    with open(os.path.join(mf_path), 'r') as f:
+        mf = toml.load(f)
+
+    unit_type = mf.get('type')
+    if unit_type == 'collection':
+        unit = EDLCollection()
+    elif unit_type == 'group':
+        unit = EDLGroup()
+    elif unit_type == 'dataset':
+        unit = EDLDataset()
+    else:
+        raise EDLError('EDL unit type "{}" is unknown, data can not be loaded.'.format(unit_type))
+
+    unit.load(path, mf)
+    return unit
