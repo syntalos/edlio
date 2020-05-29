@@ -25,7 +25,7 @@ from enum import IntEnum
 from datetime import datetime
 
 
-__all__ = ['TsyncFile', 'TSyncFileTimeUnit']
+__all__ = ['TsyncFile', 'TSyncTimeUnit']
 
 
 class TSyncTimeUnit(IntEnum):
@@ -177,3 +177,10 @@ class TsyncFile:
 
             if not indices_continuous:
                 print('WARNING: Indices in time sync file were not continuous.')
+
+
+def load_data(part_paths, aux_data):
+    ''' Entry point for automatic dataset loading '''
+    for fname in part_paths:
+        tsync = TsyncFile(fname)
+        yield tsync

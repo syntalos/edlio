@@ -94,7 +94,7 @@ class EDLUnit:
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str) -> str:
+    def root_path(self, path: str):
         self._root_path = path
 
     @property

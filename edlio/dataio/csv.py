@@ -17,20 +17,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import importlib
-
-'''
-Determine which loader is responsible for which file type.
-'''
-DATA_LOADERS = {
-    'video': 'edlio.dataio.video',
-    'tsync': 'edlio.dataio.tsyncfile',
-    'csv': 'edlio.dataio.csv',
-    'rhd': 'edlio.dataio.rhd.load_intan_rhd',
-}
+import csv
 
 
-def load_dataio_module(what):
-    path = DATA_LOADERS[what]
-    mod = importlib.import_module(path)
-    return mod.load_data
+def load_data(part_paths, aux_data):
+    ''' Entry point for automatic dataset loading '''
+    for fname in part_paths:
+        with open(fname, newline='') as f:
+            reader = csv.reader(f, delimiter=';')
+            for row in reader:
+                yield row

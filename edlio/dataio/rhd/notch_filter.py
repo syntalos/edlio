@@ -5,6 +5,7 @@
 import math
 import numpy as np
 
+
 def notch_filter(input, fSample, fNotch, Bandwidth):
     """Implements a notch filter (e.g., for 50 or 60 Hz) on vector 'input'.
 

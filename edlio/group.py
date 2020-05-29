@@ -82,6 +82,18 @@ class EDLGroup(EDLUnit):
             if isinstance(child, EDLGroup):
                 yield child
 
+    def group_by_name(self, name):
+        for group in self.groups:
+            if group.name == name:
+                return group
+        return None
+
+    def dataset_by_name(self, name):
+        for dset in self.datasets:
+            if dset.name == name:
+                return dset
+        return None
+
     def save(self):
         mf = self._make_manifest_dict()
         self.__save_metadata(mf, self.attributes)

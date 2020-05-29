@@ -3,8 +3,9 @@
 # Michael Gibson 23 April 2015
 # Modified Adrian Foy Sep 2018
 
-import sys, struct
+import struct
 import numpy as np
+
 
 def read_one_data_block(data, header, indices, fid):
     """Reads one 60 or 128 sample data block from fid into data, at the location indicated by indices."""
@@ -42,4 +43,3 @@ def read_one_data_block(data, header, indices, fid):
 
     if header['num_board_dig_out_channels'] > 0:
         data['board_dig_out_raw'][indices['board_dig_out']:(indices['board_dig_out']+ header['num_samples_per_data_block'])] = np.array(struct.unpack('<' + 'H' * header['num_samples_per_data_block'], fid.read(2 * header['num_samples_per_data_block'])))
-

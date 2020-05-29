@@ -33,4 +33,3 @@ def get_bytes_per_data_block(header):
         bytes_per_block = bytes_per_block + 1 * 2 * header['num_temp_sensor_channels']
 
     return bytes_per_block
-  
