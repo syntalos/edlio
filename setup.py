@@ -5,6 +5,7 @@ from setuptools import setup
 
 packages = [
     'edlio',
+    'edlio.dataio',
 ]
 
 setup(
