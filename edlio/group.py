@@ -96,7 +96,7 @@ class EDLGroup(EDLUnit):
 
     def save(self):
         mf = self._make_manifest_dict()
-        self.__save_metadata(mf, self.attributes)
+        self._save_metadata(mf, self.attributes)
 
     def load(self, path, mf={}):
         from .dataset import EDLDataset

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from debspawn import __appname__, __version__
+from edlio import __appname__, __version__
 from setuptools import setup
 
 packages = [
