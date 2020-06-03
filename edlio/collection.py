@@ -27,8 +27,8 @@ class EDLCollection(EDLGroup):
     An EDL Collection
     '''
 
-    def __init__(self):
-        EDLGroup.__init__(self)
+    def __init__(self, name=None):
+        EDLGroup.__init__(self, name)
 
     @property
     def generator_id(self):

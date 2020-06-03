@@ -44,9 +44,9 @@ class EDLUnit:
     Generic base class for all EDL unit types.
     '''
 
-    def __init__(self):
+    def __init__(self, name=None):
         self._parent = None
-        self._name = None
+        self._name = sanitize_name(name)
         self._collection_id = uuid.uuid4()
         self._root_path = ''
         self._authors = []
@@ -54,6 +54,7 @@ class EDLUnit:
         self._format_version = EDL_FORMAT_VERSION
         self._generator_id = None
         self._unit_type = self._type_as_unittype()
+        self._time_created = datetime.now().replace(microsecond=0)
 
     @property
     def parent(self):
@@ -173,22 +174,24 @@ class EDLUnit:
     def _make_manifest_dict(self):
         if not self._time_created:
             # set default creation time, with second-resolution (milliseconds are stripped)
-            dtime = datetime.now()
-            dtime.microsecond = 0
-            self._time_created = dtime
+            self._time_created = datetime.now().replace(microsecond=0)
 
         doc = {}
         doc['format_version'] = self._format_version
         doc['type'] = self._type_as_unittype()
-        doc['time_created'] = self._time_created
 
         if self.collection_id:
             doc['collection_id'] = str(self.collection_id)
+
+        doc['time_created'] = self._time_created
+
         if self._generator_id:
             doc['generator'] = self._generator_id
 
         if self._authors:
             doc['authors'] = self._authors
+
+        return doc
 
     def _save_metadata(self, manifest, attributes):
         if not self.path:

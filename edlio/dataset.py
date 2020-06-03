@@ -30,7 +30,7 @@ class EDLDataPart:
     index: int = -1
     fname: str = None
 
-    def __init__(self, fname: str, index:int=-1):
+    def __init__(self, fname: str, index: int=-1):
         self.fname = fname
         self.index = index
 
@@ -88,6 +88,25 @@ class EDLDataFile:
         for part in self.parts:
             yield os.path.join(self._base_path, part.fname)
 
+    def new_part(self, fname: str, index: int=-1, *, allow_exists=False):
+        if not fname:
+            raise ValueError('File name is not valid.')
+        _, fext = os.path.splitext(fname)
+        if fext and fext.startswith('.'):
+            fext = fext[1:]
+        if not self._file_type:
+            self._file_type = fext
+        elif self._file_type != fext:
+            raise ValueError('New part does not have the right extension for this data: {}'.format(self._file_type))
+        for ep in self.parts:
+            if ep.fname == fname:
+                if allow_exists:
+                    return ep, os.path.join(self._base_path, ep.fname)
+                raise ValueError('A file part with name "{}" already exists.'.format(fname))
+        part = EDLDataPart(fname, index)
+        self.parts.append(part)
+        return part, os.path.join(self._base_path, part.fname)
+
     def read(self, aux_data=None):
         ''' Read all data parts in this set.
 
@@ -115,10 +134,10 @@ class EDLDataset(EDLUnit):
     An EDL Dataset
     '''
 
-    def __init__(self):
-        EDLUnit.__init__(self)
-        self._data = None
-        self._aux_data = None
+    def __init__(self, name=None):
+        EDLUnit.__init__(self, name)
+        self._data = EDLDataFile(self.path)
+        self._aux_data = EDLDataFile(self.path)
 
     @property
     def data(self) -> EDLDataFile:
@@ -136,31 +155,49 @@ class EDLDataset(EDLUnit):
     def aux_data(self, adf: EDLDataFile):
         self._aux_data = adf
 
+    def _parse_data_md(self, d):
+        df = EDLDataFile(self.path,
+                         d.get('media_type'),
+                         d.get('file_type'))
+        for pi in d.get('parts', []):
+            df.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
+        if df.parts:
+            df.parts.sort()
+        return df
+
     def load(self, path, mf={}):
         EDLUnit.load(self, path, mf)
 
-        self._data = None
-        self._aux_data = None
+        self._data = EDLDataFile(self.path)
+        self._aux_data = EDLDataFile(self.path)
         if 'data' in mf:
-            d = mf['data']
-            df = EDLDataFile(self.path,
-                             d.get('media_type'),
-                             d.get('file_type'))
-            for pi in d.get('parts', []):
-                df.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
-            if df.parts:
-                df.parts.sort()
-                self._data = df
+            self._data = self._parse_data_md(mf['data'])
         if 'data_aux' in mf:
-            d = mf['data_aux']
-            adf = EDLDataFile(self.path,
-                              d.get('media_type'),
-                              d.get('file_type'))
-            for pi in d.get('parts', []):
-                adf.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
-            if adf.parts:
-                adf.parts.sort()
-                self._aux_data = adf
+            self._aux_data = self._parse_data_md(mf['data_aux'])
+
+    def _serialize_data_md(self, df):
+        d = {}
+        if not df.parts:
+            return {}
+        if self._data.media_type:
+            d['media_type'] = df.media_type
+        elif self._data.file_type:
+            d['file_type'] = df.file_type
+        d['parts'] = []
+        for part in df.parts:
+            pd = {'fname': part.fname}
+            if part.index >= 0:
+                pd['index'] = part.index
+            d['parts'].append(pd)
+        return d
+
+    def save(self):
+        mf = self._make_manifest_dict()
+        mf['data'] = self._serialize_data_md(self._data)
+        if self._aux_data.parts:
+            mf['data_aux'] = self._serialize_data_md(self._aux_data)
+
+        self._save_metadata(mf, self.attributes)
 
     def read_data(self):
         '''Read data from this dataset.

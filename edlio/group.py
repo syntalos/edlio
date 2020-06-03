@@ -29,8 +29,8 @@ class EDLGroup(EDLUnit):
     An EDL Group
     '''
 
-    def __init__(self):
-        EDLUnit.__init__(self)
+    def __init__(self, name=None):
+        EDLUnit.__init__(self, name)
         self._children = []
 
     @property
@@ -64,10 +64,21 @@ class EDLGroup(EDLUnit):
 
     def add_child(self, child):
         if not isinstance(child, EDLUnit):
-            raise ValueError('Can only have EDL units as children')
+            raise ValueError('Can only have EDL units as children.')
+        if not child.name:
+            raise ValueError('Child unit must have a name.')
+        old_path = None
+        if child.root_path:
+            old_path = child.path
         child._parent = self
         child.root_path = self.path
         child.collection_id = self.collection_id
+
+        if old_path and os.path.isdir(old_path):
+            os.rename(old_path, child.path)
+        else:
+            os.makedirs(child.path, exist_ok=not old_path)
+        child.save()
         self._children.append(child)
 
     @property
@@ -82,21 +93,32 @@ class EDLGroup(EDLUnit):
             if isinstance(child, EDLGroup):
                 yield child
 
-    def group_by_name(self, name):
+    def group_by_name(self, name, *, create=False):
         for group in self.groups:
             if group.name == name:
                 return group
-        return None
+        group = None
+        if create:
+            group = EDLGroup(name)
+            self.add_child(group)
+        return group
 
-    def dataset_by_name(self, name):
+    def dataset_by_name(self, name, *, create=False):
         for dset in self.datasets:
             if dset.name == name:
                 return dset
-        return None
+        dset = None
+        if create:
+            dset = EDLDataset(name)
+            self.add_child(dset)
+        return dset
 
     def save(self):
         mf = self._make_manifest_dict()
         self._save_metadata(mf, self.attributes)
+
+        for child in self._children:
+            child.save()
 
     def load(self, path, mf={}):
         from .dataset import EDLDataset

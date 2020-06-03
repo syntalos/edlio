@@ -26,7 +26,9 @@ def sanitize_name(name: str):
     Sanitize a string for use as an EDL unit name,
     by stripping or replacing invalid characters.
     '''
-    s = filter(lambda x: x in string.printable, name)
+    if not name:
+        return None
+    s = ''.join(filter(lambda x: x in string.printable, name))
     s = s.replace('/', '_').replace('\\', '_').replace(':', '')
     # TODO: Replace Windows' reserved names
     if not s:
