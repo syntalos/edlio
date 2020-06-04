@@ -34,10 +34,9 @@ def load_data(part_paths, aux_data):
     ''' Entry point for automatic dataset loading '''
     adata = []
     if aux_data:
-        header = True
         for row in aux_data.read():
-            if header:
-                header = False
+            if row[0] == 'frame':
+                # we have a table header, skip it
                 continue
             adata.append((int(row[0]), int(row[1])))
 
