@@ -25,7 +25,7 @@ Determine which loader is responsible for which file type.
 DATA_LOADERS = {
     'video': 'edlio.dataio.video',
     'tsync': 'edlio.dataio.tsyncfile',
-    'csv': 'edlio.dataio.csv',
+    'csv': 'edlio.dataio.csvdata',
     'rhd': 'edlio.dataio.rhd.load_intan_rhd',
 }
 
