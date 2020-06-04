@@ -192,6 +192,10 @@ class EDLDataset(EDLUnit):
         return d
 
     def save(self):
+        if not self.path:
+            raise ValueError('No path set for EDL group "{}"'.format(self.name))
+        os.makedirs(self.path, exist_ok=True)
+
         mf = self._make_manifest_dict()
         mf['data'] = self._serialize_data_md(self._data)
         if self._aux_data.parts:

@@ -76,9 +76,6 @@ class EDLGroup(EDLUnit):
 
         if old_path and os.path.isdir(old_path):
             os.rename(old_path, child.path)
-        else:
-            os.makedirs(child.path, exist_ok=not old_path)
-        child.save()
         self._children.append(child)
 
     @property
@@ -101,6 +98,7 @@ class EDLGroup(EDLUnit):
         if create:
             group = EDLGroup(name)
             self.add_child(group)
+            group.save()
         return group
 
     def dataset_by_name(self, name, *, create=False):
@@ -111,12 +109,16 @@ class EDLGroup(EDLUnit):
         if create:
             dset = EDLDataset(name)
             self.add_child(dset)
+            dset.save()
         return dset
 
     def save(self):
+        if not self.path:
+            raise ValueError('No path set for EDL group "{}"'.format(self.name))
+        os.makedirs(self.path, exist_ok=True)
+
         mf = self._make_manifest_dict()
         self._save_metadata(mf, self.attributes)
-
         for child in self._children:
             child.save()
 
