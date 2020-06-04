@@ -161,7 +161,9 @@ class EDLUnit:
             self._authors = mf['authors']
 
     def _type_as_unittype(self):
-        from .import EDLGroup, EDLCollection, EDLDataset
+        from .group import EDLGroup
+        from .collection import EDLCollection
+        from .dataset import EDLDataset
 
         if isinstance(self, EDLCollection):
             return 'collection'
