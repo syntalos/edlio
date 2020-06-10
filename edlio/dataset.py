@@ -212,3 +212,9 @@ class EDLDataset(EDLUnit):
         if not self._data:
             return None
         return self._data.read(self._aux_data)
+
+    def read_aux_data(self):
+        '''Read auxiliary data from this dataset. '''
+        if not self._aux_data:
+            return None
+        return self._aux_data.read()
