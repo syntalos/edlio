@@ -87,7 +87,7 @@ def read_utf8_crc_from_file(f, crc=0):
 
     length, = struct.unpack('<I', f.read(4))
     if length == int('ffffffff', 16):
-        return ''
+        return '', crc
 
     if length > (os.fstat(f.fileno()).st_size - f.tell() + 1):
         raise Exception('String length in binary too long ({}).'.format(length))
