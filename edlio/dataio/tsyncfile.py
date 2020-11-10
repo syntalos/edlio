@@ -24,7 +24,7 @@ import numpy as np
 from enum import IntEnum
 from datetime import datetime
 from uuid import UUID
-from zlib import crc32
+from crc32c import crc32c
 
 
 __all__ = ['TSyncFile', 'TSyncFileMode', 'TSyncTimeUnit']
@@ -93,7 +93,7 @@ def read_utf8_crc_from_file(f, crc=0):
         raise Exception('String length in binary too long ({}).'.format(length))
 
     data = f.read(length)
-    return str(data, 'utf-8'), crc32(data, crc)
+    return str(data, 'utf-8'), crc32c(data, crc)
 
 
 class TSyncFile:
@@ -194,7 +194,7 @@ class TSyncFile:
         self._times = v
 
     def _read_crc_unpack(self, format, buffer):
-        self._block_crc = crc32(buffer, self._block_crc)
+        self._block_crc = crc32c(buffer, self._block_crc)
         v, = struct.unpack(format, buffer)
         return v
 
@@ -276,7 +276,7 @@ class TSyncFile:
                     break
 
                 time1 = self._read_crc_unpack(tfmt1, f.read(tlen1))
-                time2 = self._read_crc_unpack(tfmt2, f.read(tlen1))
+                time2 = self._read_crc_unpack(tfmt2, f.read(tlen2))
                 bytes_remaining -= bytes_per_entry
                 self._times[i] = np.array([time1, time2])
 
