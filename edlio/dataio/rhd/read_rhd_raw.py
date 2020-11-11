@@ -200,8 +200,3 @@ def plural(n):
         return ''
     else:
         return 's'
-
-
-def load_data(part_paths, aux_data):
-    for fname in part_paths:
-        yield read_intan_data(fname)

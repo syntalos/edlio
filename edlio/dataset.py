@@ -107,7 +107,7 @@ class EDLDataFile:
         self.parts.append(part)
         return part, os.path.join(self._base_path, part.fname)
 
-    def read(self, aux_data=None):
+    def read(self, aux_data=None, **kwargs):
         ''' Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
@@ -126,7 +126,7 @@ class EDLDataFile:
             raise EDLError('I do not know how to read data of type "{}".'.format(dclass))
 
         load_data = load_dataio_module(dclass)
-        return load_data(self.part_paths(), aux_data)
+        return load_data(self.part_paths(), aux_data, **kwargs)
 
 
 class EDLDataset(EDLUnit):
@@ -203,7 +203,7 @@ class EDLDataset(EDLUnit):
 
         self._save_metadata(mf, self.attributes)
 
-    def read_data(self):
+    def read_data(self, **kwargs):
         '''Read data from this dataset.
 
         Returns a generator to read data from this dataset by individual chunks, taking
@@ -211,7 +211,7 @@ class EDLDataset(EDLUnit):
         '''
         if not self._data:
             return None
-        return self._data.read(self._aux_data)
+        return self._data.read(self._aux_data, **kwargs)
 
     def read_aux_data(self):
         '''Read auxiliary data from this dataset. '''

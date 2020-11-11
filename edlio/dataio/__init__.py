@@ -26,7 +26,7 @@ DATA_LOADERS = {
     'video': 'edlio.dataio.video',
     'tsync': 'edlio.dataio.tsyncfile',
     'csv': 'edlio.dataio.csvdata',
-    'rhd': 'edlio.dataio.rhd.load_intan_rhd',
+    'rhd': 'edlio.dataio.rhd.read_rhd',
 }
 
 
