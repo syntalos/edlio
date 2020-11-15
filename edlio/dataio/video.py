@@ -35,7 +35,7 @@ class Frame:
 
 def load_data(part_paths, aux_data):
     ''' Entry point for automatic dataset loading '''
-    sync_map = []
+    sync_map = None
     if aux_data:
         if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':
             sync_map = []
@@ -64,6 +64,6 @@ def load_data(part_paths, aux_data):
             ret, mat = vc.read()
             if not ret:
                 break
-            frame = Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0]) if sync_map else Frame(mat, -1, frame_index)
+            frame = Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0]) if sync_map is not None else Frame(mat, -1, frame_index)
             yield frame
             frame_index += 1
