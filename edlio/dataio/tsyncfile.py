@@ -239,11 +239,22 @@ class TSyncFile:
             self._time_labels = (time1Name, time2Name)
             self._time_units = (time1Unit, time2Unit)
 
+            # skip alignment padding
+            crc_nopad = self._block_crc
+            padding = (f.tell() * -1) & (8 - 1)
+            self._block_crc = crc32c(f.read(padding), self._block_crc)
+
             # check header CRC
             block_term, = struct.unpack('<I', f.read(4))
             expected_header_crc, = struct.unpack('<I', f.read(4))
             if (block_term != TSYNC_BLOCK_TERM):
-                raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
+                # check if we maybe had no padding due to an erroneous writer
+                f.seek((padding + 4 + 4) * -1, os.SEEK_CUR)
+                self._block_crc = crc_nopad
+                block_term, = struct.unpack('<I', f.read(4))
+                expected_header_crc, = struct.unpack('<I', f.read(4))
+                if (block_term != TSYNC_BLOCK_TERM):
+                    raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
             if (expected_header_crc != self._block_crc):
                 raise Exception('Header checksum mismatch: The file is either invalid or its header block was damaged.')
 
