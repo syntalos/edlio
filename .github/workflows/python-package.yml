@@ -1,0 +1,43 @@
+name: Python QA
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -yq --no-install-recommends llvm
+        python -m pip install --upgrade pip wheel
+        python -m pip install flake8 pytest
+        python -m pip install -r requirements.txt
+        python -m pip install -r docs/requirements.txt
+        
+    - name: Build & install
+      run: |
+        python ./setup.py build
+        python ./setup.py install --single-version-externally-managed --root=/tmp
+
+    #- name: Test with pytest
+    #  run: |
+    #    pytest | true
+
+    - name: Lint with flake8
+      run: |
+        # ignore issues for now
+        flake8 ./edlio ./tests --show-source --statistics || true
