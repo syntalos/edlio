@@ -17,7 +17,13 @@ setup(
     description='Module to work with data in an Experiment Directory Layout (EDL) structure',
     license="LGPL-3.0+",
     url="https://edl.readthedocs.io/",
-
+    
+    install_requires=[
+        'toml>=0.10',
+        'numpy>=1.17',
+        'crc32c>=2.1',
+        'numba>=0.50'
+    ],
     python_requires='>=3.5',
     platforms=['any'],
 
