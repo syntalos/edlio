@@ -19,13 +19,11 @@
 
 import numpy as np
 import logging as log
-from numba import jit
 
 from .read_rhd_raw import read_intan_data
 from ..tsyncfile import TSyncFileMode, TSyncTimeUnit
 
 
-@jit('int64 (double[:], double)', nopython=True, nogil=True)
 def first_ge_index(vec, c):
     ''' Get the index of the first greater-equal number to `c`
     in ascending-sorted vector `vec` '''
@@ -35,7 +33,6 @@ def first_ge_index(vec, c):
     return np.nan
 
 
-@jit(nopython=True, nogil=True)
 def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_idx, init_offset_usec):
     ''' Create time vector, synchronizing all timepoints. '''
     offset_usec = init_offset_usec
@@ -56,7 +53,6 @@ def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_i
     return tv_adj, offset_usec, sync_idx
 
 
-@jit(nopython=True, nogil=True)
 def make_nosync_tsvec(data_len, sample_rate, index_offset, start_offset_usec):
     ''' Create time vector taking only the start time into account. '''
     tv = np.zeros((data_len, 1), dtype=np.float64)

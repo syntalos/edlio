@@ -21,8 +21,7 @@ setup(
     install_requires=[
         'toml>=0.10',
         'numpy>=1.17',
-        'crc32c>=2.1',
-        'numba>=0.50'
+        'crc32c>=2.1'
     ],
     python_requires='>=3.5',
     platforms=['any'],
