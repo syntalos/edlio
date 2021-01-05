@@ -21,10 +21,11 @@ import os
 import struct
 import json
 import numpy as np
+import logging as log
 from enum import IntEnum
 from datetime import datetime
 from uuid import UUID
-from crc32c import crc32c
+from xxhash import xxh3_64
 
 
 __all__ = ['TSyncFile', 'TSyncFileMode', 'TSyncTimeUnit']
@@ -60,9 +61,10 @@ class TSyncDataType(IntEnum):
 TSYNC_MAGIC = int('F223434E5953548A', 16)
 
 TSYNC_VERSION_MAJOR = 1
-TSYNC_VERSION_MINOR = 0
+TSYNC_VERSION_MINOR = 2
 
-TSYNC_BLOCK_TERM = int('11260000', 16)
+TSYNC_BLOCK_TERM = int('1126000000000000', 16)
+TSYNC_BLOCK_TERM_32 = int('11260000', 16)
 
 
 def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType):
@@ -82,18 +84,19 @@ def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType):
     raise Exception('No data defined for how to unpack type {}'.format(dtype))
 
 
-def read_utf8_crc_from_file(f, crc=0):
+def read_utf8_xxh_from_file(f, xxh):
     ''' Read UTF-8 encoded string from binary .tsync file '''
 
     length, = struct.unpack('<I', f.read(4))
     if length == int('ffffffff', 16):
-        return '', crc
+        return ''
 
     if length > (os.fstat(f.fileno()).st_size - f.tell() + 1):
         raise Exception('String length in binary too long ({}).'.format(length))
 
     data = f.read(length)
-    return str(data, 'utf-8'), crc32c(data, crc)
+    xxh.update(data)
+    return str(data, 'utf-8')
 
 
 class TSyncFile:
@@ -193,14 +196,13 @@ class TSyncFile:
     def times(self, v):
         self._times = v
 
-    def _read_crc_unpack(self, format, buffer):
-        self._block_crc = crc32c(buffer, self._block_crc)
+    def _read_xxh_unpack(self, format, buffer):
+        self._xxh.update(buffer)
         v, = struct.unpack(format, buffer)
         return v
 
-    def _read_utf8_crc_from_file(self, f):
-        s, self._block_crc = read_utf8_crc_from_file(f, self._block_crc)
-        return s
+    def _read_utf8_xxh_from_file(self, f):
+        return read_utf8_xxh_from_file(f, self._xxh)
 
     def open(self, fname):
         with open(fname, 'rb') as f:
@@ -209,61 +211,72 @@ class TSyncFile:
                 raise Exception('Unrecognized file type: This file is no tsync file.')
 
             # read file header block
-            self._block_crc = 0
-            major_version = self._read_crc_unpack('<H', f.read(2))
-            minor_version = self._read_crc_unpack('<H', f.read(2))
+            self._xxh = xxh3_64()
+            major_version = self._read_xxh_unpack('<H', f.read(2))
+            minor_version = self._read_xxh_unpack('<H', f.read(2))
             self._format_version = '{}.{}'.format(major_version, minor_version)
-            if major_version != TSYNC_VERSION_MAJOR:
+            if major_version != TSYNC_VERSION_MAJOR or minor_version > TSYNC_VERSION_MINOR:
                 raise Exception('Can not read TSync format version {} (max {}.{})'.format(
                         self._format_version, TSYNC_VERSION_MAJOR, TSYNC_VERSION_MINOR))
+            check_xxh = major_version >= 1 and minor_version >= 2
+            if not check_xxh:
+                log.warning('Tsync file version ({}) is too old, checksum validation for integrity checks will be skipped.'.format(self._format_version))
 
-            self._time_created = datetime.utcfromtimestamp(self._read_crc_unpack('<q', f.read(8)))
-            self._generator_name = self._read_utf8_crc_from_file(f)
-            self._collection_id = UUID(self._read_utf8_crc_from_file(f))
-            user_json_raw = self._read_utf8_crc_from_file(f)
+            self._time_created = datetime.utcfromtimestamp(self._read_xxh_unpack('<q', f.read(8)))
+            self._generator_name = self._read_utf8_xxh_from_file(f)
+            self._collection_id = UUID(self._read_utf8_xxh_from_file(f))
+            user_json_raw = self._read_utf8_xxh_from_file(f)
             self._custom = {}
             if user_json_raw:
                 self._custom = json.loads(user_json_raw)
 
-            self._ts_mode = TSyncFileMode(self._read_crc_unpack('<H', f.read(2)))
-            self._block_size = self._read_crc_unpack('<i', f.read(4))
+            self._ts_mode = TSyncFileMode(self._read_xxh_unpack('<H', f.read(2)))
+            self._block_size = self._read_xxh_unpack('<i', f.read(4))
 
-            time1Name = self._read_utf8_crc_from_file(f)
-            time1Unit = TSyncTimeUnit(self._read_crc_unpack('<H', f.read(2)))
-            time1DType = TSyncDataType(self._read_crc_unpack('<H', f.read(2)))
+            time1Name = self._read_utf8_xxh_from_file(f)
+            time1Unit = TSyncTimeUnit(self._read_xxh_unpack('<H', f.read(2)))
+            time1DType = TSyncDataType(self._read_xxh_unpack('<H', f.read(2)))
 
-            time2Name = self._read_utf8_crc_from_file(f)
-            time2Unit = TSyncTimeUnit(self._read_crc_unpack('<H', f.read(2)))
-            time2DType = TSyncDataType(self._read_crc_unpack('<H', f.read(2)))
+            time2Name = self._read_utf8_xxh_from_file(f)
+            time2Unit = TSyncTimeUnit(self._read_xxh_unpack('<H', f.read(2)))
+            time2DType = TSyncDataType(self._read_xxh_unpack('<H', f.read(2)))
 
             self._time_labels = (time1Name, time2Name)
             self._time_units = (time1Unit, time2Unit)
 
             # skip alignment padding
-            crc_nopad = self._block_crc
             padding = (f.tell() * -1) & (8 - 1)
-            self._block_crc = crc32c(f.read(padding), self._block_crc)
+            self._xxh.update(f.read(padding))
 
             # check header CRC
-            block_term, = struct.unpack('<I', f.read(4))
-            expected_header_crc, = struct.unpack('<I', f.read(4))
-            if (block_term != TSYNC_BLOCK_TERM):
-                # check if we maybe had no padding due to an erroneous writer
-                f.seek((padding + 4 + 4) * -1, os.SEEK_CUR)
-                self._block_crc = crc_nopad
-                block_term, = struct.unpack('<I', f.read(4))
-                expected_header_crc, = struct.unpack('<I', f.read(4))
-                if (block_term != TSYNC_BLOCK_TERM):
+            if check_xxh:
+                term_bytecount = 16
+                block_term, = struct.unpack('<Q', f.read(8))
+                expected_header_cs, = struct.unpack('<Q', f.read(8))
+                if block_term != TSYNC_BLOCK_TERM:
                     raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
-            if (expected_header_crc != self._block_crc):
-                raise Exception('Header checksum mismatch: The file is either invalid or its header block was damaged.')
+                if expected_header_cs != self._xxh.intdigest():
+                    raise Exception('Header checksum mismatch: The file is either invalid or its header block was damaged.')
+            else:
+                term_bytecount = 8
+                block_term, = struct.unpack('<I', f.read(4))
+                f.read(4)
+                if block_term != TSYNC_BLOCK_TERM_32:
+                    # check if we maybe had no padding due to an erroneous writer
+                    f.seek((padding + 4 + 4) * -1, os.SEEK_CUR)
+                    block_term, = struct.unpack('<I', f.read(4))
+                    expected_header_crc, = struct.unpack('<I', f.read(4))
+                    if block_term != TSYNC_BLOCK_TERM_32:
+                        raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
+
+            self._xxh.reset()
 
             tfmt1, tlen1 = tsync_dtype_to_pack_fmt_len(time1DType)
             tfmt2, tlen2 = tsync_dtype_to_pack_fmt_len(time2DType)
 
             self._times = np.empty((0, 2))
             bytes_per_entry = tlen1 + tlen2
-            bytes_per_block = bytes_per_entry * self._block_size + 8
+            bytes_per_block = bytes_per_entry * self._block_size + term_bytecount
 
             bytes_remaining = os.fstat(f.fileno()).st_size - f.tell()
             if bytes_remaining <= 0:
@@ -271,7 +284,7 @@ class TSyncFile:
                 return
 
             whole_block_count = bytes_remaining // bytes_per_block
-            last_block_len = (bytes_remaining - (whole_block_count * bytes_per_block) - 8) / bytes_per_entry
+            last_block_len = (bytes_remaining - (whole_block_count * bytes_per_block) - term_bytecount) / bytes_per_entry
             if last_block_len.is_integer():
                 last_block_len = int(last_block_len)
             else:
@@ -286,24 +299,34 @@ class TSyncFile:
                 if bytes_remaining == 0:
                     break
 
-                time1 = self._read_crc_unpack(tfmt1, f.read(tlen1))
-                time2 = self._read_crc_unpack(tfmt2, f.read(tlen2))
+                time1 = self._read_xxh_unpack(tfmt1, f.read(tlen1))
+                time2 = self._read_xxh_unpack(tfmt2, f.read(tlen2))
                 bytes_remaining -= bytes_per_entry
                 self._times[i] = np.array([time1, time2])
 
                 i += 1
                 b_index += 1
-                if b_index == self._block_size or bytes_remaining == 8:
+                if b_index == self._block_size or bytes_remaining == term_bytecount:
+                    bytes_remaining -= term_bytecount
+
+                    if not check_xxh:
+                        block_term, = struct.unpack('<I', f.read(4))
+                        f.read(4)
+                        if block_term != TSYNC_BLOCK_TERM_32:
+                            raise Exception('Block terminator not found: Some data may be corrupted.')
+                        b_index = 0
+                        continue
+
                     # check validity of the block we read last
-                    block_term, = struct.unpack('<I', f.read(4))
-                    expected_crc, = struct.unpack('<I', f.read(4))
-                    bytes_remaining -= 8
-                    if (block_term != TSYNC_BLOCK_TERM):
-                        raise Exception('Block terminator not found: Some data may be corrupted.')
-                    if (expected_crc != self._block_crc):
-                        raise Exception('Block checksum mismatch: Some data may be corrupted.')
-                    self._block_crc = 0
+                    block_term, = struct.unpack('<Q', f.read(8))
+                    expected_cs, = struct.unpack('<Q', f.read(8))
+                    if block_term != TSYNC_BLOCK_TERM:
+                        raise Exception('Block terminator not found: Some data is likely corrupted.')
+                    if expected_cs != self._xxh.intdigest():
+                        raise Exception('Block checksum mismatch: Some data is likely corrupted.')
+                    self._xxh.reset()
                     b_index = 0
+            del self._xxh
 
 
 class LegacyTSyncFile:
@@ -409,18 +432,19 @@ class LegacyTSyncFile:
             self._time_created = datetime.utcfromtimestamp(ts)
             self._tolerance_us, = struct.unpack('<I', f.read(4))
 
+            xxh = xxh3_64()
             try:
-                self._generator_name, _ = read_utf8_crc_from_file(f)
+                self._generator_name = read_utf8_xxh_from_file(f, xxh)
             except UnicodeDecodeError:
                 raise Exception('This legacy tsync file is damaged and can not be read.')
 
-            json_raw, _ = read_utf8_crc_from_file(f)
+            json_raw = read_utf8_xxh_from_file(f, xxh)
             self._custom = {}
             if json_raw:
                 self._custom = json.loads(json_raw)
 
-            tlabel1, _ = read_utf8_crc_from_file(f)
-            tlabel2, _ = read_utf8_crc_from_file(f)
+            tlabel1 = read_utf8_xxh_from_file(f, xxh)
+            tlabel2 = read_utf8_xxh_from_file(f, xxh)
             self._time_labels = (tlabel1, tlabel2)
 
             tuv1, = struct.unpack('<H', f.read(2))
