@@ -218,6 +218,7 @@ class TSyncFile:
             if major_version != TSYNC_VERSION_MAJOR or minor_version > TSYNC_VERSION_MINOR:
                 raise Exception('Can not read TSync format version {} (max {}.{})'.format(
                         self._format_version, TSYNC_VERSION_MAJOR, TSYNC_VERSION_MINOR))
+            log.debug('Reading tsync {} file: {}'.format(self._format_version, fname))
             check_xxh = major_version >= 1 and minor_version >= 2
             if not check_xxh:
                 log.warning('Tsync file version ({}) is too old, checksum validation for integrity checks will be skipped.'.format(self._format_version))
@@ -427,6 +428,7 @@ class LegacyTSyncFile:
             self._format_version, = struct.unpack('<I', f.read(4))
             if self._format_version != 1:
                 raise Exception('Can not read TSync format version {}'.format(self._format_version))
+            log.debug('Reading legacy tsync file: {}'.format(fname))
 
             ts, = struct.unpack('<q', f.read(8))
             self._time_created = datetime.utcfromtimestamp(ts)
