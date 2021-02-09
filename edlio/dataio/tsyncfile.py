@@ -26,7 +26,7 @@ from enum import IntEnum
 from datetime import datetime
 from uuid import UUID
 from xxhash import xxh3_64
-from . import ureg
+from .. import ureg
 
 
 __all__ = ['TSyncFile', 'TSyncFileMode', 'TSyncTimeUnit']
