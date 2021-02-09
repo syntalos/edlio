@@ -6,9 +6,9 @@
 import sys, struct, os
 
 def read_qstring(fid):
-    """Read Qt style QString.  
+    """Read Qt style QString.
 
-    The first 32-bit unsigned number indicates the length of the string (in bytes).  
+    The first 32-bit unsigned number indicates the length of the string (in bytes).
     If this number equals 0xFFFFFFFF, the string is null.
 
     Strings are stored as unicode.
@@ -33,9 +33,9 @@ def read_qstring(fid):
         a = ''.join([chr(c) for c in data])
     else:
         a = ''.join([unichr(c) for c in data])
-    
+
     return a
-  
+
 if __name__ == '__main__':
     a=read_qstring(open(sys.argv[1], 'rb'))
     print(a)

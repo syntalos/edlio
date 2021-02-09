@@ -1,10 +1,9 @@
 #! /bin/env python
 #
 # Michael Gibson 17 July 2015
-# Modified Adrian Foy Sep 2018
+# Modified Adrian Foy February 2021
 
-import os
-import time
+import sys, struct, math, os, time
 import numpy as np
 
 from .read_header import read_header
@@ -170,7 +169,7 @@ def read_intan_data(filename):
 
         # If the software notch filter was selected during the recording, apply the
         # same notch filter to amplifier data here.
-        if header['notch_filter_frequency'] > 0:
+        if header['notch_filter_frequency'] > 0 and header['version']['major'] < 3:
             print('Applying notch filter...')
 
             print_increment = 10
