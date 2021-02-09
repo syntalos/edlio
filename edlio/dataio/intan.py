@@ -133,7 +133,7 @@ def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_i
     return tv_adj, i
 
 
-def load_data(part_paths, aux_data, do_timesync=True):
+def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False):
     ''' Load Intan RHD signals data and apply time synchronization. '''
 
     start_offset_usec = 0
@@ -190,6 +190,12 @@ def load_data(part_paths, aux_data, do_timesync=True):
                                      data_pos_idx,
                                      start_offset_usec)
         reader._sync_ts = tvec
+
+        if include_nosync_time:
+            reader._nosync_ts = make_nosync_tsvec(data_len,
+                                                  sample_rate,
+                                                  data_pos_idx,
+                                                  start_offset_usec)
 
         data_pos_idx = data_pos_idx + data_len
         yield reader
