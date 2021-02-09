@@ -21,7 +21,8 @@ setup(
     install_requires=[
         'toml>=0.10',
         'numpy>=1.17',
-        'xxhash>=2.0'
+        'xxhash>=2.0',
+        'pint>=0.10'
     ],
     python_requires='>=3.8',
     platforms=['any'],

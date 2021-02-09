@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -26,6 +26,7 @@ from enum import IntEnum
 from datetime import datetime
 from uuid import UUID
 from xxhash import xxh3_64
+from . import ureg
 
 
 __all__ = ['TSyncFile', 'TSyncFileMode', 'TSyncTimeUnit']
@@ -82,6 +83,20 @@ def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType):
     if dtype == TSyncDataType.UINT64:
         return '<Q', 8
     raise Exception('No data defined for how to unpack type {}'.format(dtype))
+
+
+def tsync_time_unit_to_punit(unit: TSyncTimeUnit):
+    if unit == TSyncTimeUnit.INDEX:
+        return ureg.dimensionless
+    if unit == TSyncTimeUnit.NANOSECONDS:
+        return ureg.nsec
+    if unit == TSyncTimeUnit.MICROSECONDS:
+        return ureg.usec
+    if unit == TSyncTimeUnit.MILLISECONDS:
+        return ureg.msec
+    if unit == TSyncTimeUnit.SECONDS:
+        return ureg.sec
+    raise Exception('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
 
 
 def read_utf8_xxh_from_file(f, xxh):
@@ -243,7 +258,8 @@ class TSyncFile:
             time2DType = TSyncDataType(self._read_xxh_unpack('<H', f.read(2)))
 
             self._time_labels = (time1Name, time2Name)
-            self._time_units = (time1Unit, time2Unit)
+            self._time_units = (tsync_time_unit_to_punit(time1Unit),
+                                tsync_time_unit_to_punit(time2Unit))
 
             # skip alignment padding
             padding = (f.tell() * -1) & (8 - 1)
@@ -344,8 +360,8 @@ class LegacyTSyncFile:
         self._generator_name = ''
         self._custom = {}
         self._time_labels = ('A', 'B')
-        self._time_units = (TSyncTimeUnit.MICROSECONDS,
-                            TSyncTimeUnit.MICROSECONDS)
+        self._time_units = (tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
+                            tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS))
         self._times = np.empty((0, 2))
         if fname:
             self.open(fname)

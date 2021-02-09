@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -22,17 +22,25 @@ __version__ = "0.0.2"
 
 import os
 import toml
+import pint
 from .unit import EDLError
 from .group import EDLGroup
 from .collection import EDLCollection
 from .dataset import EDLDataset
 
 
-__all__ = ['EDLError',
+__all__ = ['ureg',
+           'Q_',
+           'EDLError',
            'EDLGroup',
            'EDLCollection',
            'EDLDataset',
            'load']
+
+
+# Pint default registry for unit conversions
+ureg = pint.get_application_registry()
+Q_ = ureg.Quantity
 
 
 def load(path):

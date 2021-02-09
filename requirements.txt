@@ -1,3 +1,4 @@
 toml>=0.10
 numpy>=1.17
 xxhash>=2.0
+pint>=0.10
