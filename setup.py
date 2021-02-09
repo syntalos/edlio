@@ -23,7 +23,7 @@ setup(
         'numpy>=1.17',
         'xxhash>=2.0'
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.8',
     platforms=['any'],
 
     packages=packages
