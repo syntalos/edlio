@@ -143,13 +143,16 @@ def load_data(part_paths, aux_data, do_timesync=True):
         tsf_count = 0
         for tsf in aux_data.read():
             if tsf.sync_mode != TSyncFileMode.SYNCPOINTS:
-                raise Exception('Can not synchronize RHD signal timestamps using a tsync file that is not in \'syncpoints\' mode.')
+                raise Exception('Can not synchronize RHD signal timestamps using a tsync file that is ' +
+                                'not in \'syncpoints\' mode.')
             if tsf.time_units != (ureg.usec, ureg.usec):
-                raise Exception('For RHD signal synchronization, both timestamp units in tsync file must be microseconds. Found: {}'.format(tsf.time_units))
+                raise Exception('For RHD signal synchronization, both timestamp units in tsync file must be ' +
+                                'microseconds. Found: {}'.format(tsf.time_units))
             sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
             tsf_count += 1
         if tsf_count > 1:
-            log.warning('More than one tsync file found for Intan data - this is unusual and not a well-tested scenario.')
+            log.warning('More than one tsync file found for Intan data ' +
+                        '- this is unusual and not a well-tested scenario.')
 
         # the very first entry in the tsync file is the initial Intan to master-clock offset
         start_offset = sync_map[0][0] - sync_map[0][1]
@@ -157,7 +160,8 @@ def load_data(part_paths, aux_data, do_timesync=True):
     sync_idx = 0
     data_pos_idx = 0
     has_sync_info = sync_map.size > 0
-    log.info('Initial RHD time offset: {} µs ({})'.format(start_offset.magnitude, 'sync info found' if has_sync_info else 'no sync info'))
+    log.info('Initial RHD time offset: {} µs ({})'
+             .format(start_offset.magnitude, 'sync info found' if has_sync_info else 'no sync info'))
 
     # skip initial base offset sync point
     sync_map = sync_map[1:, :]

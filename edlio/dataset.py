@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -30,7 +30,7 @@ class EDLDataPart:
     index: int = -1
     fname: str = None
 
-    def __init__(self, fname: str, index: int=-1):
+    def __init__(self, fname: str, index: int = -1):
         self.fname = fname
         self.index = index
 
@@ -50,7 +50,7 @@ class EDLDataFile:
 
     parts = []
 
-    def __init__(self, base_path, media_type:str=None, file_type:str=None):
+    def __init__(self, base_path, media_type: str = None, file_type: str = None):
         self._base_path = base_path
         self._media_type = media_type
         self._file_type = file_type
@@ -88,7 +88,7 @@ class EDLDataFile:
         for part in self.parts:
             yield os.path.join(self._base_path, part.fname)
 
-    def new_part(self, fname: str, index: int=-1, *, allow_exists=False):
+    def new_part(self, fname: str, index: int = -1, *, allow_exists=False):
         if not fname:
             raise ValueError('File name is not valid.')
         _, fext = os.path.splitext(fname)
@@ -116,7 +116,8 @@ class EDLDataFile:
 
         dclass = self.media_type if self.media_type else self.file_type
         if not dclass:
-            raise EDLError('This data file has no type association. EDL metadata was probably invalid, or this file does not exist.')
+            raise EDLError('This data file has no type association. EDL metadata was probably invalid, ' +
+                           'or this file does not exist.')
         if dclass.startswith('video/'):
             dclass = 'video'
         elif dclass.startswith('text/csv'):

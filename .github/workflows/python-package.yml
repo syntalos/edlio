@@ -39,5 +39,4 @@ jobs:
 
     - name: Lint with flake8
       run: |
-        # ignore issues for now
-        flake8 ./edlio ./tests --show-source --statistics || true
+        flake8 ./edlio ./tests --show-source --statistics

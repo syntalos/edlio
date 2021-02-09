@@ -129,8 +129,8 @@ class TSyncFile:
         self._block_size = 128
         self._custom = {}
         self._time_labels = ('A', 'B')
-        self._time_units = (TSyncTimeUnit.MICROSECONDS,
-                            TSyncTimeUnit.MICROSECONDS)
+        self._time_units = (tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
+                            tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS))
         self._times = np.empty((0, 2))
         if fname:
             self.open(fname)
@@ -236,7 +236,8 @@ class TSyncFile:
             log.debug('Reading tsync {} file: {}'.format(self._format_version, fname))
             check_xxh = major_version >= 1 and minor_version >= 2
             if not check_xxh:
-                log.warning('Tsync file version ({}) is too old, checksum validation for integrity checks will be skipped.'.format(self._format_version))
+                log.warning(('Tsync file version ({}) is too old, checksum validation for ' +
+                            'integrity checks will be skipped.').format(self._format_version))
 
             self._time_created = datetime.utcfromtimestamp(self._read_xxh_unpack('<q', f.read(8)))
             self._generator_name = self._read_utf8_xxh_from_file(f)
@@ -271,9 +272,11 @@ class TSyncFile:
                 block_term, = struct.unpack('<Q', f.read(8))
                 expected_header_cs, = struct.unpack('<Q', f.read(8))
                 if block_term != TSYNC_BLOCK_TERM:
-                    raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
+                    raise Exception('Header block terminator not found: The file is either invalid ' +
+                                    'or its header block was damaged.')
                 if expected_header_cs != self._xxh.intdigest():
-                    raise Exception('Header checksum mismatch: The file is either invalid or its header block was damaged.')
+                    raise Exception('Header checksum mismatch: The file is either invalid or ' +
+                                    'its header block was damaged.')
             else:
                 term_bytecount = 8
                 block_term, = struct.unpack('<I', f.read(4))
@@ -284,7 +287,8 @@ class TSyncFile:
                     block_term, = struct.unpack('<I', f.read(4))
                     expected_header_crc, = struct.unpack('<I', f.read(4))
                     if block_term != TSYNC_BLOCK_TERM_32:
-                        raise Exception('Header block terminator not found: The file is either invalid or its header block was damaged.')
+                        raise Exception('Header block terminator not found: The file is either invalid or ' +
+                                        'its header block was damaged.')
 
             self._xxh.reset()
 
@@ -301,7 +305,8 @@ class TSyncFile:
                 return
 
             whole_block_count = bytes_remaining // bytes_per_block
-            last_block_len = (bytes_remaining - (whole_block_count * bytes_per_block) - term_bytecount) / bytes_per_entry
+            last_block_len = (bytes_remaining - (whole_block_count * bytes_per_block)
+                              - term_bytecount) / bytes_per_entry
             if last_block_len.is_integer():
                 last_block_len = int(last_block_len)
             else:
@@ -467,8 +472,8 @@ class LegacyTSyncFile:
 
             tuv1, = struct.unpack('<H', f.read(2))
             tuv2, = struct.unpack('<H', f.read(2))
-            self._time_units = (TSyncTimeUnit(tuv1),
-                                TSyncTimeUnit(tuv2))
+            self._time_units = (tsync_time_unit_to_punit(TSyncTimeUnit(tuv1)),
+                                tsync_time_unit_to_punit(TSyncTimeUnit(tuv2)))
 
             self._times = np.empty((0, 2))
             bytes_per_block = 4 + 8 + 8

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -19,7 +19,8 @@
 
 import numpy as np
 import cv2 as cv
-from .tsyncfile import TSyncFileMode, TSyncTimeUnit
+from .tsyncfile import TSyncFileMode
+from .. import ureg
 
 
 class Frame:
@@ -49,13 +50,15 @@ def load_data(part_paths, aux_data):
             for tsf in aux_data.read():
                 if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
                     raise Exception('Can not synchronize video timestamps using a non-continuous tsync file.')
-                if tsf.time_units[0] != TSyncTimeUnit.INDEX:
+                if tsf.time_units[0] != ureg.dimensionless:
                     raise Exception('Unit of first time in tsync mapping has to be \'index\' for video files.')
-                if tsf.time_units[1] != TSyncTimeUnit.MILLISECONDS:
-                    raise Exception('We currently expect video timestamps to be in milliseconds (unit was {}).'.format(tsf.time_units[1]))
-                sync_map = np.vstack((sync_map, tsf.times))
+                if tsf.time_units[1] != ureg.msec:
+                    raise Exception('We currently expect video timestamps to be in milliseconds (unit was {}).'
+                                    .format(tsf.time_units[1]))
+                sync_map = np.vstack((sync_map, tsf.times)) * ureg.msec
         else:
-            raise Exception('Unknown auxiliary data type ({}|{}) for video file.'.format(aux_data.file_type, aux_data.media_type))
+            raise Exception('Unknown auxiliary data type ({}|{}) for video file.'
+                            .format(aux_data.file_type, aux_data.media_type))
 
     frame_index = 0
     for fname in part_paths:
@@ -64,6 +67,7 @@ def load_data(part_paths, aux_data):
             ret, mat = vc.read()
             if not ret:
                 break
-            frame = Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0]) if sync_map is not None else Frame(mat, -1, frame_index)
+            frame = Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0]) \
+                if sync_map is not None else Frame(mat, -1, frame_index)
             yield frame
             frame_index += 1
