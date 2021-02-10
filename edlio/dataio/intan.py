@@ -38,6 +38,7 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         IntanRawIO.__init__(self, filename=intan_filename)
         BaseFromRaw.__init__(self, intan_filename)
         self._sync_ts = None
+        self._timestamp_len = 0
 
     def _parse_header(self):
         IntanRawIO._parse_header(self)
@@ -52,14 +53,15 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         return self._sync_ts
 
 
-def make_nosync_tsvec(data_len, sample_rate, index_offset, start_offset):
+def make_nosync_tsvec(data_len, sample_rate, init_offset):
     ''' Create time vector taking only the start time into account. '''
     tv = np.arange(0, data_len).astype(np.float64)
-    tv = ((tv + index_offset) / sample_rate).to(ureg.msec) - start_offset.to(ureg.msec)
+    tv = (tv / sample_rate).to(ureg.msec) - init_offset.to(ureg.msec)
+
     return tv
 
 
-def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_idx, init_offset):
+def make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
     '''
     Create time vector, synchronizing all timepoints.
 
@@ -81,20 +83,16 @@ def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_i
     structure of the data).
     '''
 
-    tv_adj = np.zeros((data_len, ), dtype=np.float64) * ureg.msec
+    sync_len = sync_map.shape[0]
+    if sync_len <= 1:
+        # nothing to synchronize, just return the shifted vector
+        log.debug('Intan time sync map was too short for synchronization, returning timeshifted timestamp vector.')
+        return make_nosync_tsvec(data_len, sample_rate, init_offset)
+
+    tv_adj = np.zeros((data_len,), dtype=np.float64) * ureg.msec
     init_offset = init_offset.to(ureg.msec)
 
-    # convert to seconds and multiply with sampling rate to obtain sample indices
-    idx_intan = (sync_map[:, 0].to(ureg.seconds).magnitude * sample_rate.magnitude) + index_offset
-    idx_intan = idx_intan.astype(np.int32)
-
-    sync_len = sync_map.shape[0]
-    if (init_sync_idx + 1) >= sync_len:
-        # nothing to synchronize, just return the shifted vector
-        tv_adj = make_nosync_tsvec(data_len, sample_rate, index_offset, init_offset)
-        return tv_adj, sync_len
-
-    for i in range(init_sync_idx, sync_len - 1):
+    for i in range(sync_len - 1):
         # beginning of the 'frame' in master clock time
         m_start = sync_map[i, 1].to(ureg.msec)
         # end of the 'frame' in master clock time
@@ -105,32 +103,33 @@ def make_synced_tsvec(data_len, sample_rate, sync_map, index_offset, init_sync_i
         # end of the 'frame' in Intan sample indices
         d_end = idx_intan[i + 1] + 1
         if d_end > data_len:
+            log.error(('Intan sync index is bigger than the amount of recorded data ({} > {}). '
+                       'This means data may be missing or the time-sync files does not belong to this dataset')
+                      .format(d_end, data_len))
+            # try to do something semi-sensible, then abort as there is nothing we can do anymore
             d_end = data_len
-
-        # obtain time-vector slice indices
-        t_start = d_start - index_offset
-        t_end = d_end - index_offset
-
-        # linear interpolation between the beginning time point and the end time point
-        # from the beginning sample index up to the end sample index
-        tv_adj[t_start:t_end] = np.linspace(m_start, m_end, d_end - d_start) - init_offset
+            tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start) - init_offset
+            break
 
         # initial timepoint: just use the same slope and extrapolate to the beginning
         if i == 0:
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = np.arange(0, d_start + 1) * slope_part
-            tv_adj[0:t_start + 1] = (values_part - values_part[-1] + tv_adj[d_start]) - init_offset
+            tv_adj[0:d_start + 1] = (values_part - values_part[-1] + tv_adj[d_start]) - init_offset
+            continue
 
         # last timepoint: just use the same slope and extrapolate to the end
         if i == (sync_len - 2):
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = (np.arange(d_end, data_len) - d_end) * slope_part
-            tv_adj[t_end:data_len + 1] = (values_part + tv_adj[d_end - 1]) - init_offset
-
-        if d_end == data_len:
+            tv_adj[d_end:data_len + 1] = (values_part + tv_adj[d_end - 1]) - init_offset
             break
 
-    return tv_adj, i
+        # linear interpolation between the beginning time point and the end time point
+        # from the beginning sample index up to the end sample index
+        tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start) - init_offset
+
+    return tv_adj
 
 
 def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False):
@@ -157,8 +156,6 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
         # the very first entry in the tsync file is the initial Intan to master-clock offset
         start_offset = sync_map[0][0] - sync_map[0][1]
 
-    sync_idx = 0
-    data_pos_idx = 0
     has_sync_info = sync_map.size > 0
     log.info('Initial RHD time offset: {} µs ({})'
              .format(start_offset.magnitude, 'sync info found' if has_sync_info else 'no sync info'))
@@ -166,36 +163,52 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
     # skip initial base offset sync point
     sync_map = sync_map[1:, :]
 
+    intan_readers = []
     for fname in part_paths:
         reader = SyncIntanReader(fname)
         if not has_sync_info:
             yield reader
             continue
+        # data is lazily loaded from an mmap'ed file, so we can stash all readers here for now
+        intan_readers.append(reader)
 
-        reader._sync_map = sync_map
-
-        sample_rate = reader._max_sampling_rate * ureg.hertz
-        data_len = reader._raw_data['timestamp'].shape[0]
-
-        if do_timesync:
-            tvec, sync_idx = make_synced_tsvec(data_len,
-                                               sample_rate,
-                                               sync_map,
-                                               data_pos_idx,
-                                               sync_idx,
-                                               start_offset)
+    # sanity checks and collect absolute data length of the whole recording
+    recording_data_len = 0
+    sample_rate = None
+    for reader in intan_readers:
+        if sample_rate is None:
+            sample_rate = reader._max_sampling_rate * ureg.hertz
         else:
-            tvec = make_nosync_tsvec(data_len,
-                                     sample_rate,
-                                     data_pos_idx,
-                                     start_offset)
-        reader._sync_ts = tvec
+            if sample_rate != reader._max_sampling_rate * ureg.hertz:
+                raise Exception(('Samplig rate in Intan recording slice file differs from previous files. '
+                                'The data may not belong to the same recording.'))
+        reader._timestamp_len = reader._raw_data['timestamp'].flatten().size
+        recording_data_len += reader._timestamp_len
+
+    # convert to seconds and multiply with sampling rate to obtain sample indices
+    intan_sync_idx = (sync_map[:, 0].to(ureg.seconds) * sample_rate).magnitude
+    intan_sync_idx = intan_sync_idx.astype(np.int32)
+
+    if do_timesync:
+        tvec = make_synced_tsvec(recording_data_len,
+                                 sample_rate,
+                                 intan_sync_idx,
+                                 sync_map,
+                                 start_offset)
+    if include_nosync_time or not do_timesync:
+        tvec_noadj = make_nosync_tsvec(recording_data_len,
+                                       sample_rate,
+                                       start_offset)
+        if not do_timesync:
+            tvec = tvec_noadj
+
+    last_ts_idx = 0
+    for reader in intan_readers:
+        ts_len = reader._timestamp_len
 
         if include_nosync_time:
-            reader._nosync_ts = make_nosync_tsvec(data_len,
-                                                  sample_rate,
-                                                  data_pos_idx,
-                                                  start_offset)
+            reader._nosync_ts = tvec_noadj[last_ts_idx:ts_len]
 
-        data_pos_idx = data_pos_idx + data_len
+        reader._sync_ts = tvec[last_ts_idx:ts_len]
+        last_ts_idx = ts_len
         yield reader
