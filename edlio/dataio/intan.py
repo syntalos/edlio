@@ -207,10 +207,10 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
         ts_len = reader._timestamp_len
 
         if include_nosync_time:
-            reader._nosync_ts = tvec_noadj[last_ts_idx:ts_len]
+            reader._nosync_ts = tvec_noadj[last_ts_idx:last_ts_idx+ts_len]
 
-        reader._sync_ts = tvec[last_ts_idx:ts_len]
-        last_ts_idx = ts_len
+        reader._sync_ts = tvec[last_ts_idx:last_ts_idx+ts_len]
+        last_ts_idx += ts_len
 
         digin_raw = reader._raw_data['DIGITAL-IN'].flatten()
         if digin_raw.size > 0:
