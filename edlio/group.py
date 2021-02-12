@@ -29,7 +29,18 @@ class EDLGroup(EDLUnit):
     An EDL Group
     '''
 
-    def __init__(self, name=None):
+    def __init__(self, name: str = None):
+        '''
+        Create a new EDL group.
+
+        If the group has no name and path set, it can not be saved
+        to disk.
+
+        Parameters
+        ----------
+        name
+            Name of this group, or None
+        '''
         EDLUnit.__init__(self, name)
         self._children = []
 

@@ -21,10 +21,20 @@ import string
 import random
 
 
-def sanitize_name(name: str):
+def sanitize_name(name: str) -> str:
     '''
     Sanitize a string for use as an EDL unit name,
     by stripping or replacing invalid characters.
+
+    Parameters
+    ----------
+    name
+        A string to sanitize.
+
+    Returns
+    -------
+    str
+        The sanitized name.
     '''
     if not name:
         return None

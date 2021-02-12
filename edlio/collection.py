@@ -26,10 +26,22 @@ class EDLCollection(EDLGroup):
     '''
 
     def __init__(self, name=None):
+        '''
+        Create a new EDL collection.
+
+        If the collection has no name and path set, it can not be saved
+        to disk.
+
+        Parameters
+        ----------
+        name
+            Name of this collection, or None
+        '''
         EDLGroup.__init__(self, name)
 
     @property
-    def generator_id(self):
+    def generator_id(self) -> str:
+        ''' Identification string of the software which generated this EDL unit. '''
         return self._generator_id
 
     @generator_id.setter

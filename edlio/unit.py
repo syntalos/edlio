@@ -20,6 +20,7 @@
 import os
 import uuid
 import toml
+from typing import Union
 from datetime import datetime
 from .utils import sanitize_name
 
@@ -124,9 +125,11 @@ class EDLUnit:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e)))
 
-    def load(self, path, mf={}):
+    def load(self, path: Union[str, os.PathLike[str]], mf={}):
         if not os.path.isdir(path):
             raise EDLError('Can not load unit from path "{}": Does not specify an existing directory'.format(path))
+
+        path = str(path)
         self._name = os.path.basename(path.rstrip('/\\'))
         self._root_path = os.path.abspath(os.path.join(path, '..'))
 

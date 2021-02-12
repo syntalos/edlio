@@ -136,6 +136,17 @@ class EDLDataset(EDLUnit):
     '''
 
     def __init__(self, name=None):
+        '''
+        Create a new EDL dataset.
+
+        If the dataset has no name and path set, it can not be saved
+        to disk.
+
+        Parameters
+        ----------
+        name
+            Name of this dataset, or None
+        '''
         EDLUnit.__init__(self, name)
         self._data = EDLDataFile(self.path)
         self._aux_data = EDLDataFile(self.path)

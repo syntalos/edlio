@@ -23,6 +23,7 @@ __version__ = "0.0.2"
 import os
 import toml
 import pint
+from typing import Union
 from .unit import EDLError
 from .group import EDLGroup
 from .collection import EDLCollection
@@ -43,8 +44,25 @@ ureg = pint.get_application_registry()
 Q_ = ureg.Quantity
 
 
-def load(path):
-    '''Open an EDL unit via its filesystem path'''
+def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, EDLDataset]:
+    '''
+    Open an EDL unit via its filesystem path.
+
+    This function will read an EDL unit on the filesystem and return
+    an object representing it.
+    Depending on the type of the EDL unit, the returned datatype may be
+    a collection, group or dataset.
+
+    Parameters
+    ----------
+    path
+        The filesystem location of the EDL unit.
+
+    Returns
+    -------
+    EDLCollection, EDLGroup, EDLDataset
+        An EDL unit.
+    '''
 
     mf_path = os.path.join(path, 'manifest.toml')
     if not os.path.isfile(mf_path):
