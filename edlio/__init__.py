@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-__appname__ = "edlio"
-__version__ = "0.0.2"
+from __future__ import annotations
+
+__appname__ = 'edlio'
+__version__ = '0.0.2'
 
 import os
 import toml
