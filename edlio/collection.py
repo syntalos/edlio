@@ -35,3 +35,25 @@ class EDLCollection(EDLGroup):
     @generator_id.setter
     def generator_id(self, v: str):
         self._generator_id = v
+
+    @property
+    def collection_idname(self) -> str:
+        '''
+        Retrieve a human-readable string for this collection which is
+        most likely (but not guaranteed to be) unique.
+        If this collection has no properties set, the value of this property
+        may be None or empty.
+        The format of the returned string is arbitrary and should not be parsed.
+        '''
+        parts = []
+        subject_id = self.attributes.get('subject_id')
+        if subject_id:
+            parts.append(str(subject_id))
+        if self.name:
+            parts.append(str(self.name))
+        if self.time_created:
+            parts.append(self.time_created.strftime('%y-%m-%d'))
+        if self.collection_id:
+            parts.append(str(self.collection_id)[:6])
+
+        return '_'.join(parts).replace(' ', '')
