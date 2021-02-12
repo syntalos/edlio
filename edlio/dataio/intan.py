@@ -39,6 +39,7 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         BaseFromRaw.__init__(self, intan_filename)
         self._sync_ts = None
         self._timestamp_len = 0
+        self._digin_channels = None
 
     def _parse_header(self):
         IntanRawIO._parse_header(self)
@@ -51,6 +52,24 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
     @property
     def sync_times(self):
         return self._sync_ts
+
+    @property
+    def digin_channels_raw(self):
+        ''' Obtain the raw data of digital input channels '''
+        if self._digin_channels is not None:
+            return self._digin_channels
+
+        ts_len = self._timestamp_len
+        digin_raw = self._raw_data['DIGITAL-IN'].flatten()
+        if digin_raw.size > 0:
+            # FIXME: We just assume 16 digital channels. This code should actually go into NEO
+            # in a better form, instead of being hacked in here
+            digin_chan_n = 16
+            self._digin_channels = np.zeros((digin_chan_n, ts_len), dtype=bool)
+            for i in range(0, digin_chan_n):
+                self._digin_channels[i, :] = \
+                    np.not_equal(np.bitwise_and(digin_raw, (1 << i)), 0)
+        return self._digin_channels
 
 
 def _make_nosync_tsvec(data_len, sample_rate, init_offset):
@@ -211,15 +230,5 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
 
         reader._sync_ts = tvec[last_ts_idx:last_ts_idx+ts_len]
         last_ts_idx += ts_len
-
-        digin_raw = reader._raw_data['DIGITAL-IN'].flatten()
-        if digin_raw.size > 0:
-            # FIXME: We just assume 16 digital channels, this code should actually go into NEO
-            # in a better form, instead of being hacked in here
-            digin_chan_n = 16
-            reader._digin_channels = np.zeros((digin_chan_n, ts_len), dtype=bool)
-            for i in range(0, digin_chan_n):
-                reader._digin_channels[i, :] = \
-                    np.not_equal(np.bitwise_and(digin_raw, (1 << i)), 0)
 
         yield reader
