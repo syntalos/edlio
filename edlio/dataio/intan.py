@@ -31,7 +31,11 @@ from .. import ureg
 
 
 class SyncIntanReader(IntanRawIO, BaseFromRaw):
-    __doc__ = IntanRawIO.__doc__
+    ''' Reader for Intan electrophysiology data.
+
+    This class is the same as IntanIO from NEO, but additionally also provides
+    synchronized timestamps in its :meth:`sync_times` property.
+    '''
     _prefered_signal_group_mode = 'group-by-same-units'
 
     def __init__(self, intan_filename):
@@ -51,6 +55,7 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
     @property
     def sync_times(self):
+        ''' Synchronized timestamps vector '''
         return self._sync_ts
 
     @property
@@ -152,7 +157,11 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
 
 
 def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False):
-    ''' Load Intan RHD signals data and apply time synchronization. '''
+    ''' Entry point for automatic dataset loading.
+
+    This function is used internally to load Intan RHD signals data
+    and apply time synchronization.
+    '''
 
     start_offset = 0 * ureg.usec
     sync_map = np.empty([0, 2])

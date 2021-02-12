@@ -501,7 +501,11 @@ class LegacyTSyncFile:
 
 
 def load_data(part_paths, aux_data):
-    ''' Entry point for automatic dataset loading '''
+    ''' Entry point for automatic dataset loading.
+
+    This function is used internally to Syntalos' .tsync files
+    as data or auxiliary data.
+    '''
     for fname in part_paths:
         if LegacyTSyncFile.is_legacy(fname):
             tsync = LegacyTSyncFile(fname)

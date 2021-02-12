@@ -29,13 +29,28 @@ class Frame:
     index: int
 
     def __init__(self, mat, time, index):
+        ''' Create a new frame representation for a video file.
+
+        Parameters
+        ----------
+        mat
+            OpenCV matrix containing the image data.
+        time
+            Time as quantity (usually in milliseconds)
+        index
+            An optional frame index that increases monotonically.
+        '''
         self.mat = mat
         self.time = time
         self.index = index
 
 
 def load_data(part_paths, aux_data):
-    ''' Entry point for automatic dataset loading '''
+    ''' Entry point for automatic dataset loading.
+
+    This function is used internally to load data from a video and expose
+    it as stream of frames.
+    '''
     sync_map = None
     if aux_data:
         if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':

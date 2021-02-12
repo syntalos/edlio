@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -21,7 +21,10 @@ import csv
 
 
 def load_data(part_paths, aux_data):
-    ''' Entry point for automatic dataset loading '''
+    ''' Entry point for automatic dataset loading.
+
+    This function is used internally to load CSV data.
+    '''
     for fname in part_paths:
         with open(fname, newline='') as f:
             reader = csv.reader(f, delimiter=';')
