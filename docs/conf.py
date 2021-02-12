@@ -1,7 +1,7 @@
 # Configuration file for the Sphinx documentation builder.
 
-from jupyter_sphinx_theme import *
-init_theme()
+import os
+import sys
 
 # -- Project information -----------------------------------------------------
 
@@ -12,14 +12,37 @@ author = 'Matthias Klumpp'
 # The full version, including alpha/beta/rc tags
 release = '0.1'
 
-
 # -- General configuration ---------------------------------------------------
+sys.path.insert(0, os.path.abspath('..'))
+
+html_theme = 'cloud'
+html_theme_options = {'borderless_decor': True,
+                      'lighter_header_decor': True,
+                      'roottarget': 'index'}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.coverage',
+              'sphinx.ext.napoleon',
+              'sphinx.ext.intersphinx']
+
+# Napoleon settings
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+
+# Intersphinx
+intersphinx_mapping = {'python':('https://docs.python.org/3', None),
+                       'numpy': ('https://numpy.org/doc/stable', None),
+                       'pint':  ('https://pint.readthedocs.io/en/latest', None),
+                       'neo':   ('https://neo.readthedocs.io/en/stable', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

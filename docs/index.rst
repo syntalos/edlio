@@ -8,8 +8,7 @@ Experiment Directory Layout
    intro.rst
    metadata.rst
    dataformats.rst
-
-
+   edlio/modules.rst
 
 Indices and tables
 ==================
