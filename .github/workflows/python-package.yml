@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.7', '3.8']
+        python-version: ['3.8', '3.9']
 
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +22,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt-get install -yq --no-install-recommends llvm
         python -m pip install --upgrade pip wheel
         python -m pip install flake8 pytest
         python -m pip install -r requirements.txt
@@ -31,7 +30,7 @@ jobs:
     - name: Build & install
       run: |
         python ./setup.py build
-        python ./setup.py install --single-version-externally-managed --root=/tmp
+        python ./setup.py install --root=/tmp
 
     #- name: Test with pytest
     #  run: |
