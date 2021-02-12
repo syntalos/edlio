@@ -13,11 +13,15 @@ author = 'Matthias Klumpp'
 release = '0.1'
 
 # -- General configuration ---------------------------------------------------
-sys.path.insert(0, os.path.abspath('..'))
+thisfile = __file__
+if not os.path.isabs(thisfile):
+    thisfile = os.path.normpath(os.path.join(os.getcwd(), thisfile))
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(thisfile), '..')))
 
 html_theme = 'cloud'
 html_theme_options = {'borderless_decor': True,
                       'lighter_header_decor': True,
+                      'min_height': '16cm',
                       'roottarget': 'index'}
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -26,7 +30,8 @@ html_theme_options = {'borderless_decor': True,
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.coverage',
               'sphinx.ext.napoleon',
-              'sphinx.ext.intersphinx']
+              'sphinx.ext.intersphinx',
+              'sphinx_autodoc_typehints']
 
 # Napoleon settings
 napoleon_google_docstring = False
