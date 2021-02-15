@@ -68,7 +68,7 @@ def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, E
 
     mf_path = os.path.join(path, 'manifest.toml')
     if not os.path.isfile(mf_path):
-        raise EDLError('This directory is no valid EDL unit.')
+        raise EDLError('The directory "{}" is no valid EDL unit.'.format(path))
 
     with open(os.path.join(mf_path), 'r') as f:
         mf = toml.load(f)
