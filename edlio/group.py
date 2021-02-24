@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import os
 import uuid
 import toml
@@ -42,7 +44,7 @@ class EDLGroup(EDLUnit):
             Name of this group, or None
         '''
         EDLUnit.__init__(self, name)
-        self._children = []
+        self._children: list[EDLUnit] = []
 
     @property
     def children(self):
@@ -53,7 +55,7 @@ class EDLGroup(EDLUnit):
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str) -> str:
+    def root_path(self, path: str):
         self._root_path = path
         for c in self._children:
             c.root_path = self.path
@@ -73,7 +75,7 @@ class EDLGroup(EDLUnit):
         for c in self._children:
             c.root_path = self.path
 
-    def add_child(self, child):
+    def add_child(self, child: EDLUnit):
         if not isinstance(child, EDLUnit):
             raise ValueError('Can only have EDL units as children.')
         if not child.name:

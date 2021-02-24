@@ -25,7 +25,7 @@ __version__ = '0.0.3'
 import os
 import toml
 import pint
-from typing import Union
+from typing import Union, Any
 from .unit import EDLError
 from .group import EDLGroup
 from .collection import EDLCollection
@@ -74,6 +74,7 @@ def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, E
         mf = toml.load(f)
 
     unit_type = mf.get('type')
+    unit: Any = None
     if unit_type == 'collection':
         unit = EDLCollection()
     elif unit_type == 'group':

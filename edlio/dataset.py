@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import os
 import functools
 from .unit import EDLUnit, EDLError
@@ -48,7 +50,7 @@ class EDLDataPart:
 class EDLDataFile:
     ''' A data file, associated with a dataset '''
 
-    parts = []
+    parts: list[EDLDataPart] = []
 
     def __init__(self, base_path, media_type: str = None, file_type: str = None):
         self._base_path = base_path
@@ -65,7 +67,7 @@ class EDLDataFile:
         return self._media_type
 
     @media_type.setter
-    def media_type(self, mime: str) -> str:
+    def media_type(self, mime: str):
         self._media_type = mime
 
     @property
