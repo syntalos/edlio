@@ -310,7 +310,8 @@ class TSyncFile:
             if last_block_len.is_integer():
                 last_block_len = int(last_block_len)
             else:
-                raise Exception('File may be corrupt: Suspicious size of last data block.')
+                raise Exception('File "{}" may be corrupt: Suspicious size ({}) of last data block.'
+                                .format(fname, last_block_len))
             entries_n = whole_block_count * self._block_size + last_block_len
 
             self._times = np.zeros((entries_n, 2), dtype=np.int64)
