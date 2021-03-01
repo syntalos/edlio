@@ -305,13 +305,16 @@ class TSyncFile:
                 return
 
             whole_block_count = bytes_remaining // bytes_per_block
-            last_block_len = (bytes_remaining - (whole_block_count * bytes_per_block)
-                              - term_bytecount) / bytes_per_entry
-            if last_block_len.is_integer():
-                last_block_len = int(last_block_len)
+            last_block_bytes_remaining = bytes_remaining - (whole_block_count * bytes_per_block)
+            if last_block_bytes_remaining == 0:
+                last_block_len = 0
             else:
-                raise Exception('File "{}" may be corrupt: Suspicious size ({}) of last data block.'
-                                .format(fname, last_block_len))
+                last_block_len = (last_block_bytes_remaining - term_bytecount) / bytes_per_entry
+                if last_block_len.is_integer() and last_block_len > 0:
+                    last_block_len = int(last_block_len)
+                else:
+                    raise Exception('File "{}" may be corrupt: Suspicious size ({}) of last data block.'
+                                    .format(fname, last_block_len))
             entries_n = whole_block_count * self._block_size + last_block_len
 
             self._times = np.zeros((entries_n, 2), dtype=np.int64)
