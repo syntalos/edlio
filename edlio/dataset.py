@@ -56,6 +56,7 @@ class EDLDataFile:
         self._base_path = base_path
         self._media_type = media_type
         self._file_type = file_type
+        self._summary = None
         self.parts = []
 
     @property
@@ -64,6 +65,7 @@ class EDLDataFile:
 
     @property
     def media_type(self) -> str:
+        ''' The media (MIME) type of this data. '''
         return self._media_type
 
     @media_type.setter
@@ -72,11 +74,22 @@ class EDLDataFile:
 
     @property
     def file_type(self) -> str:
+        '''´ The filetype, in case no media type was available. '''
         return self._file_type
 
     @file_type.setter
     def file_type(self, ftype: str):
         self._file_type = ftype
+
+    @property
+    def summary(self) -> str:
+        ''' A human-readable summary of what this data is about. '''
+        return self._summary
+
+    @summary.setter
+    def summary(self, text: str):
+        ''' Set the summary text '''
+        self._summary = text
 
     def __repr__(self):
         data_type = self._media_type if self._media_type else self._file_type
@@ -173,6 +186,7 @@ class EDLDataset(EDLUnit):
         df = EDLDataFile(self.path,
                          d.get('media_type'),
                          d.get('file_type'))
+        df.summary = d.get('summary')
         for pi in d.get('parts', []):
             df.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
         if df.parts:
@@ -197,6 +211,8 @@ class EDLDataset(EDLUnit):
             d['media_type'] = df.media_type
         elif self._data.file_type:
             d['file_type'] = df.file_type
+        if df.summary:
+            d['summary'] = df.summary
         d['parts'] = []
         for part in df.parts:
             pd = {'fname': part.fname}
