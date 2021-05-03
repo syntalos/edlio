@@ -285,7 +285,7 @@ class TSyncFile:
                     # check if we maybe had no padding due to an erroneous writer
                     f.seek((padding + 4 + 4) * -1, os.SEEK_CUR)
                     block_term, = struct.unpack('<I', f.read(4))
-                    expected_header_crc, = struct.unpack('<I', f.read(4))
+                    f.read(4)
                     if block_term != TSYNC_BLOCK_TERM_32:
                         raise Exception('Header block terminator not found: The file is either '
                                         'invalid or its header block was damaged.')
@@ -465,8 +465,8 @@ class LegacyTSyncFile:
             xxh = xxh3_64()
             try:
                 self._generator_name = read_utf8_xxh_from_file(f, xxh)
-            except UnicodeDecodeError:
-                raise Exception('This legacy tsync file is damaged and can not be read.')
+            except UnicodeDecodeError as uni_e:
+                raise Exception('This legacy tsync file is damaged and can not be read.') from uni_e
 
             json_raw = read_utf8_xxh_from_file(f, xxh)
             self._custom = {}

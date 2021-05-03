@@ -125,12 +125,14 @@ class EDLDataFile:
         self.parts.append(part)
         return part, os.path.join(self._base_path, part.fname)
 
-    def read(self, aux_data_entries: Sequence[EDLDataFile] = [], **kwargs):
+    def read(self, aux_data_entries: Optional[Sequence[EDLDataFile]] = None, **kwargs):
         ''' Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
         The data reader may take auxiliary data into account, if :aux_data is passed.
         '''
+        if not aux_data_entries:
+            aux_data_entries = []
 
         dclass = self.media_type if self.media_type else self.file_type
         if not dclass:
@@ -195,7 +197,8 @@ class EDLDataset(EDLUnit):
             df.parts.sort()
         return df
 
-    def load(self, path: Union[str, os.PathLike[str]], mf: MutableMapping[str, Any] = {}):
+    def load(self, path: Union[str, os.PathLike[str]],
+             mf: Optional[MutableMapping[str, Any]] = None):
         '''
         Load an EDL dataset from a path.
 
@@ -206,6 +209,8 @@ class EDLDataset(EDLUnit):
         mf
             Manifest file data as dictionary, if data from :path should not be used.
         '''
+        if not mf:
+            mf = {}
         EDLUnit.load(self, path, mf)
 
         self._data = EDLDataFile(self.path)

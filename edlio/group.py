@@ -135,8 +135,9 @@ class EDLGroup(EDLUnit):
         for child in self._children:
             child.save()
 
-    def load(self, path, mf={}):
-        from .dataset import EDLDataset
+    def load(self, path, mf=None):
+        if not mf:
+            mf = {}
         EDLUnit.load(self, path, mf)
 
         for d in os.listdir(self.path):

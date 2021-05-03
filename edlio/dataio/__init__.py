@@ -19,9 +19,8 @@
 
 import importlib
 
-'''
-Determine which loader is responsible for which file type.
-'''
+
+# Determine which loader is responsible for which file type.
 DATA_LOADERS = {
     'video': 'edlio.dataio.video',
     'tsync': 'edlio.dataio.tsyncfile',

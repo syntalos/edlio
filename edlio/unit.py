@@ -22,7 +22,7 @@ from __future__ import annotations
 import os
 import uuid
 import toml
-from typing import Any, Union, MutableMapping
+from typing import Any, Union, Optional, MutableMapping
 from datetime import datetime
 from .utils import sanitize_name
 
@@ -40,6 +40,7 @@ class EDLError(Exception):
 
     def __init__(self, message):
         self.message = message
+        super(EDLError, self).__init__(self.message)
 
 
 class EDLUnit:
@@ -125,9 +126,10 @@ class EDLUnit:
                 os.rename(old_dir_path, self.path)
             except Exception as e:
                 self._name = old_name
-                raise ValueError('Unable to set new unit name: {}'.format(str(e)))
+                raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
-    def load(self, path: Union[str, os.PathLike[str]], mf: MutableMapping[str, Any] = {}):
+    def load(self, path: Union[str, os.PathLike[str]],
+             mf: Optional[MutableMapping[str, Any]] = None):
         '''
         Load an EDL unit from a path or path/data combination.
 
@@ -141,6 +143,8 @@ class EDLUnit:
         if not os.path.isdir(path):
             raise EDLError(('Can not load unit from path "{}": Does not specify an '
                             'existing directory').format(path))
+        if not mf:
+            mf = {}
 
         path = str(path)
         self._name = os.path.basename(path.rstrip('/\\'))

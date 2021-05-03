@@ -26,13 +26,14 @@ try:
     from neo.io.basefromrawio import BaseFromRaw
 except ImportError as e:
     raise ImportError('Unable to find the neo module. Can not read Intan electrophysiology data. {}'
-                      .format(str(e)))
+                      .format(str(e))) from e
 
 from .tsyncfile import TSyncFileMode
 from .. import ureg
 from ..dataset import EDLDataFile
 
 
+# pylint: disable=abstract-method
 class SyncIntanReader(IntanRawIO, BaseFromRaw):
     ''' Reader for Intan electrophysiology data.
 
@@ -193,7 +194,7 @@ def load_data(part_paths,
             sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
             tsf_count += 1
         if tsf_count > 1:
-            log.warning('More than one tsync file found for Intan data ' +
+            log.warning('More than one tsync file found for Intan data '
                         '- this is unusual and not a well-tested scenario.')
 
         # the very first entry in the tsync file is the initial Intan to master-clock offset

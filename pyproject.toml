@@ -7,3 +7,25 @@ module = "edlio"
 author = "Matthias Klumpp"
 author-email = "matthias@tenstral.net"
 home-page = "https://edl.readthedocs.io/"
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint."messages control"]
+disable = [
+    'C', 'R',
+    'fixme',
+    'unused-argument',
+    'logging-format-interpolation',
+    'protected-access',
+    'broad-except',
+    'redefined-builtin',
+]
+
+[tool.pylint.reports]
+score = 'no'
+
+[tool.pylint.typecheck]
+ignored-modules = [
+    'cv2',
+]
