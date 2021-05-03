@@ -147,6 +147,12 @@ or ``file_type`` key or both must be present.
 but may be any agreed-on string to indicate a specific type of data. In case a ``media_type`` could be determined, this key becomes optional,
 otherwise it is required. Either the ``media_type`` or ``file_type`` key or both must be present.
 
+``summary``
+^^^^^^^^^^^^^
+
+*[optional, string]* This optional field can contain a human-readable description string that can provide some information about
+what the files are about. Values could be for example "Videos recorded from the overview camera" or "Electrophysiology data from silicon probes".
+
 ``parts``
 ^^^^^^^^^
 
