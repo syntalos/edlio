@@ -57,7 +57,7 @@ class EDLDataFile:
         self._base_path = base_path
         self._media_type = media_type
         self._file_type = file_type
-        self._summary = None
+        self._summary: Optional[str] = None
         self.parts = []
 
     @property
