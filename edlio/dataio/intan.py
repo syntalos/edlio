@@ -24,7 +24,8 @@ try:
     from neo.rawio import IntanRawIO
     from neo.io.basefromrawio import BaseFromRaw
 except ImportError as e:
-    raise ImportError('Unable to find the neo module. Can not read Intan electrophysiology data. {}'.format(str(e)))
+    raise ImportError('Unable to find the neo module. Can not read Intan electrophysiology data. {}'
+                      .format(str(e)))
 
 from .tsyncfile import TSyncFileMode
 from .. import ureg
@@ -89,28 +90,30 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
     '''
     Create time vector, synchronizing all timepoints.
 
-    Syntalos monitors the timestamps coming from the external device and compares them to a prediction
-    about what the actual timestamp based on its master clock should be.
+    Syntalos monitors the timestamps coming from the external device and compares them to a
+    prediction about what the actual timestamp based on its master clock should be.
     If the device timestamp is too large or to small compared to the prediction,
-    Syntalos writes down the timepoint on its master clock next to the timestamp of the external device.
+    Syntalos writes down the timepoint on its master clock next to the timestamp of the external
+    device.
     Then it resets the prediction again based on the newly corrected time.
 
-    To get continuous synchronized timestamps from the data provided by Syntalos, we just do a linear interpolation
-    from one time point to the next.
-    To do this quickly, we calculate the sampling index (based on the device time and device sampling rate)
-    of each timepoint in :sync_map and move from one to the other.
+    To get continuous synchronized timestamps from the data provided by Syntalos, we just do a
+    linear interpolation from one time point to the next.
+    To do this quickly, we calculate the sampling index (based on the device time and device
+    sampling rate) of each timepoint in :sync_map and move from one to the other.
 
     This works very well with accurate timing devices like Intan's RHD2000, CED, etc.
     It has *not* been tested with every device running its own clock.
 
-    This specific function is written only for use with Intan (as it makes certain assumptions about the
-    structure of the data).
+    This specific function is written only for use with Intan (as it makes certain assumptions
+    about the structure of the data).
     '''
 
     sync_len = sync_map.shape[0]
     if sync_len <= 1:
         # nothing to synchronize, just return the shifted vector
-        log.debug('Intan time sync map was too short for synchronization, returning timeshifted timestamp vector.')
+        log.debug('Intan time sync map was too short for synchronization, '
+                  'returning timeshifted timestamp vector.')
         return _make_nosync_tsvec(data_len, sample_rate, init_offset)
 
     tv_adj = np.zeros((data_len,), dtype=np.float64) * ureg.msec
@@ -127,9 +130,9 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
         # end of the 'frame' in Intan sample indices
         d_end = idx_intan[i + 1] + 1
         if d_end > data_len:
-            log.error(('Intan sync index is bigger than the amount of recorded data ({} > {}). '
-                       'This means data may be missing or the time-sync files does not belong to this dataset')
-                      .format(d_end, data_len))
+            log.error('Intan sync index is bigger than the amount of recorded data ({} > {}). '
+                      'This means data may be missing or the time-sync files does not belong '
+                      'to this dataset'.format(d_end, data_len))
             # try to do something semi-sensible, then abort as there is nothing we can do anymore
             d_end = data_len
             tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start) - base_offset_msec
@@ -143,7 +146,8 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
         if i == 0:
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = np.arange(0, d_start + 1) * slope_part
-            tv_adj[0:d_start + 1] = (values_part - values_part[-1] + tv_adj[d_start]) - base_offset_msec
+            tv_adj[0:d_start + 1] = ((values_part - values_part[-1] + tv_adj[d_start])
+                                     - base_offset_msec)
             continue
 
         # last timepoint: just use the same slope and extrapolate to the end
@@ -170,11 +174,11 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
         tsf_count = 0
         for tsf in aux_data.read():
             if tsf.sync_mode != TSyncFileMode.SYNCPOINTS:
-                raise Exception('Can not synchronize RHD signal timestamps using a tsync file that is ' +
-                                'not in \'syncpoints\' mode.')
+                raise Exception('Can not synchronize RHD signal timestamps using a tsync file '
+                                'that is not in \'syncpoints\' mode.')
             if tsf.time_units != (ureg.usec, ureg.usec):
-                raise Exception('For RHD signal synchronization, both timestamp units in tsync file must be ' +
-                                'microseconds. Found: {}'.format(tsf.time_units))
+                raise Exception('For RHD signal synchronization, both timestamp units in tsync '
+                                'file must be microseconds. Found: {}'.format(tsf.time_units))
             sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
             tsf_count += 1
         if tsf_count > 1:
@@ -186,7 +190,8 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
 
     has_sync_info = sync_map.size > 0
     log.info('Initial RHD time offset: {} µs ({})'
-             .format(start_offset.magnitude, 'sync info found' if has_sync_info else 'no sync info'))
+             .format(start_offset.magnitude,
+                     'sync info found' if has_sync_info else 'no sync info'))
 
     # skip initial base offset sync point
     sync_map = sync_map[1:, :]
@@ -208,8 +213,8 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
             sample_rate = reader._max_sampling_rate * ureg.hertz
         else:
             if sample_rate != reader._max_sampling_rate * ureg.hertz:
-                raise Exception(('Samplig rate in Intan recording slice file differs from previous files. '
-                                'The data may not belong to the same recording.'))
+                raise Exception('Samplig rate in Intan recording slice file differs from previous '
+                                'files. The data may not belong to the same recording.')
         reader._timestamp_len = reader._raw_data['timestamp'].size
         recording_data_len += reader._timestamp_len
 

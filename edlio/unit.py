@@ -129,7 +129,8 @@ class EDLUnit:
 
     def load(self, path: Union[str, os.PathLike[str]], mf={}):
         if not os.path.isdir(path):
-            raise EDLError('Can not load unit from path "{}": Does not specify an existing directory'.format(path))
+            raise EDLError(('Can not load unit from path "{}": Does not specify an '
+                            'existing directory').format(path))
 
         path = str(path)
         self._name = os.path.basename(path.rstrip('/\\'))
@@ -150,7 +151,8 @@ class EDLUnit:
         if unit_type != self._unit_type:
             self._root_path = None
             self._name = None
-            msg = 'EDL Unit type of "{}" can not be loaded by this "{}" object.'.format(unit_type, self._unit_type)
+            msg = 'EDL Unit type of "{}" can not be loaded by this "{}" object.' \
+                .format(unit_type, self._unit_type)
             raise EDLError(msg)
 
         if os.path.isfile(os.path.join(self.path, 'attributes.toml')):

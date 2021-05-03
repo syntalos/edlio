@@ -236,8 +236,8 @@ class TSyncFile:
             log.debug('Reading tsync {} file: {}'.format(self._format_version, fname))
             check_xxh = major_version >= 1 and minor_version >= 2
             if not check_xxh:
-                log.warning(('Tsync file version ({}) is too old, checksum validation for ' +
-                            'integrity checks will be skipped.').format(self._format_version))
+                log.warning('Tsync file version ({}) is too old, checksum validation for '
+                            'integrity checks will be skipped.'.format(self._format_version))
 
             self._time_created = datetime.utcfromtimestamp(self._read_xxh_unpack('<q', f.read(8)))
             self._generator_name = self._read_utf8_xxh_from_file(f)
@@ -272,10 +272,10 @@ class TSyncFile:
                 block_term, = struct.unpack('<Q', f.read(8))
                 expected_header_cs, = struct.unpack('<Q', f.read(8))
                 if block_term != TSYNC_BLOCK_TERM:
-                    raise Exception('Header block terminator not found: The file is either invalid ' +
-                                    'or its header block was damaged.')
+                    raise Exception('Header block terminator not found: The file is either '
+                                    'invalid or its header block was damaged.')
                 if expected_header_cs != self._xxh.intdigest():
-                    raise Exception('Header checksum mismatch: The file is either invalid or ' +
+                    raise Exception('Header checksum mismatch: The file is either invalid or '
                                     'its header block was damaged.')
             else:
                 term_bytecount = 8
@@ -287,8 +287,8 @@ class TSyncFile:
                     block_term, = struct.unpack('<I', f.read(4))
                     expected_header_crc, = struct.unpack('<I', f.read(4))
                     if block_term != TSYNC_BLOCK_TERM_32:
-                        raise Exception('Header block terminator not found: The file is either invalid or ' +
-                                        'its header block was damaged.')
+                        raise Exception('Header block terminator not found: The file is either '
+                                        'invalid or its header block was damaged.')
 
             self._xxh.reset()
 
@@ -313,8 +313,8 @@ class TSyncFile:
                 if last_block_len.is_integer() and last_block_len > 0:
                     last_block_len = int(last_block_len)
                 else:
-                    raise Exception('File "{}" may be corrupt: Suspicious size ({}) of last data block.'
-                                    .format(fname, last_block_len))
+                    raise Exception('File "{}" may be corrupt: Suspicious size ({}) of '
+                                    'last data block.'.format(fname, last_block_len))
             entries_n = whole_block_count * self._block_size + last_block_len
 
             self._times = np.zeros((entries_n, 2), dtype=np.int64)
@@ -339,7 +339,8 @@ class TSyncFile:
                         block_term, = struct.unpack('<I', f.read(4))
                         f.read(4)
                         if block_term != TSYNC_BLOCK_TERM_32:
-                            raise Exception('Block terminator not found: Some data may be corrupted.')
+                            raise Exception('Block terminator not found: '
+                                            'Some data may be corrupted.')
                         b_index = 0
                         continue
 
@@ -347,7 +348,8 @@ class TSyncFile:
                     block_term, = struct.unpack('<Q', f.read(8))
                     expected_cs, = struct.unpack('<Q', f.read(8))
                     if block_term != TSYNC_BLOCK_TERM:
-                        raise Exception('Block terminator not found: Some data is likely corrupted.')
+                        raise Exception('Block terminator not found: '
+                                        'Some data is likely corrupted.')
                     if expected_cs != self._xxh.intdigest():
                         raise Exception('Block checksum mismatch: Some data is likely corrupted.')
                     self._xxh.reset()
@@ -452,7 +454,8 @@ class LegacyTSyncFile:
 
             self._format_version, = struct.unpack('<I', f.read(4))
             if self._format_version != 1:
-                raise Exception('Can not read TSync format version {}'.format(self._format_version))
+                raise Exception('Can not read TSync format version {}'
+                                .format(self._format_version))
             log.debug('Reading legacy tsync file: {}'.format(fname))
 
             ts, = struct.unpack('<q', f.read(8))

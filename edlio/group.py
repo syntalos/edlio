@@ -156,6 +156,7 @@ class EDLGroup(EDLUnit):
             elif unit_type == 'dataset':
                 unit = EDLDataset()
             else:
-                raise EDLError('EDL unit type "{}" is unknown, data can not be loaded.'.format(unit_type))
+                raise EDLError('EDL unit type "{}" is unknown, data can not be loaded.'
+                               .format(unit_type))
             unit.load(unit_path, mf)
             self.add_child(unit)

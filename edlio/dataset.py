@@ -114,7 +114,7 @@ class EDLDataFile:
         if not self._file_type:
             self._file_type = fext
         elif self._file_type != fext:
-            raise ValueError('New part does not have the right extension for this data: {}' \
+            raise ValueError('New part does not have the right extension for this data: {}'
                              .format(self._file_type))
         for ep in self.parts:
             if ep.fname == fname:
