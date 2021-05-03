@@ -22,7 +22,7 @@ from __future__ import annotations
 import os
 import uuid
 import toml
-from typing import Union
+from typing import Any, Union, MutableMapping
 from datetime import datetime
 from .utils import sanitize_name
 
@@ -127,7 +127,17 @@ class EDLUnit:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e)))
 
-    def load(self, path: Union[str, os.PathLike[str]], mf={}):
+    def load(self, path: Union[str, os.PathLike[str]], mf: MutableMapping[str, Any] = {}):
+        '''
+        Load an EDL unit from a path or path/data combination.
+
+        Parameters
+        ----------
+        path
+            Filesystem path of this dataset.
+        mf
+            Manifest file data as dictionary, if data from :path should not be used.
+        '''
         if not os.path.isdir(path):
             raise EDLError(('Can not load unit from path "{}": Does not specify an '
                             'existing directory').format(path))

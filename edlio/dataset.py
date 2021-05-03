@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import functools
-from typing import Optional
+from typing import Any, Optional, Union, MutableMapping, Sequence
 from .unit import EDLUnit, EDLError
 from .dataio import load_dataio_module, DATA_LOADERS
 
@@ -125,7 +125,7 @@ class EDLDataFile:
         self.parts.append(part)
         return part, os.path.join(self._base_path, part.fname)
 
-    def read(self, aux_data=None, **kwargs):
+    def read(self, aux_data_entries: Sequence[EDLDataFile] = [], **kwargs):
         ''' Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
@@ -145,7 +145,7 @@ class EDLDataFile:
             raise EDLError('I do not know how to read data of type "{}".'.format(dclass))
 
         load_data = load_dataio_module(dclass)
-        return load_data(self.part_paths(), aux_data, **kwargs)
+        return load_data(self.part_paths(), aux_data_entries, **kwargs)
 
 
 class EDLDataset(EDLUnit):
@@ -167,7 +167,7 @@ class EDLDataset(EDLUnit):
         '''
         EDLUnit.__init__(self, name)
         self._data = EDLDataFile(self.path)
-        self._aux_data = EDLDataFile(self.path)
+        self._aux_data = []
 
     @property
     def data(self) -> EDLDataFile:
@@ -178,14 +178,13 @@ class EDLDataset(EDLUnit):
         self._data = df
 
     @property
-    def aux_data(self) -> EDLDataFile:
+    def aux_data(self) -> list[EDLDataFile]:
         return self._aux_data
 
-    @aux_data.setter
-    def aux_data(self, adf: EDLDataFile):
-        self._aux_data = adf
+    def add_aux_data(self, adf: EDLDataFile):
+        self._aux_data.append(adf)
 
-    def _parse_data_md(self, d):
+    def _parse_data_md(self, d: dict[str, Any]):
         df = EDLDataFile(self.path,
                          d.get('media_type'),
                          d.get('file_type'))
@@ -196,15 +195,30 @@ class EDLDataset(EDLUnit):
             df.parts.sort()
         return df
 
-    def load(self, path, mf={}):
+    def load(self, path: Union[str, os.PathLike[str]], mf: MutableMapping[str, Any] = {}):
+        '''
+        Load an EDL dataset from a path.
+
+        Parameters
+        ----------
+        path
+            Filesystem path of this dataset.
+        mf
+            Manifest file data as dictionary, if data from :path should not be used.
+        '''
         EDLUnit.load(self, path, mf)
 
         self._data = EDLDataFile(self.path)
-        self._aux_data = EDLDataFile(self.path)
+        self._aux_data = []
         if 'data' in mf:
             self._data = self._parse_data_md(mf['data'])
         if 'data_aux' in mf:
-            self._aux_data = self._parse_data_md(mf['data_aux'])
+            daux_raw = mf['data_aux']
+            if isinstance(daux_raw, dict):
+                self._aux_data.append(self._parse_data_md(daux_raw))
+            else:
+                for adf_raw in daux_raw:
+                    self._aux_data.append(self._parse_data_md(adf_raw))
 
     def _serialize_data_md(self, df):
         d = {}
@@ -225,14 +239,18 @@ class EDLDataset(EDLUnit):
         return d
 
     def save(self):
+        '''Save dataset changes to their current location on disk. '''
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
         os.makedirs(self.path, exist_ok=True)
 
         mf = self._make_manifest_dict()
         mf['data'] = self._serialize_data_md(self._data)
-        if self._aux_data.parts:
-            mf['data_aux'] = self._serialize_data_md(self._aux_data)
+        if self._aux_data:
+            adf_list = []
+            for adf in self._aux_data:
+                adf_list.append(self._serialize_data_md(adf))
+            mf['data_aux'] = adf_list
 
         self._save_metadata(mf, self.attributes)
 
@@ -246,8 +264,30 @@ class EDLDataset(EDLUnit):
             return None
         return self._data.read(self._aux_data, **kwargs)
 
-    def read_aux_data(self):
-        '''Read auxiliary data from this dataset. '''
+    def read_aux_data(self, key: Optional[str] = None) -> Optional[Any]:
+        '''
+        Read auxiliary data from this dataset.
+
+        Parameters
+        ----------
+        key
+            Identifier key for the auxiliary dataset to load.
+            Will look for a substring match in file_type/media_type
+            properties of the data first, then look for a summary text match
+            to determine which data was requested. If not set, the first dataset
+            is loaded.
+        Returns
+        -------
+        The data, or None in case no aux-data or aux-data entry was found.
+        '''
         if not self._aux_data:
             return None
-        return self._aux_data.read()
+        if not key:
+            return self._aux_data[0].read()
+        for adf in self._aux_data:
+            if key in adf.file_type or key in adf.media_type:
+                return adf.read()
+        for adf in self._aux_data:
+            if key in adf.summary:
+                return adf.read()
+        return None

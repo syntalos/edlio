@@ -19,8 +19,10 @@
 
 import numpy as np
 import cv2 as cv
+from typing import Optional, Sequence
 from .tsyncfile import TSyncFileMode
 from .. import ureg
+from ..dataset import EDLDataFile
 
 
 class Frame:
@@ -45,13 +47,24 @@ class Frame:
         self.index = index
 
 
-def load_data(part_paths, aux_data):
+def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
     ''' Entry point for automatic dataset loading.
 
     This function is used internally to load data from a video and expose
     it as stream of frames.
     '''
     sync_map = None
+
+    aux_data: Optional[EDLDataFile] = None
+    valid_timestamp_aux_keys = ['tsync', 'csv']
+    for adf in aux_data_entries:
+        for vtak in valid_timestamp_aux_keys:
+            if vtak in adf.file_type or vtak in adf.media_type:
+                aux_data = adf
+                break
+        if aux_data is not None:
+            break
+
     if aux_data:
         if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':
             sync_map = []

@@ -507,7 +507,7 @@ class LegacyTSyncFile:
                 print('WARNING: Indices in time sync file were not continuous.')
 
 
-def load_data(part_paths, aux_data):
+def load_data(part_paths, aux_data_list):
     ''' Entry point for automatic dataset loading.
 
     This function is used internally to Syntalos' .tsync files

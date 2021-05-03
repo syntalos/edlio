@@ -19,6 +19,7 @@
 
 import numpy as np
 import logging as log
+from typing import Optional
 
 try:
     from neo.rawio import IntanRawIO
@@ -29,6 +30,7 @@ except ImportError as e:
 
 from .tsyncfile import TSyncFileMode
 from .. import ureg
+from ..dataset import EDLDataFile
 
 
 class SyncIntanReader(IntanRawIO, BaseFromRaw):
@@ -160,7 +162,10 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
     return tv_adj
 
 
-def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False):
+def load_data(part_paths,
+              aux_data_entries,
+              do_timesync=True,
+              include_nosync_time=False):
     ''' Entry point for automatic dataset loading.
 
     This function is used internally to load Intan RHD signals data
@@ -169,6 +174,12 @@ def load_data(part_paths, aux_data, do_timesync=True, include_nosync_time=False)
 
     start_offset = 0 * ureg.usec
     sync_map = np.empty([0, 2])
+
+    aux_data: Optional[EDLDataFile] = None
+    for adf in aux_data_entries:
+        if 'tsync' in adf.file_type or 'tsync' in adf.media_type:
+            aux_data = adf
+            break
 
     if aux_data:
         tsf_count = 0
