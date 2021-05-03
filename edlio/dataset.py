@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import os
 import functools
+from typing import Optional
 from .unit import EDLUnit, EDLError
 from .dataio import load_dataio_module, DATA_LOADERS
 
@@ -64,36 +65,37 @@ class EDLDataFile:
         return (self._media_type, self._file_type)
 
     @property
-    def media_type(self) -> str:
+    def media_type(self) -> Optional[str]:
         ''' The media (MIME) type of this data. '''
         return self._media_type
 
     @media_type.setter
-    def media_type(self, mime: str):
+    def media_type(self, mime: Optional[str]):
         self._media_type = mime
 
     @property
-    def file_type(self) -> str:
+    def file_type(self) -> Optional[str]:
         '''´ The filetype, in case no media type was available. '''
         return self._file_type
 
     @file_type.setter
-    def file_type(self, ftype: str):
+    def file_type(self, ftype: Optional[str]):
         self._file_type = ftype
 
     @property
-    def summary(self) -> str:
+    def summary(self) -> Optional[str]:
         ''' A human-readable summary of what this data is about. '''
         return self._summary
 
     @summary.setter
-    def summary(self, text: str):
+    def summary(self, text: Optional[str]):
         ''' Set the summary text '''
         self._summary = text
 
     def __repr__(self):
         data_type = self._media_type if self._media_type else self._file_type
-        return 'EDLDataFile(type=' + data_type + ', parts=' + str(self.parts) + ')'
+        return 'EDLDataFile(type=' + data_type + ', parts=' + str(self.parts) + \
+            ', summary=' + str(self.summary) + ')'
 
     def part_paths(self):
         '''
@@ -112,7 +114,8 @@ class EDLDataFile:
         if not self._file_type:
             self._file_type = fext
         elif self._file_type != fext:
-            raise ValueError('New part does not have the right extension for this data: {}'.format(self._file_type))
+            raise ValueError('New part does not have the right extension for this data: {}' \
+                             .format(self._file_type))
         for ep in self.parts:
             if ep.fname == fname:
                 if allow_exists:
@@ -131,8 +134,8 @@ class EDLDataFile:
 
         dclass = self.media_type if self.media_type else self.file_type
         if not dclass:
-            raise EDLError('This data file has no type association. EDL metadata was probably invalid, ' +
-                           'or this file does not exist.')
+            raise EDLError(('This data file has no type association. EDL metadata was '
+                            'probably invalid, or this file does not exist.'))
         if dclass.startswith('video/'):
             dclass = 'video'
         elif dclass.startswith('text/csv'):
