@@ -19,7 +19,7 @@
 
 import numpy as np
 import cv2 as cv
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 from .tsyncfile import TSyncFileMode
 from .. import ureg
 from ..dataset import EDLDataFile
@@ -53,7 +53,7 @@ def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
     This function is used internally to load data from a video and expose
     it as stream of frames.
     '''
-    sync_map = None
+    sync_map: Optional[Any] = None
 
     aux_data: Optional[EDLDataFile] = None
     valid_timestamp_aux_keys = ['tsync', 'csv']
