@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 from edlio import __appname__, __version__
 from setuptools import setup
+
+source_root = os.path.dirname(__file__)
+if not os.path.isabs(__file__):
+    thisfile = os.path.dirname(os.path.normpath(os.path.join(os.getcwd(), __file__)))
 
 packages = [
     'edlio',
@@ -18,7 +23,7 @@ setup(
     url="https://edl.readthedocs.io/",
     long_description=open(os.path.join(source_root, 'README.md')).read(),
     long_description_content_type='text/markdown',
-    
+
     install_requires=[
         'toml>=0.10',
         'numpy>=1.17',
