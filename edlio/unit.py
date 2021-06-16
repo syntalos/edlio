@@ -155,11 +155,13 @@ class EDLUnit:
             with open(os.path.join(self.path, 'manifest.toml'), 'r') as f:
                 mf = toml.load(f)
 
-        self._format_version = mf['format_version']
+        self._format_version = str(mf.get('format_version', 'unknown'))
         if self._format_version != EDL_FORMAT_VERSION:
             self._root_path = None
             self._name = None
-            raise EDLError('Can not load unit: Format version is unsupported.')
+            raise EDLError(('Can not load unit: Format version is unsupported '
+                            '(was \'{}\', expected \'{}\').').format(
+                                self._format_version, EDL_FORMAT_VERSION))
 
         unit_type = mf.get('type')
         if unit_type != self._unit_type:
