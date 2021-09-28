@@ -152,7 +152,7 @@ class EDLUnit:
 
         self._attrs = {}
         if not mf:
-            with open(os.path.join(self.path, 'manifest.toml'), 'r') as f:
+            with open(os.path.join(self.path, 'manifest.toml'), 'r', encoding='utf-8') as f:
                 mf = toml.load(f)
 
         self._format_version = str(mf.get('format_version', 'unknown'))
@@ -172,7 +172,7 @@ class EDLUnit:
             raise EDLError(msg)
 
         if os.path.isfile(os.path.join(self.path, 'attributes.toml')):
-            with open(os.path.join(self.path, 'attributes.toml'), 'r') as f:
+            with open(os.path.join(self.path, 'attributes.toml'), 'r', encoding='utf-8') as f:
                 self._attrs = toml.load(f)
 
         self._time_created = mf['time_created']
@@ -223,9 +223,9 @@ class EDLUnit:
             raise EDLError('No path is set for this EDL unit')
         os.makedirs(self.path, exist_ok=True)
 
-        with open(os.path.join(self.path, 'manifest.toml'), 'w') as f:
+        with open(os.path.join(self.path, 'manifest.toml'), 'w', encoding='utf-8') as f:
             toml.dump(manifest, f)
 
         if attributes:
-            with open(os.path.join(self.path, 'attributes.toml'), 'w') as f:
+            with open(os.path.join(self.path, 'attributes.toml'), 'w', encoding='utf-8') as f:
                 toml.dump(attributes, f)

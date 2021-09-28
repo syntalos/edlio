@@ -15,7 +15,7 @@ packages = [
     'edlio.dataio',
 ]
 
-pyproject_data = toml.loads(pathlib.Path('pyproject.toml').read_text())
+pyproject_data = toml.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))
 
 setup(
     name=__appname__,
@@ -25,7 +25,7 @@ setup(
     description='Module to work with data in an Experiment Directory Layout (EDL) structure',
     url="https://edl.readthedocs.io/",
     license=pyproject_data['project']['license']['text'],
-    long_description=open(os.path.join(source_root, 'README.md')).read(),
+    long_description=open(os.path.join(source_root, 'README.md'), encoding='utf-8').read(),
     long_description_content_type='text/markdown',
 
     install_requires=pyproject_data['project']['dependencies'],

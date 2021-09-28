@@ -26,7 +26,7 @@ def load_data(part_paths, aux_data_entries):
     This function is used internally to load CSV data.
     '''
     for fname in part_paths:
-        with open(fname, newline='') as f:
+        with open(fname, newline='', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter=';')
             for row in reader:
                 yield row

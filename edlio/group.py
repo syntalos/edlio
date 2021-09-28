@@ -148,7 +148,7 @@ class EDLGroup(EDLUnit):
             if not os.path.isfile(mf_path):
                 continue
 
-            with open(os.path.join(mf_path), 'r') as f:
+            with open(os.path.join(mf_path), 'r', encoding='utf-8') as f:
                 mf = toml.load(f)
 
             unit_type = mf.get('type')

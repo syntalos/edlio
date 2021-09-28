@@ -74,7 +74,7 @@ def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, E
     if not os.path.isfile(mf_path):
         raise EDLError('The directory "{}" is no valid EDL unit.'.format(path))
 
-    with open(os.path.join(mf_path), 'r') as f:
+    with open(os.path.join(mf_path), 'r', encoding='utf-8') as f:
         mf = toml.load(f)
 
     unit_type = mf.get('type')
