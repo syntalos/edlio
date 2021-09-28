@@ -1,13 +1,33 @@
-[build-system]
-requires = ["flit_core >=2,<4"]
-build-backend = "flit_core.buildapi"
+[project]
+name = "edlio"
+authors = [
+    {name = "Matthias Klumpp"},
+]
 
-[tool.flit.metadata]
-module = "edlio"
-author = "Matthias Klumpp"
-author-email = "matthias@tenstral.net"
-home-page = "https://edl.readthedocs.io/"
-description-file = "README.md"
+license = {text="LGPL-3.0+"}
+readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers"
+]
+dynamic = ['version', 'description']
+
+requires-python = ">=3.8"
+dependencies = [
+    "toml>=0.10",
+    "numpy>=1.17",
+    "xxhash>=2.0",
+    "Pint>=0.10"
+]
+
+[project.urls]
+Documentation = "https://edl.readthedocs.io/"
+Source = "https://github.com/bothlab/edlio"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [tool.pylint.format]
 max-line-length = 100
