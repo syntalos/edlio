@@ -149,15 +149,14 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
         if i == 0:
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = np.arange(0, d_start + 1) * slope_part
-            tv_adj[0:d_start + 1] = ((values_part - values_part[-1] + tv_adj[d_start])
-                                     - base_offset_msec)
+            tv_adj[0:d_start + 1] = values_part - values_part[-1] + tv_adj[d_start]
             continue
 
         # last timepoint: just use the same slope and extrapolate to the end
         if i == (sync_len - 2):
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = (np.arange(d_end, data_len) - d_end) * slope_part
-            tv_adj[d_end:data_len + 1] = (values_part + tv_adj[d_end - 1]) - base_offset_msec
+            tv_adj[d_end:data_len + 1] = values_part + tv_adj[d_end - 1]
             break
 
     return tv_adj
