@@ -112,16 +112,15 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
     about the structure of the data).
     '''
 
+    base_offset_msec = init_offset.to(ureg.msec)
     sync_len = sync_map.shape[0]
     if sync_len <= 1:
         # nothing to synchronize, just return the shifted vector
         log.debug('Intan time sync map was too short for synchronization, '
                   'returning timeshifted timestamp vector.')
-        return _make_nosync_tsvec(data_len, sample_rate, init_offset)
+        return _make_nosync_tsvec(data_len, sample_rate, init_offset) - base_offset_msec
 
     tv_adj = np.zeros((data_len,), dtype=np.float64) * ureg.msec
-    base_offset_msec = init_offset.to(ureg.msec)
-
     for i in range(sync_len - 1):
         # beginning of the 'frame' in master clock time
         m_start = sync_map[i, 1].to(ureg.msec)
