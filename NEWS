@@ -1,3 +1,13 @@
+Version 0.1.1
+~~~~~~~~~~~~~~
+Released: 2021-12-16
+
+Bugfixes:
+  * Print bad tsync format version in case there was a mismatch
+  * Make sure the wheel build always contains dependency data
+  * Always explicitly specify encoding when opening text files
+  * intan: Offset-correct raw time vector if we did not have enough sync points
+
 Version 0.1.0
 ~~~~~~~~~~~~~~
 Released: 2021-05-18
