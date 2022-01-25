@@ -89,7 +89,7 @@ def _make_nosync_tsvec(data_len, sample_rate, init_offset):
     return tv
 
 
-def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
+def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
     '''
     Create time vector, synchronizing all timepoints.
 
@@ -112,13 +112,14 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
     about the structure of the data).
     '''
 
-    base_offset_msec = init_offset.to(ureg.msec)
     sync_len = sync_map.shape[0]
-    if sync_len <= 1:
-        # nothing to synchronize, just return the shifted vector
+    if sync_len <= 2:
+        # nothing to synchronize (we just have the initial offset and the end point),
+        # just return the shifted vector
         log.debug('Intan time sync map was too short for synchronization, '
                   'returning timeshifted timestamp vector.')
-        return _make_nosync_tsvec(data_len, sample_rate, init_offset) - base_offset_msec
+        init_offset = (sync_map[0][0] - sync_map[0][1]).to(ureg.msec)
+        return _make_nosync_tsvec(data_len, sample_rate, init_offset)
 
     tv_adj = np.zeros((data_len,), dtype=np.float64) * ureg.msec
     for i in range(sync_len - 1):
@@ -137,12 +138,12 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map, init_offset):
                       'to this dataset'.format(d_end, data_len))
             # try to do something semi-sensible, then abort as there is nothing we can do anymore
             d_end = data_len
-            tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start) - base_offset_msec
+            tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start)
             break
 
         # linear interpolation between the beginning time point and the end time point
         # from the beginning sample index up to the end sample index
-        tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start) - base_offset_msec
+        tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start)
 
         # initial timepoint: just use the same slope and extrapolate to the beginning
         if i == 0:
@@ -203,9 +204,6 @@ def load_data(part_paths,
              .format(start_offset.magnitude,
                      'sync info found' if has_sync_info else 'no sync info'))
 
-    # skip initial base offset sync point
-    sync_map = sync_map[1:, :]
-
     intan_readers = []
     for fname in part_paths:
         reader = SyncIntanReader(fname)
@@ -236,8 +234,7 @@ def load_data(part_paths,
         tvec = _make_synced_tsvec(recording_data_len,
                                   sample_rate,
                                   intan_sync_idx,
-                                  sync_map,
-                                  start_offset)
+                                  sync_map)
     if include_nosync_time or not do_timesync:
         tvec_noadj = _make_nosync_tsvec(recording_data_len,
                                         sample_rate,
