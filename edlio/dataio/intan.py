@@ -118,7 +118,7 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
         # just return the shifted vector
         log.debug('Intan time sync map was too short for synchronization, '
                   'returning timeshifted timestamp vector.')
-        init_offset = (sync_map[0][0] - sync_map[0][1]).to(ureg.msec)
+        init_offset = sync_map[0][0] - sync_map[0][1]
         return _make_nosync_tsvec(data_len, sample_rate, init_offset)
 
     tv_adj = np.zeros((data_len,), dtype=np.float64) * ureg.msec
@@ -144,13 +144,6 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
         # linear interpolation between the beginning time point and the end time point
         # from the beginning sample index up to the end sample index
         tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start)
-
-        # initial timepoint: just use the same slope and extrapolate to the beginning
-        if i == 0:
-            slope_part = (m_end - m_start) / (d_end - d_start)
-            values_part = np.arange(0, d_start + 1) * slope_part
-            tv_adj[0:d_start + 1] = values_part - values_part[-1] + tv_adj[d_start]
-            continue
 
         # last timepoint: just use the same slope and extrapolate to the end
         if i == (sync_len - 2):
