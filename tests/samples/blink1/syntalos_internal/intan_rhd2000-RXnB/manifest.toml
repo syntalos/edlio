@@ -1,0 +1,12 @@
+collection_id = 'a87011dd-80a7-429c-af2f-e8d7608bc0ea'
+format_version = '1'
+time_created = 2021-02-08T18:18:41+01:00
+type = 'dataset'
+
+[data]
+file_type = 'tsync'
+
+    [[data.parts]]
+    fname = 'offsets.tsync'
+    index = 0
+

@@ -1,0 +1,68 @@
+machine_node = 'pio2pc177 [debian 11]'
+recording_length_msec = 65051.0
+success = true
+
+[[modules]]
+id = 'miniscope'
+name = 'Miniscope'
+
+[[modules]]
+id = 'devel.clock'
+name = 'Sync Clock'
+
+[[modules]]
+id = 'intan_rhd2000'
+name = 'Intan RHD2000 USB Interface'
+
+[[modules]]
+id = 'camera-generic'
+name = 'Generic Camera'
+
+[[modules]]
+id = 'camera-tis'
+name = 'TIS Camera'
+
+[[modules]]
+id = 'videotransform'
+name = 'Video Transformer 2'
+
+[[modules]]
+id = 'canvas'
+name = 'WC View'
+
+[[modules]]
+id = 'videotransform'
+name = 'Video Transformer'
+
+[[modules]]
+id = 'videorecorder'
+name = 'Video Recorder'
+
+[[modules]]
+id = 'videorecorder'
+name = 'Video Recorder 2'
+
+[[modules]]
+id = 'pyscript'
+name = 'Python Script'
+
+[[modules]]
+id = 'firmata-io'
+name = 'Firmata IO'
+
+[[modules]]
+id = 'canvas'
+name = 'MS View'
+
+[[modules]]
+id = 'videorecorder'
+name = 'Video Recorder 3'
+
+[[modules]]
+id = 'table'
+name = 'Table'
+
+[[modules]]
+id = 'canvas'
+name = 'IC View'
+

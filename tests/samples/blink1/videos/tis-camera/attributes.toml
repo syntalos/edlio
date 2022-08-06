@@ -1,0 +1,11 @@
+[encoder]
+lossless = false
+target_quality = 24
+thread_count = 4
+
+[video]
+colored = true
+frame_height = 112
+frame_width = 128
+framerate = 60.0
+
