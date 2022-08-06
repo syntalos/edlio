@@ -1,3 +1,16 @@
+Version 0.1.2
+~~~~~~~~~~~~~~
+Released: 2022-08-06
+
+Features:
+ * Switch to tomlkit for TOML read/write support
+ * Format code with Black
+ * tests: Add example recording in EDL format
+
+Bugfixes:
+ * intan: Don't extrapolate to the beginning
+ * intan: Never apply the initial offset twice
+
 Version 0.1.1
 ~~~~~~~~~~~~~~
 Released: 2021-12-16
