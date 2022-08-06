@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-import cv2 as cv
 from typing import Any, Optional, Sequence
-from .tsyncfile import TSyncFileMode
+
+import cv2 as cv
+import numpy as np
+
 from .. import ureg
 from ..dataset import EDLDataFile
+from .tsyncfile import TSyncFileMode
 
 
 class Frame:
@@ -31,7 +33,7 @@ class Frame:
     index: int
 
     def __init__(self, mat, time, index):
-        ''' Create a new frame representation for a video file.
+        '''Create a new frame representation for a video file.
 
         Parameters
         ----------
@@ -48,7 +50,7 @@ class Frame:
 
 
 def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
-    ''' Entry point for automatic dataset loading.
+    '''Entry point for automatic dataset loading.
 
     This function is used internally to load data from a video and expose
     it as stream of frames.
@@ -77,18 +79,29 @@ def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
             sync_map = np.empty([0, 2])
             for tsf in aux_data.read():
                 if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
-                    raise Exception(('Can not synchronize video timestamps using a '
-                                     'non-continuous tsync file.'))
+                    raise Exception(
+                        (
+                            'Can not synchronize video timestamps using a '
+                            'non-continuous tsync file.'
+                        )
+                    )
                 if tsf.time_units[0] != ureg.dimensionless:
-                    raise Exception('Unit of first time in tsync mapping has to be \'index\' for '
-                                    'video files.')
+                    raise Exception(
+                        'Unit of first time in tsync mapping has to be \'index\' for '
+                        'video files.'
+                    )
                 if tsf.time_units[1] != ureg.msec:
-                    raise Exception('We currently expect video timestamps to be in '
-                                    'milliseconds (unit was {}).'.format(tsf.time_units[1]))
+                    raise Exception(
+                        'We currently expect video timestamps to be in '
+                        'milliseconds (unit was {}).'.format(tsf.time_units[1])
+                    )
                 sync_map = np.vstack((sync_map, tsf.times)) * ureg.msec
         else:
-            raise Exception('Unknown auxiliary data type ({}|{}) for video file.'
-                            .format(aux_data.file_type, aux_data.media_type))
+            raise Exception(
+                'Unknown auxiliary data type ({}|{}) for video file.'.format(
+                    aux_data.file_type, aux_data.media_type
+                )
+            )
 
     frame_index = 0
     for fname in part_paths:
@@ -97,7 +110,10 @@ def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
             ret, mat = vc.read()
             if not ret:
                 break
-            frame = Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0]) \
-                if sync_map is not None else Frame(mat, -1, frame_index)
+            frame = (
+                Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0])
+                if sync_map is not None
+                else Frame(mat, -1, frame_index)
+            )
             yield frame
             frame_index += 1

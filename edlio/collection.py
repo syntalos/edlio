@@ -41,7 +41,7 @@ class EDLCollection(EDLGroup):
 
     @property
     def generator_id(self) -> str:
-        ''' Identification string of the software which generated this EDL unit. '''
+        '''Identification string of the software which generated this EDL unit.'''
         return self._generator_id
 
     @generator_id.setter

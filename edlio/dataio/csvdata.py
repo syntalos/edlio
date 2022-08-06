@@ -21,7 +21,7 @@ import csv
 
 
 def load_data(part_paths, aux_data_entries):
-    ''' Entry point for automatic dataset loading.
+    '''Entry point for automatic dataset loading.
 
     This function is used internally to load CSV data.
     '''

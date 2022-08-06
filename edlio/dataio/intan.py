@@ -17,29 +17,34 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
 import logging as log
 from typing import Optional
+
+import numpy as np
 
 try:
     from neo.rawio import IntanRawIO
     from neo.io.basefromrawio import BaseFromRaw
 except ImportError as e:
-    raise ImportError('Unable to find the neo module. Can not read Intan electrophysiology data. {}'
-                      .format(str(e))) from e
+    raise ImportError(
+        'Unable to find the neo module. Can not read Intan electrophysiology data. {}'.format(
+            str(e)
+        )
+    ) from e
 
-from .tsyncfile import TSyncFileMode
 from .. import ureg
 from ..dataset import EDLDataFile
+from .tsyncfile import TSyncFileMode
 
 
 # pylint: disable=abstract-method
 class SyncIntanReader(IntanRawIO, BaseFromRaw):
-    ''' Reader for Intan electrophysiology data.
+    '''Reader for Intan electrophysiology data.
 
     This class is the same as IntanIO from NEO, but additionally also provides
     synchronized timestamps in its :meth:`sync_times` property.
     '''
+
     _prefered_signal_group_mode = 'group-by-same-units'
 
     def __init__(self, intan_filename):
@@ -54,17 +59,17 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
     @property
     def has_adjusted_times(self) -> bool:
-        ''' Returns True if we have synchronized or otherwise adjusted time data. '''
+        '''Returns True if we have synchronized or otherwise adjusted time data.'''
         return self._sync_ts is not None
 
     @property
     def sync_times(self):
-        ''' Synchronized timestamps vector '''
+        '''Synchronized timestamps vector'''
         return self._sync_ts
 
     @property
     def digin_channels_raw(self):
-        ''' Obtain the raw data of digital input channels '''
+        '''Obtain the raw data of digital input channels'''
         if self._digin_channels is not None:
             return self._digin_channels
 
@@ -76,13 +81,12 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
             digin_chan_n = 16
             self._digin_channels = np.zeros((digin_chan_n, ts_len), dtype=bool)
             for i in range(0, digin_chan_n):
-                self._digin_channels[i, :] = \
-                    np.not_equal(np.bitwise_and(digin_raw, (1 << i)), 0)
+                self._digin_channels[i, :] = np.not_equal(np.bitwise_and(digin_raw, (1 << i)), 0)
         return self._digin_channels
 
 
 def _make_nosync_tsvec(data_len, sample_rate, init_offset):
-    ''' Create time vector taking only the start time into account. '''
+    '''Create time vector taking only the start time into account.'''
     tv = np.arange(0, data_len).astype(np.float64)
     tv = (tv / sample_rate).to(ureg.msec) - init_offset.to(ureg.msec)
 
@@ -116,8 +120,10 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
     if sync_len <= 2:
         # nothing to synchronize (we just have the initial offset and the end point),
         # just return the shifted vector
-        log.debug('Intan time sync map was too short for synchronization, '
-                  'returning timeshifted timestamp vector.')
+        log.debug(
+            'Intan time sync map was too short for synchronization, '
+            'returning timeshifted timestamp vector.'
+        )
         init_offset = sync_map[0][0] - sync_map[0][1]
         return _make_nosync_tsvec(data_len, sample_rate, init_offset)
 
@@ -133,9 +139,11 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
         # end of the 'frame' in Intan sample indices
         d_end = idx_intan[i + 1] + 1
         if d_end > data_len:
-            log.error('Intan sync index is bigger than the amount of recorded data ({} > {}). '
-                      'This means data may be missing or the time-sync files does not belong '
-                      'to this dataset'.format(d_end, data_len))
+            log.error(
+                'Intan sync index is bigger than the amount of recorded data ({} > {}). '
+                'This means data may be missing or the time-sync files does not belong '
+                'to this dataset'.format(d_end, data_len)
+            )
             # try to do something semi-sensible, then abort as there is nothing we can do anymore
             d_end = data_len
             tv_adj[d_start:d_end] = np.linspace(m_start, m_end, d_end - d_start)
@@ -149,17 +157,14 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
         if i == (sync_len - 2):
             slope_part = (m_end - m_start) / (d_end - d_start)
             values_part = (np.arange(d_end, data_len) - d_end) * slope_part
-            tv_adj[d_end:data_len + 1] = values_part + tv_adj[d_end - 1]
+            tv_adj[d_end : data_len + 1] = values_part + tv_adj[d_end - 1]
             break
 
     return tv_adj
 
 
-def load_data(part_paths,
-              aux_data_entries,
-              do_timesync=True,
-              include_nosync_time=False):
-    ''' Entry point for automatic dataset loading.
+def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_time=False):
+    '''Entry point for automatic dataset loading.
 
     This function is used internally to load Intan RHD signals data
     and apply time synchronization.
@@ -178,24 +183,32 @@ def load_data(part_paths,
         tsf_count = 0
         for tsf in aux_data.read():
             if tsf.sync_mode != TSyncFileMode.SYNCPOINTS:
-                raise Exception('Can not synchronize RHD signal timestamps using a tsync file '
-                                'that is not in \'syncpoints\' mode.')
+                raise Exception(
+                    'Can not synchronize RHD signal timestamps using a tsync file '
+                    'that is not in \'syncpoints\' mode.'
+                )
             if tsf.time_units != (ureg.usec, ureg.usec):
-                raise Exception('For RHD signal synchronization, both timestamp units in tsync '
-                                'file must be microseconds. Found: {}'.format(tsf.time_units))
+                raise Exception(
+                    'For RHD signal synchronization, both timestamp units in tsync '
+                    'file must be microseconds. Found: {}'.format(tsf.time_units)
+                )
             sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
             tsf_count += 1
         if tsf_count > 1:
-            log.warning('More than one tsync file found for Intan data '
-                        '- this is unusual and not a well-tested scenario.')
+            log.warning(
+                'More than one tsync file found for Intan data '
+                '- this is unusual and not a well-tested scenario.'
+            )
 
         # the very first entry in the tsync file is the initial Intan to master-clock offset
         start_offset = sync_map[0][0] - sync_map[0][1]
 
     has_sync_info = sync_map.size > 0
-    log.info('Initial RHD time offset: {} µs ({})'
-             .format(start_offset.magnitude,
-                     'sync info found' if has_sync_info else 'no sync info'))
+    log.info(
+        'Initial RHD time offset: {} µs ({})'.format(
+            start_offset.magnitude, 'sync info found' if has_sync_info else 'no sync info'
+        )
+    )
 
     intan_readers = []
     for fname in part_paths:
@@ -214,8 +227,10 @@ def load_data(part_paths,
             sample_rate = reader._max_sampling_rate * ureg.hertz
         else:
             if sample_rate != reader._max_sampling_rate * ureg.hertz:
-                raise Exception('Samplig rate in Intan recording slice file differs from previous '
-                                'files. The data may not belong to the same recording.')
+                raise Exception(
+                    'Samplig rate in Intan recording slice file differs from previous '
+                    'files. The data may not belong to the same recording.'
+                )
         reader._timestamp_len = reader._raw_data['timestamp'].size
         recording_data_len += reader._timestamp_len
 
@@ -224,14 +239,9 @@ def load_data(part_paths,
     intan_sync_idx = intan_sync_idx.astype(np.int32)
 
     if do_timesync:
-        tvec = _make_synced_tsvec(recording_data_len,
-                                  sample_rate,
-                                  intan_sync_idx,
-                                  sync_map)
+        tvec = _make_synced_tsvec(recording_data_len, sample_rate, intan_sync_idx, sync_map)
     if include_nosync_time or not do_timesync:
-        tvec_noadj = _make_nosync_tsvec(recording_data_len,
-                                        sample_rate,
-                                        start_offset)
+        tvec_noadj = _make_nosync_tsvec(recording_data_len, sample_rate, start_offset)
         if not do_timesync:
             tvec = tvec_noadj
 
@@ -240,9 +250,9 @@ def load_data(part_paths,
         ts_len = reader._timestamp_len
 
         if include_nosync_time:
-            reader._nosync_ts = tvec_noadj[last_ts_idx:last_ts_idx+ts_len]
+            reader._nosync_ts = tvec_noadj[last_ts_idx : last_ts_idx + ts_len]
 
-        reader._sync_ts = tvec[last_ts_idx:last_ts_idx+ts_len]
+        reader._sync_ts = tvec[last_ts_idx : last_ts_idx + ts_len]
         last_ts_idx += ts_len
 
         yield reader

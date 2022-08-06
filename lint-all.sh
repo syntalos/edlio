@@ -13,3 +13,6 @@ echo "OK"
 echo "MyPy"
 mypy --pretty edlio
 echo "OK"
+
+echo "Black"
+black --diff .

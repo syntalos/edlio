@@ -27,22 +27,17 @@ __appname__ = 'edlio'
 __version__ = '0.1.2'
 
 import os
-import tomlkit as toml
-import pint
 import typing as T
+
+import pint
+import tomlkit as toml
+
 from .unit import EDLError
 from .group import EDLGroup
-from .collection import EDLCollection
 from .dataset import EDLDataset
+from .collection import EDLCollection
 
-
-__all__ = ['ureg',
-           'Q_',
-           'EDLError',
-           'EDLGroup',
-           'EDLCollection',
-           'EDLDataset',
-           'load']
+__all__ = ['ureg', 'Q_', 'EDLError', 'EDLGroup', 'EDLCollection', 'EDLDataset', 'load']
 
 
 # Pint default registry for unit conversions

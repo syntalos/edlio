@@ -50,3 +50,17 @@ score = 'no'
 ignored-modules = [
     'cv2',
 ]
+
+[tool.isort]
+py_version = 39
+profile = "black"
+multi_line_output = 3
+skip_gitignore = true
+length_sort = true
+atomic = true
+skip_glob = ["tests/samples/*"]
+
+[tool.black]
+target-version = ['py39']
+line-length = 100
+skip-string-normalization = true

@@ -19,7 +19,6 @@
 
 import importlib
 
-
 # Determine which loader is responsible for which file type.
 DATA_LOADERS = {
     'video': 'edlio.dataio.video',

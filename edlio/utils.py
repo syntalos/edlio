@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import string
 import random
+import string
 
 
 def sanitize_name(name: str) -> str:

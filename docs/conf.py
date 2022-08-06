@@ -19,19 +19,23 @@ if not os.path.isabs(thisfile):
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(thisfile), '..')))
 
 html_theme = 'cloud'
-html_theme_options = {'borderless_decor': True,
-                      'lighter_header_decor': True,
-                      'min_height': '16cm',
-                      'roottarget': 'index'}
+html_theme_options = {
+    'borderless_decor': True,
+    'lighter_header_decor': True,
+    'min_height': '16cm',
+    'roottarget': 'index',
+}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.coverage',
-              'sphinx.ext.napoleon',
-              'sphinx.ext.intersphinx',
-              'sphinx_autodoc_typehints']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx',
+    'sphinx_autodoc_typehints',
+]
 
 # Napoleon settings
 napoleon_google_docstring = False
@@ -44,10 +48,12 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 
 # Intersphinx
-intersphinx_mapping = {'python':('https://docs.python.org/3', None),
-                       'numpy': ('https://numpy.org/doc/stable', None),
-                       'pint':  ('https://pint.readthedocs.io/en/latest', None),
-                       'neo':   ('https://neo.readthedocs.io/en/stable', None)}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable', None),
+    'pint': ('https://pint.readthedocs.io/en/latest', None),
+    'neo': ('https://neo.readthedocs.io/en/stable', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

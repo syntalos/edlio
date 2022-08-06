@@ -21,11 +21,12 @@ from __future__ import annotations
 
 import os
 import uuid
-import tomlkit as toml
 from typing import Any, Union, Optional, MutableMapping
 from datetime import datetime
-from .utils import sanitize_name
 
+import tomlkit as toml
+
+from .utils import sanitize_name
 
 # version of the EDL specification
 EDL_FORMAT_VERSION: str = '1'
@@ -128,8 +129,9 @@ class EDLUnit:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
-    def load(self, path: Union[str, os.PathLike[str]],
-             mf: Optional[MutableMapping[str, Any]] = None):
+    def load(
+        self, path: Union[str, os.PathLike[str]], mf: Optional[MutableMapping[str, Any]] = None
+    ):
         '''
         Load an EDL unit from a path or path/data combination.
 
@@ -141,8 +143,11 @@ class EDLUnit:
             Manifest file data as dictionary, if data from :path should not be used.
         '''
         if not os.path.isdir(path):
-            raise EDLError(('Can not load unit from path "{}": Does not specify an '
-                            'existing directory').format(path))
+            raise EDLError(
+                (
+                    'Can not load unit from path "{}": Does not specify an ' 'existing directory'
+                ).format(path)
+            )
         if not mf:
             mf = {}
 
@@ -159,16 +164,20 @@ class EDLUnit:
         if self._format_version != EDL_FORMAT_VERSION:
             self._root_path = None
             self._name = None
-            raise EDLError(('Can not load unit: Format version is unsupported '
-                            '(was \'{}\', expected \'{}\').').format(
-                                self._format_version, EDL_FORMAT_VERSION))
+            raise EDLError(
+                (
+                    'Can not load unit: Format version is unsupported '
+                    '(was \'{}\', expected \'{}\').'
+                ).format(self._format_version, EDL_FORMAT_VERSION)
+            )
 
         unit_type = mf.get('type')
         if unit_type != self._unit_type:
             self._root_path = None
             self._name = None
-            msg = 'EDL Unit type of "{}" can not be loaded by this "{}" object.' \
-                .format(unit_type, self._unit_type)
+            msg = 'EDL Unit type of "{}" can not be loaded by this "{}" object.'.format(
+                unit_type, self._unit_type
+            )
             raise EDLError(msg)
 
         if os.path.isfile(os.path.join(self.path, 'attributes.toml')):
@@ -177,7 +186,7 @@ class EDLUnit:
 
         self._time_created = mf['time_created']
         if 'collection_id' in mf:
-            self._collection_id = uuid.UUID(mf['collection_id'])
+            self._collection_id = uuid.UUID(str(mf['collection_id']))
         if 'generator' in mf:
             self._generator_id = mf['generator']
         if 'authors' in mf:
@@ -185,8 +194,8 @@ class EDLUnit:
 
     def _type_as_unittype(self):
         from .group import EDLGroup
-        from .collection import EDLCollection
         from .dataset import EDLDataset
+        from .collection import EDLCollection
 
         if isinstance(self, EDLCollection):
             return 'collection'

@@ -21,14 +21,15 @@ from __future__ import annotations
 
 import os
 import functools
-from typing import Any, Optional, Union, MutableMapping, Sequence
+from typing import Any, Union, Optional, Sequence, MutableMapping
+
 from .unit import EDLUnit, EDLError
-from .dataio import load_dataio_module, DATA_LOADERS
+from .dataio import DATA_LOADERS, load_dataio_module
 
 
 @functools.total_ordering
 class EDLDataPart:
-    ''' Describes a part of a data file that has been split '''
+    '''Describes a part of a data file that has been split'''
 
     index: int = -1
     fname: str = None
@@ -49,7 +50,7 @@ class EDLDataPart:
 
 
 class EDLDataFile:
-    ''' A data file, associated with a dataset '''
+    '''A data file, associated with a dataset'''
 
     parts: list[EDLDataPart] = []
 
@@ -66,7 +67,7 @@ class EDLDataFile:
 
     @property
     def media_type(self) -> Optional[str]:
-        ''' The media (MIME) type of this data. '''
+        '''The media (MIME) type of this data.'''
         return self._media_type
 
     @media_type.setter
@@ -75,7 +76,7 @@ class EDLDataFile:
 
     @property
     def file_type(self) -> Optional[str]:
-        '''´ The filetype, in case no media type was available. '''
+        '''´ The filetype, in case no media type was available.'''
         return self._file_type
 
     @file_type.setter
@@ -84,18 +85,25 @@ class EDLDataFile:
 
     @property
     def summary(self) -> Optional[str]:
-        ''' A human-readable summary of what this data is about. '''
+        '''A human-readable summary of what this data is about.'''
         return self._summary
 
     @summary.setter
     def summary(self, text: Optional[str]):
-        ''' Set the summary text '''
+        '''Set the summary text'''
         self._summary = text
 
     def __repr__(self):
         data_type = self._media_type if self._media_type else self._file_type
-        return 'EDLDataFile(type=' + data_type + ', parts=' + str(self.parts) + \
-            ', summary=' + str(self.summary) + ')'
+        return (
+            'EDLDataFile(type='
+            + data_type
+            + ', parts='
+            + str(self.parts)
+            + ', summary='
+            + str(self.summary)
+            + ')'
+        )
 
     def part_paths(self):
         '''
@@ -114,8 +122,11 @@ class EDLDataFile:
         if not self._file_type:
             self._file_type = fext
         elif self._file_type != fext:
-            raise ValueError('New part does not have the right extension for this data: {}'
-                             .format(self._file_type))
+            raise ValueError(
+                'New part does not have the right extension for this data: {}'.format(
+                    self._file_type
+                )
+            )
         for ep in self.parts:
             if ep.fname == fname:
                 if allow_exists:
@@ -126,7 +137,7 @@ class EDLDataFile:
         return part, os.path.join(self._base_path, part.fname)
 
     def read(self, aux_data_entries: Optional[Sequence[EDLDataFile]] = None, **kwargs):
-        ''' Read all data parts in this set.
+        '''Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
         The data reader may take auxiliary data into account, if :aux_data is passed.
@@ -136,8 +147,12 @@ class EDLDataFile:
 
         dclass = self.media_type if self.media_type else self.file_type
         if not dclass:
-            raise EDLError(('This data file has no type association. EDL metadata was '
-                            'probably invalid, or this file does not exist.'))
+            raise EDLError(
+                (
+                    'This data file has no type association. EDL metadata was '
+                    'probably invalid, or this file does not exist.'
+                )
+            )
         if dclass.startswith('video/'):
             dclass = 'video'
         elif dclass.startswith('text/csv'):
@@ -187,9 +202,7 @@ class EDLDataset(EDLUnit):
         self._aux_data.append(adf)
 
     def _parse_data_md(self, d: dict[str, Any]):
-        df = EDLDataFile(self.path,
-                         d.get('media_type'),
-                         d.get('file_type'))
+        df = EDLDataFile(self.path, d.get('media_type'), d.get('file_type'))
         df.summary = d.get('summary')
         for pi in d.get('parts', []):
             df.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
@@ -197,8 +210,9 @@ class EDLDataset(EDLUnit):
             df.parts.sort()
         return df
 
-    def load(self, path: Union[str, os.PathLike[str]],
-             mf: Optional[MutableMapping[str, Any]] = None):
+    def load(
+        self, path: Union[str, os.PathLike[str]], mf: Optional[MutableMapping[str, Any]] = None
+    ):
         '''
         Load an EDL dataset from a path.
 
@@ -244,7 +258,7 @@ class EDLDataset(EDLUnit):
         return d
 
     def save(self):
-        '''Save dataset changes to their current location on disk. '''
+        '''Save dataset changes to their current location on disk.'''
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
         os.makedirs(self.path, exist_ok=True)
