@@ -15,7 +15,7 @@ dynamic = ['version', 'description']
 
 requires-python = ">=3.8"
 dependencies = [
-    "toml>=0.10",
+    "tomlkit>=0.6.0",
     "numpy>=1.17",
     "xxhash>=2.0",
     "Pint>=0.10"

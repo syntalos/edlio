@@ -27,9 +27,9 @@ __appname__ = 'edlio'
 __version__ = '0.1.2'
 
 import os
-import toml
+import tomlkit as toml
 import pint
-from typing import Union, Any
+import typing as T
 from .unit import EDLError
 from .group import EDLGroup
 from .collection import EDLCollection
@@ -50,7 +50,7 @@ ureg = pint.get_application_registry()
 Q_ = ureg.Quantity
 
 
-def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, EDLDataset]:
+def load(path: T.Union[str, os.PathLike[str]]) -> T.Union[EDLCollection, EDLGroup, EDLDataset]:
     '''
     Open an EDL unit via its filesystem path.
 
@@ -78,7 +78,7 @@ def load(path: Union[str, os.PathLike[str]]) -> Union[EDLCollection, EDLGroup, E
         mf = toml.load(f)
 
     unit_type = mf.get('type')
-    unit: Any = None
+    unit: T.Any = None
     if unit_type == 'collection':
         unit = EDLCollection()
     elif unit_type == 'group':

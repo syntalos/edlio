@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import uuid
-import toml
+import tomlkit as toml
 from typing import Any, Union, Optional, MutableMapping
 from datetime import datetime
 from .utils import sanitize_name

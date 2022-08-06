@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import uuid
-import toml
+import tomlkit as toml
 from .unit import EDLUnit, EDLError
 from .dataset import EDLDataset
 
