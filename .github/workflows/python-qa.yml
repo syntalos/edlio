@@ -27,14 +27,14 @@ jobs:
         python -m flit build
         rm -r dist/
 
+    - name: Test
+      run: |
+        python -m pytest
+
     - name: Build & Install
       run: |
         python ./setup.py build
         python ./setup.py install --root=/tmp
-
-    #- name: Test with pytest
-    #  run: |
-    #    pytest | true
 
 
   lint:
@@ -58,6 +58,10 @@ jobs:
       run: |
         python -m pylint -f colorized ./edlio ./tests
         python -m pylint -f colorized setup.py
+
+    - name: Lint (black)
+      run: |
+        python -m black --diff .
 
 
   mypy:
