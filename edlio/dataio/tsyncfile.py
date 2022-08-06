@@ -361,7 +361,7 @@ class TSyncFile:
                         f.read(4)
                         if block_term != TSYNC_BLOCK_TERM_32:
                             raise Exception(
-                                'Block terminator not found: ' 'Some data may be corrupted.'
+                                'Block terminator not found: Some data may be corrupted.'
                             )
                         b_index = 0
                         continue
@@ -371,7 +371,7 @@ class TSyncFile:
                     (expected_cs,) = struct.unpack('<Q', f.read(8))
                     if block_term != TSYNC_BLOCK_TERM:
                         raise Exception(
-                            'Block terminator not found: ' 'Some data is likely corrupted.'
+                            'Block terminator not found: Some data is likely corrupted.'
                         )
                     if expected_cs != self._xxh.intdigest():
                         raise Exception('Block checksum mismatch: Some data is likely corrupted.')
