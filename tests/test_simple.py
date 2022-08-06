@@ -32,10 +32,10 @@ def test_load_intan_raw(samples_dir):
     for intan in dset.read_data(include_nosync_time=True):
         times = intan.sync_times
         dig_chan_all = intan._raw_data['DIGITAL-IN']
-        assert dig_chan_all
+        assert dig_chan_all.any()
 
         ts_raw = intan._raw_data['timestamp']
-        assert ts_raw
+        assert ts_raw.any()
         assert intan._timestamp_len == 1304640
         assert intan.digin_channels_raw[0].size == 1304640
 
