@@ -23,7 +23,7 @@ Simple EDL reading example
     print('Loaded data collection {}, created on {}, recording length: {}'.format(
         dcoll.collection_idname,
         dcoll.time_created,
-        dcoll.attributes.get('recording_length_msec', 'unknown'))
+        dcoll.attributes.get('recording_length_msec', 'unknown')))
 
     # get reference to the "videos" group
     egroup = dcoll.group_by_name('videos')
