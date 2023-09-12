@@ -86,7 +86,7 @@ def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType):
         return '<q', 8
     if dtype == TSyncDataType.UINT64:
         return '<Q', 8
-    raise Exception('No data defined for how to unpack type {}'.format(dtype))
+    raise RuntimeError('No data defined for how to unpack type {}'.format(dtype))
 
 
 def tsync_time_unit_to_punit(unit: TSyncTimeUnit):
@@ -100,7 +100,7 @@ def tsync_time_unit_to_punit(unit: TSyncTimeUnit):
         return ureg.msec
     if unit == TSyncTimeUnit.SECONDS:
         return ureg.sec
-    raise Exception('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
+    raise ValueError('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
 
 
 def read_utf8_xxh_from_file(f, xxh):
@@ -111,7 +111,7 @@ def read_utf8_xxh_from_file(f, xxh):
         return ''
 
     if length > (os.fstat(f.fileno()).st_size - f.tell() + 1):
-        raise Exception('String length in binary too long ({}).'.format(length))
+        raise ValueError('String length in binary too long ({}).'.format(length))
 
     data = f.read(length)
     xxh.update(data)
@@ -229,7 +229,7 @@ class TSyncFile:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<Q', f.read(8))
             if magic_number != TSYNC_MAGIC:
-                raise Exception('Unrecognized file type: This file is no tsync file.')
+                raise ValueError('Unrecognized file type: This file is no tsync file.')
 
             # read file header block
             self._xxh = xxh3_64()
@@ -237,7 +237,7 @@ class TSyncFile:
             minor_version = self._read_xxh_unpack('<H', f.read(2))
             self._format_version = '{}.{}'.format(major_version, minor_version)
             if major_version != TSYNC_VERSION_MAJOR or minor_version > TSYNC_VERSION_MINOR:
-                raise Exception(
+                raise ValueError(
                     'Can not read TSync format version {} (max {}.{})'.format(
                         self._format_version, TSYNC_VERSION_MAJOR, TSYNC_VERSION_MINOR
                     )
@@ -285,12 +285,12 @@ class TSyncFile:
                 (block_term,) = struct.unpack('<Q', f.read(8))
                 (expected_header_cs,) = struct.unpack('<Q', f.read(8))
                 if block_term != TSYNC_BLOCK_TERM:
-                    raise Exception(
+                    raise ValueError(
                         'Header block terminator not found: The file is either '
                         'invalid or its header block was damaged.'
                     )
                 if expected_header_cs != self._xxh.intdigest():
-                    raise Exception(
+                    raise ValueError(
                         'Header checksum mismatch: The file is either invalid or '
                         'its header block was damaged.'
                     )
@@ -304,7 +304,7 @@ class TSyncFile:
                     (block_term,) = struct.unpack('<I', f.read(4))
                     f.read(4)
                     if block_term != TSYNC_BLOCK_TERM_32:
-                        raise Exception(
+                        raise ValueError(
                             'Header block terminator not found: The file is either '
                             'invalid or its header block was damaged.'
                         )
@@ -332,7 +332,7 @@ class TSyncFile:
                 if last_block_len.is_integer() and last_block_len > 0:
                     last_block_len = int(last_block_len)
                 else:
-                    raise Exception(
+                    raise ValueError(
                         'File "{}" may be corrupt: Suspicious size ({}) of '
                         'last data block.'.format(fname, last_block_len)
                     )
@@ -360,7 +360,7 @@ class TSyncFile:
                         (block_term,) = struct.unpack('<I', f.read(4))
                         f.read(4)
                         if block_term != TSYNC_BLOCK_TERM_32:
-                            raise Exception(
+                            raise ValueError(
                                 'Block terminator not found: Some data may be corrupted.'
                             )
                         b_index = 0
@@ -370,11 +370,11 @@ class TSyncFile:
                     (block_term,) = struct.unpack('<Q', f.read(8))
                     (expected_cs,) = struct.unpack('<Q', f.read(8))
                     if block_term != TSYNC_BLOCK_TERM:
-                        raise Exception(
+                        raise ValueError(
                             'Block terminator not found: Some data is likely corrupted.'
                         )
                     if expected_cs != self._xxh.intdigest():
-                        raise Exception('Block checksum mismatch: Some data is likely corrupted.')
+                        raise ValueError('Block checksum mismatch: Some data is likely corrupted.')
                     self._xxh.reset()
                     b_index = 0
             del self._xxh
@@ -475,11 +475,13 @@ class LegacyTSyncFile:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<I', f.read(4))
             if magic_number != int('C6BBDFBC', 16):
-                raise Exception('Unrecognized file type.')
+                raise ValueError('Unrecognized file type.')
 
             (self._format_version,) = struct.unpack('<I', f.read(4))
             if self._format_version != 1:
-                raise Exception('Can not read TSync format version {}'.format(self._format_version))
+                raise ValueError(
+                    'Can not read TSync format version {}'.format(self._format_version)
+                )
             log.debug('Reading legacy tsync file: {}'.format(fname))
 
             (ts,) = struct.unpack('<q', f.read(8))
@@ -490,7 +492,9 @@ class LegacyTSyncFile:
             try:
                 self._generator_name = read_utf8_xxh_from_file(f, xxh)
             except UnicodeDecodeError as uni_e:
-                raise Exception('This legacy tsync file is damaged and can not be read.') from uni_e
+                raise ValueError(
+                    'This legacy tsync file is damaged and can not be read.'
+                ) from uni_e
 
             json_raw = read_utf8_xxh_from_file(f, xxh)
             self._custom = {}
@@ -516,7 +520,7 @@ class LegacyTSyncFile:
                 return
 
             if bytes_remaining % bytes_per_block != 0:
-                raise Exception('File may be corrupt: Not a whole number of data blocks found!')
+                raise ValueError('File may be corrupt: Not a whole number of data blocks found!')
 
             num_data_blocks = int(bytes_remaining / bytes_per_block)
             indices_continuous = True

@@ -79,25 +79,25 @@ def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
             sync_map = np.empty([0, 2])
             for tsf in aux_data.read():
                 if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
-                    raise Exception(
+                    raise ValueError(
                         (
                             'Can not synchronize video timestamps using a '
                             'non-continuous tsync file.'
                         )
                     )
                 if tsf.time_units[0] != ureg.dimensionless:
-                    raise Exception(
+                    raise ValueError(
                         'Unit of first time in tsync mapping has to be \'index\' for '
                         'video files.'
                     )
                 if tsf.time_units[1] != ureg.msec:
-                    raise Exception(
+                    raise ValueError(
                         'We currently expect video timestamps to be in '
                         'milliseconds (unit was {}).'.format(tsf.time_units[1])
                     )
                 sync_map = np.vstack((sync_map, tsf.times)) * ureg.msec
         else:
-            raise Exception(
+            raise ValueError(
                 'Unknown auxiliary data type ({}|{}) for video file.'.format(
                     aux_data.file_type, aux_data.media_type
                 )

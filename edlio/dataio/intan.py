@@ -183,12 +183,12 @@ def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_tim
         tsf_count = 0
         for tsf in aux_data.read():
             if tsf.sync_mode != TSyncFileMode.SYNCPOINTS:
-                raise Exception(
+                raise ValueError(
                     'Can not synchronize RHD signal timestamps using a tsync file '
                     'that is not in \'syncpoints\' mode.'
                 )
             if tsf.time_units != (ureg.usec, ureg.usec):
-                raise Exception(
+                raise ValueError(
                     'For RHD signal synchronization, both timestamp units in tsync '
                     'file must be microseconds. Found: {}'.format(tsf.time_units)
                 )
@@ -227,7 +227,7 @@ def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_tim
             sample_rate = reader._max_sampling_rate * ureg.hertz
         else:
             if sample_rate != reader._max_sampling_rate * ureg.hertz:
-                raise Exception(
+                raise ValueError(
                     'Samplig rate in Intan recording slice file differs from previous '
                     'files. The data may not belong to the same recording.'
                 )

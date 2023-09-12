@@ -34,7 +34,7 @@ def samples_dir():
 
     smpldir = os.path.join(source_root, 'tests', 'samples')
     if not os.path.isdir(smpldir):
-        raise Exception('Unable to find test samples directory in {}'.format(smpldir))
+        raise RuntimeError('Unable to find test samples directory in {}'.format(smpldir))
 
     # unpack any xz files that we just compress for efficient storage,
     # but need in their raw form for testing
