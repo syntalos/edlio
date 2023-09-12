@@ -18,6 +18,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from datetime import datetime
 
 import edlio
 from edlio import ureg
@@ -41,3 +42,20 @@ def test_load_intan_raw(samples_dir):
 
         assert times[0] == 6.196 * ureg.ms
         assert intan._nosync_ts[0] == 6.196 * ureg.ms
+
+
+def test_load_tsync_only(samples_dir):
+    test_coll = edlio.load(os.path.join(samples_dir, 'blink1'))
+    assert test_coll.collection_idname == 'blink1_21-02-08_a87011'
+
+    dset = test_coll.group_by_name('videos').dataset_by_name('miniscope')
+
+    tsync_data = [tsync for tsync in dset.read_aux_data('tsync')]
+    assert len(tsync_data) == 1
+    tsync = tsync_data[0]
+
+    assert tsync.time_units == (ureg.dimensionless, ureg.millisecond)
+    assert tsync.time_labels == ('frame-no', 'master-time')
+    assert tsync.time_created == datetime.fromisoformat('2021-02-08 17:17:31')
+    assert tsync.times.shape == (1287, 2)
+    assert tsync.times.size == 2574

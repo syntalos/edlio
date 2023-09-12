@@ -92,3 +92,43 @@ an input from the Intan boards digital channel as 1/0 value in a plot.
     plt.plot(x_time, y_sig)
     plt.show()
 
+
+Accessing raw tsync data
+========================
+
+Sometimes data, e.g. a video file, has been processed by a 3rd-party application, and
+you need to get the timestamps back without reading all raw data again.
+
+In this case, reading only the tsync data (or any other accompanying auxiliary data)
+is possible!
+By using the ``read_aux_data(key)`` function of a dataset, you can specify which auxiliary
+data you want to load, If there is only one kind, supplying a key is not necessary (which is the majority of cases).
+Otherwise you can define the file/data type you want to load as key.
+
+In our case, we load the time sync data for a Miniscope dataset, and display it without ever touching the
+original raw video. This data can then be used to map frame numbers to timestamps in a video that
+was processed from the raw video (e.g. by tools like Minian or MIN1PIPE).
+
+.. code-block:: python
+
+    import edlio
+
+    # load our data collection
+    dcoll = edlio.load('/path/to/edl/dataset/directory')
+
+    # get the miniscope video dataset
+    dset = test_coll.group_by_name('videos').dataset_by_name('miniscope')
+
+    # read auxiliary tsync data files - we assume there is only one such file here
+    tsync_data = [tsync for tsync in dset.read_aux_data('tsync')]
+    assert len(tsync_data) == 1
+    tsync = tsync_data[0]
+
+    # print some information
+    print('Labels:', tsync.time_labels)
+    print('Units:', tsync.time_units)
+    print('Creation Date:', tsync.time_created)
+
+    # get a (X, 2) matrix mapping frame numbers to time stamps (in this case,
+    # ensure your tsync units and labels match your expectations!)
+    print(tsync.times)
