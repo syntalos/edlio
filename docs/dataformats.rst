@@ -69,7 +69,7 @@ to align timestamps in post processing in case there was a timestamp divergence 
 The `edlio` library fully supports reading tsync files, and is usually using them fully automatically to align times, no manual
 intervention is necessary.
 
-The tsync binary file format is `described in the Syntalos documentation <https://github.com/bothlab/syntalos>`_.
+The tsync binary file format is `described in the Syntalos documentation <https://syntalos.readthedocs.io/en/latest/tsync-format.html>`_.
 
 Electrophysiology
 =================
