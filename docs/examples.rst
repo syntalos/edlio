@@ -10,11 +10,18 @@ This document contains a few examples of how to use `edlio`.
 Simple EDL reading example
 ==========================
 
+This code snippet reads an EDL collection that has a `generic-camera` dataset
+containing a camera video in a `videos` EDL group.
+
+If the camera data has time-sync information in the `tsync` format, the timing data
+is loaded automatically and provided as value in ``frame.time``.
+
 .. code-block:: python
 
     import sys
     import edlio
     import cv2 as cv
+
 
     # load our data collection
     dcoll = edlio.load('/path/to/edl/dataset/directory')
@@ -44,3 +51,44 @@ Simple EDL reading example
 
         if cv.waitKey(25) & 0xFF == ord('q'):
             break
+
+
+Reading electrophysiology data
+==============================
+
+The `edlio` library will automatically time-sync Intan electrophysiology data
+when data is read. The data itself is made available as an
+`IntanRawIO <https://neo.readthedocs.io/en/stable/rawio.html#neo.rawio.IntanRawIO>`_
+subclass from the Neo library, and can be used like any other Neo object.
+
+The code below loads all intan files, has them time-synchronized automatically and then displays
+an input from the Intan boards digital channel as 1/0 value in a plot.
+
+.. code-block:: python
+
+    import edlio
+    import matplotlib.pyplot as plt
+
+
+    # load our data collection
+    dcoll = edlio.load('/path/to/edl/dataset/directory')
+
+    # grab the "intan-signals" dataset
+    dset = dcoll.dataset_by_name('intan-signals')
+
+    x_time = []
+    y_sig = []
+
+    # read each data file, and concatenate all data to a large chunk
+    for intan in dset.read_data(do_timesync=True):
+        x_time.append(intan.sync_times)
+        y_sig.append(intan.digin_channels_raw[0] * 1)
+
+    x_time = np.concatenate(x_time)
+    y_sig = np.concatenate(y_sig)
+
+    # plot the result
+    plt.figure()
+    plt.plot(x_time, y_sig)
+    plt.show()
+

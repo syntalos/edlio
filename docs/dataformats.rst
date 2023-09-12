@@ -66,7 +66,10 @@ Time Sync Files
 Time Sync Files (extension: .tsync) are binary files created by `Syntalos <https://github.com/bothlab/syntalos>`_ which can be used
 to align timestamps in post processing in case there was a timestamp divergence due to divergent clocks in unsynchronized DAQ devices.
 
-TODO: Document the .tsync binary format here.
+The `edlio` library fully supports reading tsync files, and is usually using them fully automatically to align times, no manual
+intervention is necessary.
+
+The tsync binary file format is `described in the Syntalos documentation <https://github.com/bothlab/syntalos>`_.
 
 Electrophysiology
 =================
