@@ -117,7 +117,7 @@ was processed from the raw video (e.g. by tools like Minian or MIN1PIPE).
     dcoll = edlio.load('/path/to/edl/dataset/directory')
 
     # get the miniscope video dataset
-    dset = test_coll.group_by_name('videos').dataset_by_name('miniscope')
+    dset = dcoll.group_by_name('videos').dataset_by_name('miniscope')
 
     # read auxiliary tsync data files - we assume there is only one such file here
     tsync_data = [tsync for tsync in dset.read_aux_data('tsync')]
