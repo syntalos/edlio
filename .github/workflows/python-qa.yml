@@ -50,7 +50,7 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip wheel 'flake8>=4.0' 'pylint>=2.12' black
+        python -m pip install --upgrade pip setuptools wheel 'flake8>=4.0' 'pylint>=2.12' black
         python -m pip install -r requirements.all.txt
 
     - name: Lint (flake8)
@@ -77,7 +77,7 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip wheel mypy
+        python -m pip install --upgrade pip setuptools wheel mypy
         python -m pip install -r requirements.all.txt
 
     - name: Check with MyPy
