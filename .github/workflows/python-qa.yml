@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip wheel pytest flit
+        python -m pip install --upgrade pip setuptools wheel pytest flit
         python -m pip install -r requirements.all.txt
         python -m pip install -r docs/requirements.txt
         
