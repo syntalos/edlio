@@ -1,5 +1,5 @@
 -r ../requirements.txt
-sphinx>=2.4
+sphinx>=6.0
 pygments>=2.6
 cloud_sptheme
 sphinx-autodoc-typehints
