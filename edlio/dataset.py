@@ -20,8 +20,8 @@
 from __future__ import annotations
 
 import os
+import typing as T
 import functools
-from typing import Any, Union, Optional, Sequence, MutableMapping
 
 from .unit import EDLUnit, EDLError
 from .dataio import DATA_LOADERS, load_dataio_module
@@ -59,7 +59,7 @@ class EDLDataFile:
         base_path,
         media_type: str | None = None,
         file_type: str | None = None,
-        unit_attrs: dict[str, Any] = None,
+        unit_attrs: dict[str, T.Any] = None,
     ):
         if not unit_attrs:
             unit_attrs = {}
@@ -68,7 +68,7 @@ class EDLDataFile:
         self._media_type = media_type
         self._file_type = file_type
         self._unit_attrs = unit_attrs
-        self._summary: Optional[str] = None
+        self._summary: T.Optional[str] = None
         self.parts = []
 
     @property
@@ -76,30 +76,30 @@ class EDLDataFile:
         return (self._media_type, self._file_type)
 
     @property
-    def media_type(self) -> Optional[str]:
+    def media_type(self) -> T.Optional[str]:
         '''The media (MIME) type of this data.'''
         return self._media_type
 
     @media_type.setter
-    def media_type(self, mime: Optional[str]):
+    def media_type(self, mime: T.Optional[str]):
         self._media_type = mime
 
     @property
-    def file_type(self) -> Optional[str]:
+    def file_type(self) -> T.Optional[str]:
         '''´ The filetype, in case no media type was available.'''
         return self._file_type
 
     @file_type.setter
-    def file_type(self, ftype: Optional[str]):
+    def file_type(self, ftype: T.Optional[str]):
         self._file_type = ftype
 
     @property
-    def summary(self) -> Optional[str]:
+    def summary(self) -> T.Optional[str]:
         '''A human-readable summary of what this data is about.'''
         return self._summary
 
     @summary.setter
-    def summary(self, text: Optional[str]):
+    def summary(self, text: T.Optional[str]):
         '''Set the summary text'''
         self._summary = text
 
@@ -146,7 +146,7 @@ class EDLDataFile:
         self.parts.append(part)
         return part, os.path.join(self._base_path, part.fname)
 
-    def read(self, aux_data_entries: Optional[Sequence[EDLDataFile]] = None, **kwargs):
+    def read(self, aux_data_entries: T.Optional[T.Sequence[EDLDataFile]] = None, **kwargs):
         '''Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
@@ -222,7 +222,7 @@ class EDLDataset(EDLUnit):
     def add_aux_data(self, adf: EDLDataFile):
         self._aux_data.append(adf)
 
-    def _parse_data_md(self, d: dict[str, Any]):
+    def _parse_data_md(self, d: dict[str, T.Any]):
         df = EDLDataFile(
             self.path, d.get('media_type'), d.get('file_type'), unit_attrs=self.attributes
         )
@@ -233,9 +233,7 @@ class EDLDataset(EDLUnit):
             df.parts.sort()
         return df
 
-    def load(
-        self, path: Union[str, os.PathLike[str]], mf: Optional[MutableMapping[str, Any]] = None
-    ):
+    def load(self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None):
         '''
         Load an EDL dataset from a path.
 
@@ -306,7 +304,7 @@ class EDLDataset(EDLUnit):
             return None
         return self._data.read(self._aux_data, **kwargs)
 
-    def read_aux_data(self, key: Optional[str] = None) -> Optional[Any]:
+    def read_aux_data(self, key: T.Optional[str] = None) -> T.Optional[T.Any]:
         '''
         Read auxiliary data from this dataset.
 

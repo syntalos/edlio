@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Any, Optional, Sequence
+import typing as T
 
 import cv2 as cv
 import numpy as np
@@ -49,15 +49,15 @@ class Frame:
         self.index = index
 
 
-def load_data(part_paths, aux_data_entries: Sequence[EDLDataFile]):
+def load_data(part_paths, aux_data_entries: T.Sequence[EDLDataFile]):
     '''Entry point for automatic dataset loading.
 
     This function is used internally to load data from a video and expose
     it as stream of frames.
     '''
-    sync_map: Optional[Any] = None
+    sync_map: T.Optional[T.Any] = None
 
-    aux_data: Optional[EDLDataFile] = None
+    aux_data: T.Optional[EDLDataFile] = None
     valid_timestamp_aux_keys = ['tsync', 'csv']
     for adf in aux_data_entries:
         for vtak in valid_timestamp_aux_keys:

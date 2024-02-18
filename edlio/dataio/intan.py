@@ -18,7 +18,6 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging as log
-from typing import Optional
 
 import numpy as np
 
@@ -173,7 +172,7 @@ def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_tim
     start_offset = 0 * ureg.usec
     sync_map = np.empty([0, 2])
 
-    aux_data: Optional[EDLDataFile] = None
+    aux_data: EDLDataFile | None = None
     for adf in aux_data_entries:
         if 'tsync' in adf.file_type or 'tsync' in adf.media_type:
             aux_data = adf

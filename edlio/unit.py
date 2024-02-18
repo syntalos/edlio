@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import uuid
-from typing import Any, Union, Optional, MutableMapping
+import typing as T
 from datetime import datetime
 
 import tomlkit as toml
@@ -129,9 +129,7 @@ class EDLUnit:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
-    def load(
-        self, path: Union[str, os.PathLike[str]], mf: Optional[MutableMapping[str, Any]] = None
-    ):
+    def load(self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None):
         '''
         Load an EDL unit from a path or path/data combination.
 
