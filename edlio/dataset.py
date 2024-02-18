@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -54,10 +54,20 @@ class EDLDataFile:
 
     parts: list[EDLDataPart] = []
 
-    def __init__(self, base_path, media_type: str = None, file_type: str = None):
+    def __init__(
+        self,
+        base_path,
+        media_type: str | None = None,
+        file_type: str | None = None,
+        unit_attrs: dict[str, Any] = None,
+    ):
+        if not unit_attrs:
+            unit_attrs = {}
+
         self._base_path = base_path
         self._media_type = media_type
         self._file_type = file_type
+        self._unit_attrs = unit_attrs
         self._summary: Optional[str] = None
         self.parts = []
 
@@ -157,9 +167,20 @@ class EDLDataFile:
             dclass = 'video'
         elif dclass.startswith('text/csv'):
             dclass = 'csv'
+        elif dclass == 'application/json':
+            dclass = 'json'
+        elif dclass == 'application/zstd':
+            if self.file_type == 'json.zst':
+                dclass = 'json'
+        elif 'json' in dclass:
+            dclass = 'json'
 
         if dclass not in DATA_LOADERS:
             raise EDLError('I do not know how to read data of type "{}".'.format(dclass))
+
+        if dclass == 'json':
+            # knowing the JSON schema in advance is very useful
+            kwargs['json_schema'] = self._unit_attrs.get('json_schema')
 
         load_data = load_dataio_module(dclass)
         return load_data(self.part_paths(), aux_data_entries, **kwargs)
@@ -183,7 +204,7 @@ class EDLDataset(EDLUnit):
             Name of this dataset, or None
         '''
         EDLUnit.__init__(self, name)
-        self._data = EDLDataFile(self.path)
+        self._data = EDLDataFile(self.path, unit_attrs=self.attributes)
         self._aux_data = []
 
     @property
@@ -202,7 +223,9 @@ class EDLDataset(EDLUnit):
         self._aux_data.append(adf)
 
     def _parse_data_md(self, d: dict[str, Any]):
-        df = EDLDataFile(self.path, d.get('media_type'), d.get('file_type'))
+        df = EDLDataFile(
+            self.path, d.get('media_type'), d.get('file_type'), unit_attrs=self.attributes
+        )
         df.summary = d.get('summary')
         for pi in d.get('parts', []):
             df.parts.append(EDLDataPart(pi['fname'], pi.get('index', -1)))
@@ -227,7 +250,7 @@ class EDLDataset(EDLUnit):
             mf = {}
         EDLUnit.load(self, path, mf)
 
-        self._data = EDLDataFile(self.path)
+        self._data = EDLDataFile(self.path, unit_attrs=self.attributes)
         self._aux_data = []
         if 'data' in mf:
             self._data = self._parse_data_md(mf['data'])

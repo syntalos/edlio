@@ -21,10 +21,11 @@ import importlib
 
 # Determine which loader is responsible for which file type.
 DATA_LOADERS = {
-    'video': 'edlio.dataio.video',
-    'tsync': 'edlio.dataio.tsyncfile',
     'csv': 'edlio.dataio.csvdata',
+    'json': 'edlio.dataio.jsondata',
     'rhd': 'edlio.dataio.intan',
+    'tsync': 'edlio.dataio.tsyncfile',
+    'video': 'edlio.dataio.video',
 }
 
 
