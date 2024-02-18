@@ -1,0 +1,3 @@
+json_data_unit = 'au'
+json_schema = 'extended-pandas'
+json_time_unit = 'milliseconds'

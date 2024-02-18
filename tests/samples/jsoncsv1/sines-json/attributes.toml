@@ -1,0 +1,3 @@
+json_data_unit = 'au'
+json_schema = 'pandas-split'
+json_time_unit = 'milliseconds'

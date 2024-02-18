@@ -1,0 +1,23 @@
+machine_node = 'testnode [debian 12]'
+recording_length_msec = 22893.0
+success = true
+
+[[modules]]
+id = 'devel.datasource'
+name = 'Devel: DataSource'
+
+[[modules]]
+id = 'table'
+name = 'Table'
+
+[[modules]]
+id = 'jsonwriter'
+name = 'JSON Writer'
+
+[[modules]]
+id = 'jsonwriter'
+name = 'JSON Writer 2'
+
+[[modules]]
+id = 'jsonwriter'
+name = 'JSON Writer 3'
