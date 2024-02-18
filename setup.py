@@ -34,6 +34,7 @@ setup(
     long_description=open(os.path.join(source_root, 'README.md'), encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     install_requires=pyproject_data['project']['dependencies'],
+    tests_require=pyproject_data['project']['optional-dependencies']['test'],
     python_requires=pyproject_data['project']['requires-python'],
     platforms=['any'],
     packages=packages,
