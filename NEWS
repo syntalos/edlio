@@ -1,3 +1,24 @@
+Version 0.2.0
+~~~~~~~~~~~~~~
+Released: 2024-02-18
+
+Features:
+ * ci: Test with Python 3.11
+ * csv: Allow loading CSV as Pandas dataframe
+ * tests: Add JSON/CSV example data
+ * Implement support for reading JSON table/array data
+ * Bump minimum required Python version
+
+Bugfixes:
+ * Add test dependencies and optional dependencies
+ * Modernize type-hints slightly
+
+Documentation:
+ * docs: Add more descriptions to example code
+ * docs: Add an example for reading raw tsync files
+ * Add readthedocs.yaml file for documentation build
+ * docs: Allow JSON for table/array storage
+
 Version 0.1.2
 ~~~~~~~~~~~~~~
 Released: 2022-08-06
