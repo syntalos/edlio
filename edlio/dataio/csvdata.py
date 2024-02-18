@@ -20,13 +20,21 @@
 import csv
 
 
-def load_data(part_paths, aux_data_entries):
+def load_data(part_paths, aux_data_entries, as_dataframe: bool = False):
     '''Entry point for automatic dataset loading.
 
     This function is used internally to load CSV data.
     '''
-    for fname in part_paths:
-        with open(fname, newline='', encoding='utf-8') as f:
-            reader = csv.reader(f, delimiter=';')
-            for row in reader:
-                yield row
+
+    if as_dataframe:
+        import pandas as pd
+
+        for fname in part_paths:
+            df = pd.read_csv(fname, sep=';')
+            yield df
+        else:
+            for fname in part_paths:
+                with open(fname, newline='', encoding='utf-8') as f:
+                    reader = csv.reader(f, delimiter=';')
+                    for row in reader:
+                        yield row
