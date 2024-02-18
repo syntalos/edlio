@@ -32,9 +32,9 @@ def load_data(part_paths, aux_data_entries, as_dataframe: bool = False):
         for fname in part_paths:
             df = pd.read_csv(fname, sep=';')
             yield df
-        else:
-            for fname in part_paths:
-                with open(fname, newline='', encoding='utf-8') as f:
-                    reader = csv.reader(f, delimiter=';')
-                    for row in reader:
-                        yield row
+    else:
+        for fname in part_paths:
+            with open(fname, newline='', encoding='utf-8') as f:
+                reader = csv.reader(f, delimiter=';')
+                for row in reader:
+                    yield row
