@@ -1,5 +1,6 @@
 -r ../requirements.txt
 sphinx>=6.0
 pygments>=2.6
-cloud_sptheme
+pydata-sphinx-theme
 sphinx-autodoc-typehints
+neo

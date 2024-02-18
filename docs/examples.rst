@@ -1,5 +1,8 @@
-Examples of using EDL with `edlio`
-##################################
+Examples
+########
+
+Examples using `edlio`
+======================
 
 To easily read data from EDL directories, the Python module `edlio` exists.
 Due to the simple structure of EDL, support for it can easily be implemented
@@ -8,7 +11,7 @@ in any other language as well.
 This document contains a few examples of how to use `edlio`.
 
 Simple EDL reading example
-==========================
+--------------------------
 
 This code snippet reads an EDL collection that has a `generic-camera` dataset
 containing a camera video in a `videos` EDL group.
@@ -54,7 +57,7 @@ is loaded automatically and provided as value in ``frame.time``.
 
 
 Reading electrophysiology data
-==============================
+------------------------------
 
 The `edlio` library will automatically time-sync Intan electrophysiology data
 when data is read. The data itself is made available as an
@@ -94,7 +97,7 @@ an input from the Intan boards digital channel as 1/0 value in a plot.
 
 
 Accessing raw tsync data
-========================
+------------------------
 
 Sometimes data, e.g. a video file, has been processed by a 3rd-party application, and
 you need to get the timestamps back without reading all raw data again.
