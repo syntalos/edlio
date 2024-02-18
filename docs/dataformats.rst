@@ -43,6 +43,8 @@ VP9 is often a good middle ground).
 Tables
 ======
 
+CSV
+---
 Tables may be stored as text in `text/comma-separated-values` (.csv) files. CSV files as used by EDL must be semicolon-separated,
 UTF-8 encoded text documents. Numbers encoded in text must not be padded with zeros or use abbreviations. The machine locale `C`
 (`English/UnitedStates`) should be used for encoding. Decimal separator is the dot, digit group separators must not be used.
@@ -50,15 +52,31 @@ UTF-8 encoded text documents. Numbers encoded in text must not be padded with ze
 Dates must and times must be stored in RFC 822 compliant form. Duration integers are assumed to be milliseconds unless the unit
 is explicitly specified in a table header.
 
+JSON
+----
+Tables can also be stored in the JSON format used by `Pandas <https://pandas.pydata.org/>`_
+in its ``split`` variant. The JSON file may be compressed using the Zstd compression algorithm.
+
 Arrays
 ======
 
+NumPy (.npz)
+------------
 Arrays/Matrices should preferrably be stored as NumPy .npz files (multiple arrays) or .npy binary files.
 The document `numpy.lib.format <https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html>`_
 describes the binary format in detail.
 
 Only scalar numeric types are permitted for NPY arrays for the moment, pickling Python objects into NPY arrays
 is forbidden as doing so greatly reduces compatibility with other tools.
+
+JSON
+----
+Time-series data can also be saved in the JSON format used by `Pandas <https://pandas.pydata.org/>`_
+in its ``split`` variant.
+Using the values ``Infinity``/``-Infinity`` for positive/negative infinite values, as well as ``NaN``
+for non-numbers is permitted as a divergency from the JSON specification.
+
+The JSON file may be `Zstd <https://en.wikipedia.org/wiki/Zstd>`_-compressed.
 
 Time Sync Files
 ===============
