@@ -237,6 +237,7 @@ def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_tim
     intan_sync_idx = (sync_map[:, 0].to(ureg.seconds) * sample_rate).magnitude
     intan_sync_idx = intan_sync_idx.astype(np.int32)
 
+    tvec_noadj = None  # silence pylint
     if include_nosync_time or not do_timesync:
         tvec_noadj = _make_nosync_tsvec(recording_data_len, sample_rate, start_offset)
     if do_timesync:
