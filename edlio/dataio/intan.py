@@ -237,12 +237,12 @@ def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_tim
     intan_sync_idx = (sync_map[:, 0].to(ureg.seconds) * sample_rate).magnitude
     intan_sync_idx = intan_sync_idx.astype(np.int32)
 
-    if do_timesync:
-        tvec = _make_synced_tsvec(recording_data_len, sample_rate, intan_sync_idx, sync_map)
     if include_nosync_time or not do_timesync:
         tvec_noadj = _make_nosync_tsvec(recording_data_len, sample_rate, start_offset)
-        if not do_timesync:
-            tvec = tvec_noadj
+    if do_timesync:
+        tvec = _make_synced_tsvec(recording_data_len, sample_rate, intan_sync_idx, sync_map)
+    else:
+        tvec = tvec_noadj
 
     last_ts_idx = 0
     for reader in intan_readers:
