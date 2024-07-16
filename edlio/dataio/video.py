@@ -90,12 +90,15 @@ def load_data(part_paths, aux_data_entries: T.Sequence[EDLDataFile]):
                         'Unit of first time in tsync mapping has to be \'index\' for '
                         'video files.'
                     )
-                if tsf.time_units[1] != ureg.msec:
+                if tsf.time_units[1] == ureg.msec:
+                    sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.msec
+                elif tsf.time_units[1] == ureg.usec:
+                    sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
+                else:
                     raise ValueError(
                         'We currently expect video timestamps to be in '
-                        'milliseconds (unit was {}).'.format(tsf.time_units[1])
+                        'microseconds or milliseconds (unit was {}).'.format(tsf.time_units[1])
                     )
-                sync_map = np.vstack((sync_map, tsf.times)) * ureg.msec
         else:
             raise ValueError(
                 'Unknown auxiliary data type ({}|{}) for video file.'.format(
