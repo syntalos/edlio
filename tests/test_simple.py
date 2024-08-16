@@ -34,7 +34,7 @@ def test_load_intan_raw(samples_dir):
 
     for intan in dset.read_data(include_nosync_time=True):
         times = intan.sync_times
-        dig_chan_all = intan._raw_data['DIGITAL-IN']
+        dig_chan_all = intan.digin_channels_raw
         assert dig_chan_all.any()
 
         ts_raw = intan._raw_data['timestamp']
