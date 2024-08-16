@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -73,7 +73,19 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
             return self._digin_channels
 
         ts_len = self._timestamp_len
-        digin_raw = self._raw_data['DIGITAL-IN'].flatten()
+        digin_raw = None
+        dig_fields = ('DIGITAL-IN', 'USB board digital input channel')
+        for field in dig_fields:
+            if field in self._raw_data.dtype.names:
+                digin_raw = self._raw_data[field].flatten()
+                break
+        if digin_raw is None:
+            raise ValueError(
+                'Unable to find board digital input channel data! (Available fields: {})'.format(
+                    self._raw_data.dtype.names
+                )
+            )
+
         if digin_raw.size > 0:
             # FIXME: We just assume 16 digital channels. This code should actually go into NEO
             # in a better form, instead of being hacked in here
