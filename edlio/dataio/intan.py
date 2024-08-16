@@ -76,13 +76,13 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         digin_raw = None
         dig_fields = ('DIGITAL-IN', 'USB board digital input channel')
         for field in dig_fields:
-            if field in self._raw_data.dtype.names:
+            if field in self._raw_data.dtype.names:  # pylint: disable=no-member
                 digin_raw = self._raw_data[field].flatten()
                 break
         if digin_raw is None:
             raise ValueError(
                 'Unable to find board digital input channel data! (Available fields: {})'.format(
-                    self._raw_data.dtype.names
+                    self._raw_data.dtype.names  # pylint: disable=no-member
                 )
             )
 
