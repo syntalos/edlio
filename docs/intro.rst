@@ -18,10 +18,10 @@ requirements:
 4. Support datasets of multiple modalities: Electrophysiology, Tables, Matrices, Video recordings, ...
 5. Allow massively parallel write and read access on the level of individual datsets
 
-The EDL format is a specification for a storage layout for experiment data, with primary
-focus on neuroscientific data. It was originally devised exclusively for the
-`Syntalos <https://github.com/bothlab/syntalos>`_ DAQ system, which has governed many of
-its design decisions.
+The EDL format is a specification for a storage layout for data
+from scientific experiments, with primary focus on neuroscientific data.
+It was originally devised exclusively for the `Syntalos <https://syntalos.github.io/>`_
+DAQ system, which has governed many of its design decisions.
 
 Architecture Overview
 =====================
