@@ -80,19 +80,27 @@ an input from the Intan boards digital channel as 1/0 value in a plot.
     dset = dcoll.dataset_by_name('intan-signals')
 
     x_time = []
-    y_sig = []
+    y_sig_d = []
+    y_sig_a = []
 
     # read each data file, and concatenate all data to a large chunk
-    for intan in dset.read_data(do_timesync=True):
-        x_time.append(intan.sync_times)
-        y_sig.append(intan.digin_channels_raw[0] * 1)
+    for nreader in dset.read_data(do_timesync=True):
+        x_time.append(nreader.sync_times)
+
+        # read one digital channel
+        y_sig_d.append(nreader.digin_channels_raw[0] * 1)
+        # read one analog channel
+        y_sig_a.append(nreader.get_analogsignal_chunk(stream_index=0,
+                                                      channel_names=['A-001']))
 
     x_time = np.concatenate(x_time)
-    y_sig = np.concatenate(y_sig)
+    y_sig_d = np.concatenate(y_sig_d)
+    y_sig_a = np.concatenate(y_sig_a)
 
     # plot the result
     plt.figure()
-    plt.plot(x_time, y_sig)
+    plt.plot(x_time, y_sig_d)
+    plt.plot(x_time, y_sig_a)
     plt.show()
 
 
