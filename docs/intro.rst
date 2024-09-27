@@ -103,7 +103,7 @@ directory structure like EDL, it also has some disadvantages which may make EDL 
 
 * Writing in parallel to multiple datasets in a HDF5 file is very slow due to thread synchronization, making HDF5 not a
   great choice for massively parallel data acquisition.
-* In case of an error while writing (e.g. due to a crash of the writing process), the entore HDF5 file may be corrupted,
+* In case of an error while writing (e.g. due to a crash of the writing process), the entire HDF5 file may be corrupted,
   instead of just one file. EDL is a bit more robust.
 * HDF5 has a limited set of ways to compress its array data. EDL, by using file-formats designed for the recorded modalities,
   can compress the stored data a lot more (e.g. by using the FFV1 video codec for video data).
@@ -121,15 +121,15 @@ experimental pipelines. Like EDL, it is modeled using the same abstractions that
 Exdir and EDL are *extremely* similar to each other, and Syntalos used Exdir for a short time. However, there are some key differences:
 
 * EDL uses `TOML <https://toml.io/en/>`_ for metadata and Exdir uses `YAML <https://yaml.org/>`_. While YAML is great to write for
-  humans and sometimes less verbose than TOML, it has quite a lot of `abigutities and pitfalls <https://noyaml.com/>`_ for humans and
-  programs to run into, which sometimes makes it harder to be used.
+  humans and sometimes less verbose than TOML, it has quite a lot of `ambiguities and pitfalls <https://noyaml.com/>`_ for humans and
+  programs to run into, which sometimes makes it more difficult to be used for structured data storage.
 * Exdir adheres fairly strictly to the HDF5 abstract data model and the data types that HDF5 supports. While arrays are well-supported
   as Numpy arrays, there are no standards for "raw" datasets (containing videos or images). For use in a DAQ system like Syntalos, the
   "raw" dataset type wpuld have to be massively extended.
 * Each Exdir dataset can only contain one format, while EDL supports "auxiliary data" that describes the contained data further and is not
-  pure textual TOML metadata. This auxiliary data may for example be timestamps for a video file. In Exdir, this data would had to be split
-  into two datasets, which users found very confusing. EDL allows strongly linked data to be kept together in one directory.
-* Exdir has no unique ID for the dataset, and also does not mandata the ID to be added as metadata to files contained in its structure.
+  pure textual TOML metadata. This auxiliary data may for example be timestamps for a video file. In Exdir, this data would have needed to
+  be split into two datasets, which users found very confusing. EDL allows strongly linked data to be kept together in one directory.
+* Exdir has no unique ID for the dataset, and also does not mandate the ID to be added as metadata to files contained in its structure.
   This is a feature that we really wanted for EDL, and that was a bit difficult to retrofit into Exdir.
 
 Overall, Exdir is a fine format that simply has a few less features compared to what we needed for Syntalos. Its advantage over EDL
