@@ -16,7 +16,7 @@ In addition to that, a storage layout for raw experiment data also has to fulfil
 requirements:
 
 4. Support datasets of multiple modalities: Electrophysiology, Tables, Matrices, Video recordings, ...
-5. Allow massively parallel write and read access on the level of individual datsets
+5. Allow massively parallel write and read access on the level of individual datasets
 
 The EDL format is a specification for a storage layout for data
 from scientific experiments, with primary focus on neuroscientific data.
@@ -99,7 +99,7 @@ large amounts of data in a single, structured file. Currently, HDF5 is the most-
 other file formats, and is especially useful to store array data.
 
 While HDF5 is an excellent format to store structured data, and has the advantage of being just one file instead of a
-directory structure like EDL, it also has some disadvantages which may make EDL preferrable in some applications:
+directory structure like EDL, it also has some disadvantages which may make EDL preferable in some applications:
 
 * Writing in parallel to multiple datasets in a HDF5 file is very slow due to thread synchronization, making HDF5 not a
   great choice for massively parallel data acquisition.
@@ -125,7 +125,7 @@ Exdir and EDL are *extremely* similar to each other, and Syntalos used Exdir for
   programs to run into, which sometimes makes it more difficult to be used for structured data storage.
 * Exdir adheres fairly strictly to the HDF5 abstract data model and the data types that HDF5 supports. While arrays are well-supported
   as Numpy arrays, there are no standards for "raw" datasets (containing videos or images). For use in a DAQ system like Syntalos, the
-  "raw" dataset type wpuld have to be massively extended.
+  "raw" dataset type would have to be massively extended.
 * Each Exdir dataset can only contain one format, while EDL supports "auxiliary data" that describes the contained data further and is not
   pure textual TOML metadata. This auxiliary data may for example be timestamps for a video file. In Exdir, this data would have needed to
   be split into two datasets, which users found very confusing. EDL allows strongly linked data to be kept together in one directory.
