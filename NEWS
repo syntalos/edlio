@@ -1,5 +1,19 @@
+Version 0.2.1
+~~~~~~~~~~~~~
+Released: 2024-10-01
+
+Features:
+ * Accept microsecond-precision video timestamps
+
+Bugfixes:
+ * intan: Load digital input channel even if it has an alternative name
+
+Documentation:
+ * docs: Add project comparison section
+ * docs: Expand the ephys reader example
+
 Version 0.2.0
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Released: 2024-02-18
 
 Features:
@@ -20,7 +34,7 @@ Documentation:
  * docs: Allow JSON for table/array storage
 
 Version 0.1.2
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Released: 2022-08-06
 
 Features:
@@ -33,7 +47,7 @@ Bugfixes:
  * intan: Never apply the initial offset twice
 
 Version 0.1.1
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Released: 2021-12-16
 
 Bugfixes:
@@ -43,7 +57,7 @@ Bugfixes:
   * intan: Offset-correct raw time vector if we did not have enough sync points
 
 Version 0.1.0
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Released: 2021-05-18
 
 Notes:
