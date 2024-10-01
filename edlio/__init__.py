@@ -24,7 +24,7 @@ Module to work with data in an Experiment Directory Layout (EDL) structure
 from __future__ import annotations
 
 __appname__ = 'edlio'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 import os
 import typing as T
