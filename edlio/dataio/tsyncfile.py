@@ -23,7 +23,7 @@ import struct
 import logging as log
 from enum import IntEnum
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 import numpy as np
 from xxhash import xxh3_64
@@ -250,7 +250,9 @@ class TSyncFile:
                     'integrity checks will be skipped.'.format(self._format_version)
                 )
 
-            self._time_created = datetime.utcfromtimestamp(self._read_xxh_unpack('<q', f.read(8)))
+            self._time_created = datetime.fromtimestamp(
+                self._read_xxh_unpack('<q', f.read(8)), tz=timezone.utc
+            )
             self._generator_name = self._read_utf8_xxh_from_file(f)
             self._collection_id = UUID(self._read_utf8_xxh_from_file(f))
             user_json_raw = self._read_utf8_xxh_from_file(f)

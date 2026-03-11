@@ -18,7 +18,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import numpy as np
 
@@ -58,7 +58,9 @@ def test_load_tsync_only(samples_dir):
 
     assert tsync.time_units == (ureg.dimensionless, ureg.millisecond)
     assert tsync.time_labels == ('frame-no', 'master-time')
-    assert tsync.time_created == datetime.fromisoformat('2021-02-08 17:17:31')
+    assert tsync.time_created == datetime.fromisoformat('2021-02-08 17:17:31').replace(
+        tzinfo=timezone.utc
+    )
     assert tsync.times.shape == (1287, 2)
     assert tsync.times.size == 2574
 
