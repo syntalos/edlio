@@ -8,9 +8,11 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ['3.11',
-                         '3.12',
-                         '3.13']
+        python-version: [
+          '3.12',
+          '3.13',
+          '3.13',
+        ]
 
     steps:
     - uses: actions/checkout@v6
@@ -23,7 +25,7 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel pytest flit
         python -m pip install -r requirements.all.txt
         python -m pip install -r docs/requirements.txt
-        
+
     - name: Build (Flit)
       run: |
         python -m flit build
