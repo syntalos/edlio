@@ -77,7 +77,7 @@ def test_load_json_csv(samples_dir):
     dfs = list(dset.read_data())
     assert len(dfs) == 1
     assert dfs[0].dtypes.array == [np.int64, np.int64]
-    assert dfs[0].columns.array == ['timestamp_msec', 'Int 1']
+    assert dfs[0].columns.tolist() == ['timestamp_msec', 'Int 1']
     assert dfs[0].shape == (4524, 2)
 
     # check reading a pandas-compatible JSON float numbers set
@@ -90,7 +90,7 @@ def test_load_json_csv(samples_dir):
     dfs = list(dset.read_data())
     assert len(dfs) == 1
     assert dfs[0].dtypes.array == [np.int64, np.float64, np.float64, np.float64]
-    assert dfs[0].columns.array == ['timestamp_msec', 'Sine 1', 'Sine 2', 'Sine 3']
+    assert dfs[0].columns.tolist() == ['timestamp_msec', 'Sine 1', 'Sine 2', 'Sine 3']
     assert dfs[0].shape == (4524, 4)
 
     # check reading a JSON string table
@@ -99,7 +99,7 @@ def test_load_json_csv(samples_dir):
     dfs = list(dset.read_data())
     assert len(dfs) == 1
     assert dfs[0].dtypes.array == [np.int64, np.dtype('O'), np.dtype('O')]
-    assert dfs[0].columns.array == ['Time', 'Tag', 'Value']
+    assert dfs[0].columns.tolist() == ['Time', 'Tag', 'Value']
     assert dfs[0].shape == (5, 3)
 
     # check reading a CSV table as Pandas DataFrame
@@ -107,7 +107,7 @@ def test_load_json_csv(samples_dir):
     dfs = list(dset.read_data(as_dataframe=True))
     assert len(dfs) == 1
     assert dfs[0].dtypes.array == [np.int64, np.dtype('O'), np.dtype('O')]
-    assert dfs[0].columns.array == ['Time', 'Tag', 'Value']
+    assert dfs[0].columns.tolist() == ['Time', 'Tag', 'Value']
     assert dfs[0].shape == (5, 3)
 
     # check reading a CSV table row-by-row
