@@ -21,12 +21,12 @@ from .group import EDLGroup
 
 
 class EDLCollection(EDLGroup):
-    '''
+    """
     An EDL Collection
-    '''
+    """
 
     def __init__(self, name: str | None = None):
-        '''
+        """
         Create a new EDL collection.
 
         If the collection has no name and path set, it can not be saved
@@ -36,12 +36,12 @@ class EDLCollection(EDLGroup):
         ----------
         name
             Name of this collection, or None
-        '''
+        """
         EDLGroup.__init__(self, name)
 
     @property
     def generator_id(self) -> str | None:
-        '''Identification string of the software which generated this EDL unit.'''
+        """Identification string of the software which generated this EDL unit."""
         return self._generator_id
 
     @generator_id.setter
@@ -50,13 +50,13 @@ class EDLCollection(EDLGroup):
 
     @property
     def collection_idname(self) -> str:
-        '''
+        """
         Retrieve a human-readable string for this collection which is
         most likely (but not guaranteed to be) unique.
         If this collection has no properties set, the value of this property
         may be None or empty.
         The format of the returned string is arbitrary and should not be parsed.
-        '''
+        """
         parts = []
         subject_id = self.attributes.get('subject_id')
         if subject_id:

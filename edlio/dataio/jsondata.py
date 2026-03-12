@@ -56,11 +56,11 @@ def _read_pandas_extended_json(fname: str | os.PathLike) -> pd.DataFrame:
 
 def load_data(
     part_paths: T.Iterable[str], aux_data_entries: T.Any, json_schema: str | None = None
-) -> T.Iterator['pd.DataFrame']:
-    '''Entry point for automatic dataset loading.
+) -> T.Iterator[pd.DataFrame]:
+    """Entry point for automatic dataset loading.
 
     This function is used internally to load JSON data.
-    '''
+    """
     try:
         import pandas as pd
     except ImportError as e:

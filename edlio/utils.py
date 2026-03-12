@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -26,7 +26,7 @@ _T = T.TypeVar('_T')
 
 
 def sanitize_name(name: str) -> str:
-    '''
+    """
     Sanitize a string for use as an EDL unit name,
     by stripping or replacing invalid characters.
 
@@ -39,7 +39,7 @@ def sanitize_name(name: str) -> str:
     -------
     str
         The sanitized name.
-    '''
+    """
     if not name:
         return None
     s = ''.join(filter(lambda x: x in string.printable, name))

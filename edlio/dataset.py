@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -29,7 +29,7 @@ from .dataio import DATA_LOADERS, load_dataio_module
 
 @functools.total_ordering
 class EDLDataPart:
-    '''Describes a part of a data file that has been split'''
+    """Describes a part of a data block that has been split into multiple files."""
 
     index: int = -1
     fname: str = None
@@ -54,7 +54,7 @@ class EDLDataPart:
 
 
 class EDLDataFile:
-    '''A data file, associated with a dataset'''
+    """A data file, associated with a dataset"""
 
     parts: list[EDLDataPart] = []
 
@@ -120,10 +120,10 @@ class EDLDataFile:
         )
 
     def part_paths(self) -> T.Iterator[str]:
-        '''
+        """
         Return a generator for the path of each file-part, in their correct
         sorting order.
-        '''
+        """
         for part in self.parts:
             yield os.path.join(self._base_path, part.fname)
 

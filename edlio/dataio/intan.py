@@ -40,11 +40,11 @@ from .tsyncfile import TSyncFileMode
 
 # pylint: disable=abstract-method
 class SyncIntanReader(IntanRawIO, BaseFromRaw):
-    '''Reader for Intan electrophysiology data.
+    """Reader for Intan electrophysiology data.
 
     This class is the same as IntanIO from NEO, but additionally also provides
     synchronized timestamps in its :meth:`sync_times` property.
-    '''
+    """
 
     _prefered_signal_group_mode = 'group-by-same-units'
 
@@ -60,12 +60,12 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
     @property
     def has_adjusted_times(self) -> bool:
-        '''Returns True if we have synchronized or otherwise adjusted time data.'''
+        """Returns True if we have synchronized or otherwise adjusted time data."""
         return self._sync_ts is not None
 
     @property
     def sync_times(self) -> T.Any:
-        '''Synchronized timestamps vector'''
+        """Synchronized timestamps vector"""
         return self._sync_ts
 
     @property

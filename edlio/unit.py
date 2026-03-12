@@ -45,9 +45,9 @@ class EDLError(Exception):
 
 
 class EDLUnit:
-    '''
+    """
     Generic base class for all EDL unit types.
-    '''
+    """
 
     def __init__(self, name: str | None = None):
         self._parent: EDLUnit | None = None
@@ -130,7 +130,7 @@ class EDLUnit:
                 raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
     def load(self, path: str | os.PathLike, mf: T.MutableMapping[str, T.Any] | None = None) -> None:
-        '''
+        """
         Load an EDL unit from a path or path/data combination.
 
         Parameters
@@ -139,7 +139,7 @@ class EDLUnit:
             Filesystem path of this dataset.
         mf
             Manifest file data as dictionary, if data from :path should not be used.
-        '''
+        """
         if not os.path.isdir(path):
             raise EDLError(
                 (
