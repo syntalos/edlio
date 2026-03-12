@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   qa:
-    name: Build & Test
+    name: QA
     uses: ./.github/workflows/python-qa.yml
 
   release:
