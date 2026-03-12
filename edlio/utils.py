@@ -58,7 +58,7 @@ def listify(item: list[_T]) -> list[_T]: ...
 def listify(item: _T) -> list[_T]: ...
 
 
-def listify(item):
+def listify(item: T.Any) -> list[T.Any]:
     """
     Return a list of :item, unless :item already is a list.
     """

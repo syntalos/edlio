@@ -100,7 +100,7 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
 def _make_nosync_tsvec(
     data_len: int, sample_rate: pint.Quantity[int], init_offset: pint.Quantity[int]
-):
+) -> pint.Quantity[np.ndarray]:
     """Create time vector taking only the start time into account."""
     tv = np.arange(0, data_len).astype(np.float64) * ureg.dimensionless
     tv = (tv / sample_rate).to(ureg.msec) - init_offset.to(ureg.msec)
@@ -113,7 +113,7 @@ def _make_synced_tsvec(
     sample_rate: pint.Quantity[int],
     idx_intan: np.ndarray,
     sync_map: pint.Quantity[np.ndarray],
-):
+) -> pint.Quantity[np.ndarray]:
     """Create time vector, synchronizing all timepoints.
 
     Syntalos monitors the timestamps coming from the external device and compares them to a

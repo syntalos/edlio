@@ -26,6 +26,7 @@ from enum import IntEnum
 from uuid import UUID
 from datetime import datetime, timezone
 
+import pint
 import numpy as np
 from xxhash import xxh3_64
 
@@ -90,17 +91,17 @@ def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType) -> tuple[str, int]:
     raise RuntimeError('No data defined for how to unpack type {}'.format(dtype))
 
 
-def tsync_time_unit_to_punit(unit: TSyncTimeUnit):
+def tsync_time_unit_to_punit(unit: TSyncTimeUnit) -> pint.Unit:
     if unit == TSyncTimeUnit.INDEX:
-        return ureg.dimensionless
+        return T.cast(pint.Unit, ureg.dimensionless)
     if unit == TSyncTimeUnit.NANOSECONDS:
-        return ureg.nsec
+        return T.cast(pint.Unit, ureg.nsec)
     if unit == TSyncTimeUnit.MICROSECONDS:
-        return ureg.usec
+        return T.cast(pint.Unit, ureg.usec)
     if unit == TSyncTimeUnit.MILLISECONDS:
-        return ureg.msec
+        return T.cast(pint.Unit, ureg.msec)
     if unit == TSyncTimeUnit.SECONDS:
-        return ureg.sec
+        return T.cast(pint.Unit, ureg.sec)
     raise ValueError('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
 
 
@@ -488,7 +489,7 @@ class LegacyTSyncFile:
             log.debug('Reading legacy tsync file: {}'.format(fname))
 
             (ts,) = struct.unpack('<q', f.read(8))
-            self._time_created = datetime.utcfromtimestamp(ts)
+            self._time_created = datetime.fromtimestamp(ts, tz=timezone.utc)
             (self._tolerance_us,) = struct.unpack('<I', f.read(4))
 
             xxh = xxh3_64()
