@@ -17,14 +17,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import sys
+from pathlib import Path
 
-thisfile = __file__
-if not os.path.isabs(thisfile):
-    thisfile = os.path.normpath(os.path.join(os.getcwd(), thisfile))
-source_root = os.path.normpath(os.path.join(os.path.dirname(thisfile), '..'))
-sys.path.append(os.path.normpath(source_root))
+source_root = str(Path(__file__).resolve().parent.parent)
+if source_root not in sys.path:
+    # Prefer local project imports over globally installed packages.
+    sys.path.insert(0, source_root)
 
 
 __all__ = ['source_root']
