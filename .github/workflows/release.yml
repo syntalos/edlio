@@ -9,13 +9,13 @@ permissions:
   contents: write
 
 jobs:
-  build-test:
+  qa:
     name: Build & Test
-    uses: ./.github/workflows/build-test.yml
+    uses: ./.github/workflows/python-qa.yml
 
   release:
     name: Create Release
-    needs: build-test
+    needs: qa
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -26,10 +26,31 @@ jobs:
           VERSION="${GITHUB_REF#refs/tags/v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Extract release notes from NEWS.md
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Extract the block for this version from NEWS.md.
+          # The block starts with "Version X.Y.Z" and ends before the next "Version " line.
+          awk -v ver="$VERSION" '
+            BEGIN { found=0 }
+            /^Version / {
+              if (found) exit
+              if ($2 == ver) { found=1; next }
+            }
+            /^-+$/ && found && !body { next }
+            found { body=1; print }
+          ' NEWS.md > release_notes.md
+
+          if [ ! -s release_notes.md ]; then
+            echo "::warning::No release notes found for version $VERSION in NEWS.md"
+            echo "Release $VERSION" > release_notes.md
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: Version ${{ steps.version.outputs.version }}
-          generate_release_notes: true
+          body_path: release_notes.md
           draft: false
           prerelease: false
