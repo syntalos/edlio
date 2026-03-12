@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -20,6 +20,7 @@
 import os
 import json
 import struct
+import typing as T
 import logging as log
 from enum import IntEnum
 from uuid import UUID
@@ -72,8 +73,8 @@ TSYNC_BLOCK_TERM = int('1126000000000000', 16)
 TSYNC_BLOCK_TERM_32 = int('11260000', 16)
 
 
-def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType):
-    '''Convert tsync data type into Python unpack format string and length'''
+def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType) -> tuple[str, int]:
+    """Convert tsync data type into Python unpack format string and length"""
     if dtype == TSyncDataType.INT16:
         return '<h', 2
     if dtype == TSyncDataType.UINT16:
@@ -103,8 +104,8 @@ def tsync_time_unit_to_punit(unit: TSyncTimeUnit):
     raise ValueError('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
 
 
-def read_utf8_xxh_from_file(f, xxh):
-    '''Read UTF-8 encoded string from binary .tsync file'''
+def read_utf8_xxh_from_file(f: T.BinaryIO, xxh: T.Any) -> str:
+    """Read UTF-8 encoded string from binary .tsync file"""
 
     (length,) = struct.unpack('<I', f.read(4))
     if length == int('ffffffff', 16):
@@ -124,14 +125,14 @@ class TSyncFile:
     Syntalos DAQ system.
     '''
 
-    def __init__(self, fname=None):
+    def __init__(self, fname: str | None = None):
         self._format_version = '1.0'
-        self._time_created = None
+        self._time_created: datetime | None = None
         self._generator_name = ''
         self._collection_id = UUID(int=0x00)
         self._ts_mode = TSyncFileMode.CONTINUOUS
         self._block_size = 128
-        self._custom = {}
+        self._custom: dict[str, T.Any] = {}
         self._time_labels = ('A', 'B')
         self._time_units = (
             tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
@@ -142,90 +143,90 @@ class TSyncFile:
             self.open(fname)
 
     @property
-    def time_created(self):
+    def time_created(self) -> datetime | None:
         return self._time_created
 
     @property
     def tolerance(self) -> int:
-        '''The tolerance range value, in microseconds'''
-        return self._custom.get('tolerance_us', 0)
+        """The tolerance range value, in microseconds"""
+        return int(self._custom.get('tolerance_us', 0))
 
     @tolerance.setter
-    def tolerance(self, usec: int):
+    def tolerance(self, usec: int) -> None:
         self._custom['tolerance_us'] = usec
 
     @property
     def generator_name(self) -> str:
-        '''Name of the module that generated this file.'''
+        """Name of the module that generated this file."""
         return self._generator_name
 
     @generator_name.setter
-    def generator_name(self, name: str):
+    def generator_name(self, name: str) -> None:
         self._generator_name = name
 
     @property
     def collection_id(self) -> UUID:
-        '''Data collection ID this file belongs to.'''
+        """Data collection ID this file belongs to."""
         return self._collection_id
 
     @collection_id.setter
-    def collection_id(self, uuid: UUID):
+    def collection_id(self, uuid: UUID) -> None:
         self._collection_id = uuid
 
     @property
     def sync_mode(self) -> TSyncFileMode:
-        '''Time data storage mode..'''
+        """Time data storage mode.."""
         return self._ts_mode
 
     @sync_mode.setter
-    def sync_mode(self, mode: TSyncFileMode):
+    def sync_mode(self, mode: TSyncFileMode) -> None:
         self._ts_mode = mode
 
     @property
-    def custom(self) -> dict:
-        '''User-defined custom üroperties of this file.'''
+    def custom(self) -> dict[str, T.Any]:
+        """User-defined custom properties of this file."""
         return self._custom
 
     @custom.setter
-    def custom(self, v: dict):
+    def custom(self, v: dict[str, T.Any]) -> None:
         self._custom = v
 
     @property
-    def time_labels(self):
-        '''Labels of the two encoded times.'''
+    def time_labels(self) -> tuple[str, str]:
+        """Labels of the two encoded times."""
         return self._time_labels
 
     @time_labels.setter
-    def time_labels(self, v):
+    def time_labels(self, v: tuple[str, str]) -> None:
         self._time_labels = v
 
     @property
-    def time_units(self):
-        '''Units of the two encoded times.'''
+    def time_units(self) -> tuple[T.Any, T.Any]:
+        """Units of the two encoded times."""
         return self._time_units
 
     @time_units.setter
-    def time_units(self, v):
+    def time_units(self, v: tuple[T.Any, T.Any]) -> None:
         self._time_units = v
 
     @property
-    def times(self):
-        '''The actual time values of the two clocks.'''
+    def times(self) -> np.ndarray:
+        """The actual time values of the two clocks."""
         return self._times
 
     @times.setter
-    def times(self, v):
+    def times(self, v: np.ndarray) -> None:
         self._times = v
 
-    def _read_xxh_unpack(self, format, buffer):
+    def _read_xxh_unpack(self, format: str, buffer: bytes) -> int:
         self._xxh.update(buffer)
         (v,) = struct.unpack(format, buffer)
-        return v
+        return int(v)
 
-    def _read_utf8_xxh_from_file(self, f):
+    def _read_utf8_xxh_from_file(self, f: T.BinaryIO) -> str:
         return read_utf8_xxh_from_file(f, self._xxh)
 
-    def open(self, fname):
+    def open(self, fname: str) -> None:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<Q', f.read(8))
             if magic_number != TSYNC_MAGIC:
@@ -330,13 +331,13 @@ class TSyncFile:
             if last_block_bytes_remaining == 0:
                 last_block_len = 0
             else:
-                last_block_len = (last_block_bytes_remaining - term_bytecount) / bytes_per_entry
-                if last_block_len.is_integer() and last_block_len > 0:
-                    last_block_len = int(last_block_len)
+                last_block_len_f = (last_block_bytes_remaining - term_bytecount) / bytes_per_entry
+                if last_block_len_f.is_integer() and last_block_len_f > 0:
+                    last_block_len = int(last_block_len_f)
                 else:
                     raise ValueError(
                         'File "{}" may be corrupt: Suspicious size ({}) of '
-                        'last data block.'.format(fname, last_block_len)
+                        'last data block.'.format(fname, last_block_len_f)
                     )
             entries_n = whole_block_count * self._block_size + last_block_len
 
@@ -383,18 +384,18 @@ class TSyncFile:
 
 
 class LegacyTSyncFile:
-    '''
+    """
     Read a legacy TimeSync (.tsync) binary file as generated by the
     Syntalos DAQ system (legacy variant for an older, experimental
     version of this file format that was briefly in use).
-    '''
+    """
 
-    def __init__(self, fname=None):
+    def __init__(self, fname: str | None = None):
         self._format_version = 1
-        self._time_created = None
-        self._tolerance = 0
+        self._time_created: datetime | None = None
+        self._tolerance_us = 0
         self._generator_name = ''
-        self._custom = {}
+        self._custom: dict[str, T.Any] = {}
         self._time_labels = ('A', 'B')
         self._time_units = (
             tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
@@ -405,7 +406,7 @@ class LegacyTSyncFile:
             self.open(fname)
 
     @property
-    def time_created(self):
+    def time_created(self) -> datetime | None:
         return self._time_created
 
     @property
@@ -414,7 +415,7 @@ class LegacyTSyncFile:
         return self._tolerance_us
 
     @tolerance.setter
-    def tolerance(self, usec: int):
+    def tolerance(self, usec: int) -> None:
         self._tolerance_us = usec
 
     @property
@@ -423,7 +424,7 @@ class LegacyTSyncFile:
         return self._generator_name
 
     @generator_name.setter
-    def generator_name(self, name: str):
+    def generator_name(self, name: str) -> None:
         self._generator_name = name
 
     @property
@@ -432,48 +433,48 @@ class LegacyTSyncFile:
         return TSyncFileMode.SYNCPOINTS
 
     @property
-    def custom(self) -> dict:
+    def custom(self) -> dict[str, T.Any]:
         '''User-defined custom üroperties of this file.'''
         return self._custom
 
     @custom.setter
-    def custom(self, v: dict):
+    def custom(self, v: dict[str, T.Any]) -> None:
         self._custom = v
 
     @property
-    def time_labels(self):
+    def time_labels(self) -> tuple[str, str]:
         '''Labels of the two encoded times.'''
         return self._time_labels
 
     @time_labels.setter
-    def time_labels(self, v):
+    def time_labels(self, v: tuple[str, str]) -> None:
         self._time_labels = v
 
     @property
-    def time_units(self):
+    def time_units(self) -> tuple[T.Any, T.Any]:
         '''Units of the two encoded times.'''
         return self._time_units
 
     @time_units.setter
-    def time_units(self, v):
+    def time_units(self, v: tuple[T.Any, T.Any]) -> None:
         self._time_units = v
 
     @property
-    def times(self):
+    def times(self) -> np.ndarray:
         '''The actual time values of the two clocks.'''
         return self._times
 
     @times.setter
-    def times(self, v):
+    def times(self, v: np.ndarray) -> None:
         self._times = v
 
     @staticmethod
-    def is_legacy(fname):
+    def is_legacy(fname: str) -> bool:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<I', f.read(4))
-            return magic_number == int('C6BBDFBC', 16)
+            return bool(magic_number == int('C6BBDFBC', 16))
 
-    def open(self, fname):
+    def open(self, fname: str) -> None:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<I', f.read(4))
             if magic_number != int('C6BBDFBC', 16):
@@ -539,13 +540,14 @@ class LegacyTSyncFile:
                 print('WARNING: Indices in time sync file were not continuous.')
 
 
-def load_data(part_paths, aux_data_list):
-    '''Entry point for automatic dataset loading.
+def load_data(part_paths: T.Iterable[str], aux_data_list: T.Any) -> T.Iterator[T.Any]:
+    """Entry point for automatic dataset loading.
 
     This function is used internally to Syntalos' .tsync files
     as data or auxiliary data.
-    '''
+    """
     for fname in part_paths:
+        tsync: LegacyTSyncFile | TSyncFile
         if LegacyTSyncFile.is_legacy(fname):
             tsync = LegacyTSyncFile(fname)
         else:

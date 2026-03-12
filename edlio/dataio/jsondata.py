@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -17,12 +17,17 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import os
 import json
 import typing as T
 
+if T.TYPE_CHECKING:
+    import pandas as pd
 
-def _read_pandas_extended_json(fname: str | os.PathLike):
+
+def _read_pandas_extended_json(fname: str | os.PathLike) -> pd.DataFrame:
     import pandas as pd
 
     if str(fname).endswith('.zst'):
@@ -49,7 +54,9 @@ def _read_pandas_extended_json(fname: str | os.PathLike):
     return df
 
 
-def load_data(part_paths, aux_data_entries, json_schema: T.Optional[str] = None):
+def load_data(
+    part_paths: T.Iterable[str], aux_data_entries: T.Any, json_schema: str | None = None
+) -> T.Iterator['pd.DataFrame']:
     '''Entry point for automatic dataset loading.
 
     This function is used internally to load JSON data.

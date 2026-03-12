@@ -38,13 +38,17 @@ class EDLDataPart:
         self.fname = fname
         self.index = index
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, EDLDataPart):
+            return NotImplemented
         return self.index < other.index
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, EDLDataPart):
+            return False
         return self.index == other.index
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         idx_str = '' if self.index < 0 else ', index=' + (str(self.index))
         return 'EDLDataPart(' + self.fname + idx_str + ')'
 
@@ -56,10 +60,10 @@ class EDLDataFile:
 
     def __init__(
         self,
-        base_path,
+        base_path: str | None,
         media_type: str | None = None,
         file_type: str | None = None,
-        unit_attrs: dict[str, T.Any] = None,
+        unit_attrs: dict[str, T.Any] | None = None,
     ):
         if not unit_attrs:
             unit_attrs = {}
@@ -72,38 +76,38 @@ class EDLDataFile:
         self.parts = []
 
     @property
-    def data_type(self):
+    def data_type(self) -> tuple[str | None, str | None]:
         return (self._media_type, self._file_type)
 
     @property
     def media_type(self) -> T.Optional[str]:
-        '''The media (MIME) type of this data.'''
+        """The media (MIME) type of this data."""
         return self._media_type
 
     @media_type.setter
-    def media_type(self, mime: T.Optional[str]):
+    def media_type(self, mime: T.Optional[str]) -> None:
         self._media_type = mime
 
     @property
     def file_type(self) -> T.Optional[str]:
-        '''´ The filetype, in case no media type was available.'''
+        """The filetype, in case no media type was available."""
         return self._file_type
 
     @file_type.setter
-    def file_type(self, ftype: T.Optional[str]):
+    def file_type(self, ftype: T.Optional[str]) -> None:
         self._file_type = ftype
 
     @property
     def summary(self) -> T.Optional[str]:
-        '''A human-readable summary of what this data is about.'''
+        """A human-readable summary of what this data is about."""
         return self._summary
 
     @summary.setter
-    def summary(self, text: T.Optional[str]):
-        '''Set the summary text'''
+    def summary(self, text: T.Optional[str]) -> None:
+        """Set the summary text for this data."""
         self._summary = text
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         data_type = self._media_type if self._media_type else self._file_type
         return (
             'EDLDataFile(type='
@@ -115,7 +119,7 @@ class EDLDataFile:
             + ')'
         )
 
-    def part_paths(self):
+    def part_paths(self) -> T.Iterator[str]:
         '''
         Return a generator for the path of each file-part, in their correct
         sorting order.
@@ -123,7 +127,9 @@ class EDLDataFile:
         for part in self.parts:
             yield os.path.join(self._base_path, part.fname)
 
-    def new_part(self, fname: str, index: int = -1, *, allow_exists=False):
+    def new_part(
+        self, fname: str, index: int = -1, *, allow_exists: bool = False
+    ) -> tuple[EDLDataPart, str]:
         if not fname:
             raise ValueError('File name is not valid.')
         _, fext = os.path.splitext(fname)
@@ -146,12 +152,14 @@ class EDLDataFile:
         self.parts.append(part)
         return part, os.path.join(self._base_path, part.fname)
 
-    def read(self, aux_data_entries: T.Optional[T.Sequence[EDLDataFile]] = None, **kwargs):
-        '''Read all data parts in this set.
+    def read(
+        self, aux_data_entries: T.Optional[T.Sequence[EDLDataFile]] = None, **kwargs: T.Any
+    ) -> T.Any:
+        """Read all data parts in this set.
 
         This returns a generator which reads all the individual data parts in this data file.
         The data reader may take auxiliary data into account, if :aux_data is passed.
-        '''
+        """
         if not aux_data_entries:
             aux_data_entries = []
 
@@ -187,12 +195,12 @@ class EDLDataFile:
 
 
 class EDLDataset(EDLUnit):
-    '''
+    """
     An EDL Dataset
-    '''
+    """
 
-    def __init__(self, name=None):
-        '''
+    def __init__(self, name: str | None = None):
+        """
         Create a new EDL dataset.
 
         If the dataset has no name and path set, it can not be saved
@@ -202,27 +210,27 @@ class EDLDataset(EDLUnit):
         ----------
         name
             Name of this dataset, or None
-        '''
+        """
         EDLUnit.__init__(self, name)
         self._data = EDLDataFile(self.path, unit_attrs=self.attributes)
-        self._aux_data = []
+        self._aux_data: list[EDLDataFile] = []
 
     @property
     def data(self) -> EDLDataFile:
         return self._data
 
     @data.setter
-    def data(self, df: EDLDataFile):
+    def data(self, df: EDLDataFile) -> None:
         self._data = df
 
     @property
     def aux_data(self) -> list[EDLDataFile]:
         return self._aux_data
 
-    def add_aux_data(self, adf: EDLDataFile):
+    def add_aux_data(self, adf: EDLDataFile) -> None:
         self._aux_data.append(adf)
 
-    def _parse_data_md(self, d: dict[str, T.Any]):
+    def _parse_data_md(self, d: dict[str, T.Any]) -> EDLDataFile:
         df = EDLDataFile(
             self.path, d.get('media_type'), d.get('file_type'), unit_attrs=self.attributes
         )
@@ -233,8 +241,10 @@ class EDLDataset(EDLUnit):
             df.parts.sort()
         return df
 
-    def load(self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None):
-        '''
+    def load(
+        self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None
+    ) -> None:
+        """
         Load an EDL dataset from a path.
 
         Parameters
@@ -243,7 +253,7 @@ class EDLDataset(EDLUnit):
             Filesystem path of this dataset.
         mf
             Manifest file data as dictionary, if data from :path should not be used.
-        '''
+        """
         if not mf:
             mf = {}
         EDLUnit.load(self, path, mf)
@@ -260,8 +270,8 @@ class EDLDataset(EDLUnit):
                 for adf_raw in daux_raw:
                     self._aux_data.append(self._parse_data_md(adf_raw))
 
-    def _serialize_data_md(self, df):
-        d = {}
+    def _serialize_data_md(self, df: EDLDataFile) -> dict[str, T.Any]:
+        d: dict[str, T.Any] = {}
         if not df.parts:
             return {}
         if self._data.media_type:
@@ -272,14 +282,14 @@ class EDLDataset(EDLUnit):
             d['summary'] = df.summary
         d['parts'] = []
         for part in df.parts:
-            pd = {'fname': part.fname}
+            pd: dict[str, T.Any] = {'fname': part.fname}
             if part.index >= 0:
                 pd['index'] = part.index
             d['parts'].append(pd)
         return d
 
-    def save(self):
-        '''Save dataset changes to their current location on disk.'''
+    def save(self) -> None:
+        """Save dataset changes to their current location on disk."""
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
         os.makedirs(self.path, exist_ok=True)
@@ -294,18 +304,18 @@ class EDLDataset(EDLUnit):
 
         self._save_metadata(mf, self.attributes)
 
-    def read_data(self, **kwargs):
-        '''Read data from this dataset.
+    def read_data(self, **kwargs: T.Any) -> T.Any:
+        """Read data from this dataset.
 
         Returns a generator to read data from this dataset by individual chunks, taking
         auxiliary data into account.
-        '''
+        """
         if not self._data:
             return None
         return self._data.read(self._aux_data, **kwargs)
 
-    def read_aux_data(self, key: T.Optional[str] = None) -> T.Optional[T.Any]:
-        '''
+    def read_aux_data(self, key: str | None = None) -> T.Any | None:
+        """
         Read auxiliary data from this dataset.
 
         Parameters
@@ -319,7 +329,7 @@ class EDLDataset(EDLUnit):
         Returns
         -------
         The data, or None in case no aux-data or aux-data entry was found.
-        '''
+        """
         if not self._aux_data:
             return None
         if not key:

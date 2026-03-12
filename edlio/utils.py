@@ -19,6 +19,10 @@
 
 import random
 import string
+import typing as T
+import collections
+
+_T = T.TypeVar('_T')
 
 
 def sanitize_name(name: str) -> str:
@@ -44,3 +48,24 @@ def sanitize_name(name: str) -> str:
     if not s:
         s = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
     return s
+
+
+@T.overload
+def listify(item: list[_T]) -> list[_T]: ...
+
+
+@T.overload
+def listify(item: _T) -> list[_T]: ...
+
+
+def listify(item):
+    """
+    Return a list of :item, unless :item already is a list.
+    """
+    if not item:
+        return []
+    if type(item) is list:
+        return item
+    if isinstance(item, collections.abc.Sequence):
+        return list(item)
+    return [item]

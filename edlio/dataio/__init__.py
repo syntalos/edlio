@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import typing as T
 import importlib
 
 # Determine which loader is responsible for which file type.
@@ -29,7 +30,7 @@ DATA_LOADERS = {
 }
 
 
-def load_dataio_module(what):
+def load_dataio_module(what: str) -> T.Callable[..., T.Any]:
     path = DATA_LOADERS[what]
     mod = importlib.import_module(path)
-    return mod.load_data
+    return T.cast(T.Callable[..., T.Any], mod.load_data)

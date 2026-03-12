@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -17,14 +17,22 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import csv
+import typing as T
+
+if T.TYPE_CHECKING:
+    import pandas as pd
 
 
-def load_data(part_paths, aux_data_entries, as_dataframe: bool = False):
-    '''Entry point for automatic dataset loading.
+def load_data(
+    part_paths: T.Iterable[str], aux_data_entries: T.Any, as_dataframe: bool = False
+) -> T.Iterator[pd.DataFrame | list[str]]:
+    """Entry point for automatic dataset loading.
 
     This function is used internally to load CSV data.
-    '''
+    """
 
     if as_dataframe:
         import pandas as pd

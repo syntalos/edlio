@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import os
 import uuid
+import typing as T
 
 import tomlkit as toml
 
@@ -33,7 +34,7 @@ class EDLGroup(EDLUnit):
     An EDL Group
     '''
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str | None = None):
         '''
         Create a new EDL group.
 
@@ -49,7 +50,7 @@ class EDLGroup(EDLUnit):
         self._children: list[EDLUnit] = []
 
     @property
-    def children(self):
+    def children(self) -> list[EDLUnit]:
         return self._children
 
     @property
@@ -57,7 +58,7 @@ class EDLGroup(EDLUnit):
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str):
+    def root_path(self, path: str) -> None:
         self._root_path = path
         for c in self._children:
             c.root_path = self.path
@@ -67,17 +68,17 @@ class EDLGroup(EDLUnit):
         return self._collection_id
 
     @collection_id.setter
-    def collection_id(self, v: uuid.UUID):
+    def collection_id(self, v: uuid.UUID) -> None:
         self._collection_id = v
         for c in self._children:
             c.collection_id = self._collection_id
 
-    def change_name(self, new_name):
+    def change_name(self, new_name: str) -> None:
         EDLUnit.change_name(self, new_name)
         for c in self._children:
             c.root_path = self.path
 
-    def add_child(self, child: EDLUnit):
+    def add_child(self, child: EDLUnit) -> None:
         if not isinstance(child, EDLUnit):
             raise ValueError('Can only have EDL units as children.')
         if not child.name:
@@ -94,18 +95,18 @@ class EDLGroup(EDLUnit):
         self._children.append(child)
 
     @property
-    def datasets(self):
+    def datasets(self) -> T.Iterator[EDLDataset]:
         for child in self._children:
             if isinstance(child, EDLDataset):
                 yield child
 
     @property
-    def groups(self):
+    def groups(self) -> T.Iterator[EDLGroup]:
         for child in self._children:
             if isinstance(child, EDLGroup):
                 yield child
 
-    def group_by_name(self, name, *, create=False):
+    def group_by_name(self, name: str, *, create: bool = False) -> EDLGroup | None:
         for group in self.groups:
             if group.name == name:
                 return group
@@ -116,7 +117,7 @@ class EDLGroup(EDLUnit):
             group.save()
         return group
 
-    def dataset_by_name(self, name, *, create=False):
+    def dataset_by_name(self, name: str, *, create: bool = False) -> EDLDataset | None:
         for dset in self.datasets:
             if dset.name == name:
                 return dset
@@ -127,7 +128,7 @@ class EDLGroup(EDLUnit):
             dset.save()
         return dset
 
-    def save(self):
+    def save(self) -> None:
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
         os.makedirs(self.path, exist_ok=True)
@@ -137,7 +138,7 @@ class EDLGroup(EDLUnit):
         for child in self._children:
             child.save()
 
-    def load(self, path, mf=None):
+    def load(self, path: str | os.PathLike, mf: T.MutableMapping[str, T.Any] | None = None) -> None:
         if not mf:
             mf = {}
         EDLUnit.load(self, path, mf)
@@ -154,6 +155,7 @@ class EDLGroup(EDLUnit):
                 mf = toml.load(f)
 
             unit_type = mf.get('type')
+            unit: EDLGroup | EDLDataset
             if unit_type == 'group':
                 unit = EDLGroup()
             elif unit_type == 'dataset':

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -27,7 +27,6 @@ __appname__ = 'edlio'
 __version__ = '0.2.2'
 
 import os
-import typing as T
 
 import pint
 import tomlkit as toml
@@ -45,8 +44,8 @@ ureg = pint.get_application_registry()
 Q_ = ureg.Quantity
 
 
-def load(path: T.Union[str, os.PathLike[str]]) -> T.Union[EDLCollection, EDLGroup, EDLDataset]:
-    '''
+def load(path: str | os.PathLike[str]) -> EDLCollection | EDLGroup | EDLDataset:
+    """
     Open an EDL unit via its filesystem path.
 
     This function will read an EDL unit on the filesystem and return
@@ -63,7 +62,7 @@ def load(path: T.Union[str, os.PathLike[str]]) -> T.Union[EDLCollection, EDLGrou
     -------
     EDLCollection, EDLGroup, EDLDataset
         An EDL unit.
-    '''
+    """
 
     mf_path = os.path.join(path, 'manifest.toml')
     if not os.path.isfile(mf_path):
@@ -73,7 +72,7 @@ def load(path: T.Union[str, os.PathLike[str]]) -> T.Union[EDLCollection, EDLGrou
         mf = toml.load(f)
 
     unit_type = mf.get('type')
-    unit: T.Any = None
+    unit: EDLCollection | EDLGroup | EDLDataset
     if unit_type == 'collection':
         unit = EDLCollection()
     elif unit_type == 'group':

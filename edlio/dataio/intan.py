@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import typing as T
 import logging as log
 
+import pint
 import numpy as np
 
 try:
@@ -46,14 +48,14 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
     _prefered_signal_group_mode = 'group-by-same-units'
 
-    def __init__(self, intan_filename):
+    def __init__(self, intan_filename: str):
         IntanRawIO.__init__(self, filename=intan_filename)
         BaseFromRaw.__init__(self, intan_filename)
         self._sync_ts = None
         self._timestamp_len = 0
-        self._digin_channels = None
+        self._digin_channels: np.ndarray | None = None
 
-    def _parse_header(self):
+    def _parse_header(self) -> None:
         IntanRawIO._parse_header(self)
 
     @property
@@ -62,13 +64,13 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         return self._sync_ts is not None
 
     @property
-    def sync_times(self):
+    def sync_times(self) -> T.Any:
         '''Synchronized timestamps vector'''
         return self._sync_ts
 
     @property
-    def digin_channels_raw(self):
-        '''Obtain the raw data of digital input channels'''
+    def digin_channels_raw(self) -> np.ndarray:
+        """Obtain the raw data of digital input channels"""
         if self._digin_channels is not None:
             return self._digin_channels
 
@@ -96,17 +98,23 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
         return self._digin_channels
 
 
-def _make_nosync_tsvec(data_len, sample_rate, init_offset):
-    '''Create time vector taking only the start time into account.'''
-    tv = np.arange(0, data_len).astype(np.float64)
+def _make_nosync_tsvec(
+    data_len: int, sample_rate: pint.Quantity[int], init_offset: pint.Quantity[int]
+):
+    """Create time vector taking only the start time into account."""
+    tv = np.arange(0, data_len).astype(np.float64) * ureg.dimensionless
     tv = (tv / sample_rate).to(ureg.msec) - init_offset.to(ureg.msec)
 
     return tv
 
 
-def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
-    '''
-    Create time vector, synchronizing all timepoints.
+def _make_synced_tsvec(
+    data_len: int,
+    sample_rate: pint.Quantity[int],
+    idx_intan: np.ndarray,
+    sync_map: pint.Quantity[np.ndarray],
+):
+    """Create time vector, synchronizing all timepoints.
 
     Syntalos monitors the timestamps coming from the external device and compares them to a
     prediction about what the actual timestamp based on its master clock should be.
@@ -125,7 +133,7 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
 
     This specific function is written only for use with Intan (as it makes certain assumptions
     about the structure of the data).
-    '''
+    """
 
     sync_len = sync_map.shape[0]
     if sync_len <= 2:
@@ -174,15 +182,20 @@ def _make_synced_tsvec(data_len, sample_rate, idx_intan, sync_map):
     return tv_adj
 
 
-def load_data(part_paths, aux_data_entries, do_timesync=True, include_nosync_time=False):
-    '''Entry point for automatic dataset loading.
+def load_data(
+    part_paths: T.Iterable[str],
+    aux_data_entries: T.Sequence[EDLDataFile],
+    do_timesync: bool = True,
+    include_nosync_time: bool = False,
+) -> T.Iterator[SyncIntanReader]:
+    """Entry point for automatic dataset loading.
 
     This function is used internally to load Intan RHD signals data
     and apply time synchronization.
-    '''
+    """
 
     start_offset = 0 * ureg.usec
-    sync_map = np.empty([0, 2])
+    sync_map = np.empty([0, 2]) * ureg.dimensionless
 
     aux_data: EDLDataFile | None = None
     for adf in aux_data_entries:

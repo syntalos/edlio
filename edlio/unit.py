@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -26,20 +26,20 @@ from datetime import datetime
 
 import tomlkit as toml
 
-from .utils import sanitize_name
+from .utils import listify, sanitize_name
 
 # version of the EDL specification
 EDL_FORMAT_VERSION: str = '1'
 
 
 class EDLError(Exception):
-    '''Exception raised for errors in the input.
+    """Exception raised for errors in the input.
 
     Attributes:
         message -- explanation of the error
-    '''
+    """
 
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
         super(EDLError, self).__init__(self.message)
 
@@ -49,28 +49,28 @@ class EDLUnit:
     Generic base class for all EDL unit types.
     '''
 
-    def __init__(self, name=None):
-        self._parent = None
+    def __init__(self, name: str | None = None):
+        self._parent: EDLUnit | None = None
         self._name = sanitize_name(name)
         self._collection_id = uuid.uuid4()
         self._root_path = ''
-        self._authors = []
-        self._attrs = {}
+        self._authors: list[T.Any] = []
+        self._attrs: dict[str, T.Any] = {}
         self._format_version = EDL_FORMAT_VERSION
-        self._generator_id = None
+        self._generator_id: str | None = None
         self._unit_type = self._type_as_unittype()
         self._time_created = datetime.now().replace(microsecond=0)
 
     @property
-    def parent(self):
+    def parent(self) -> EDLUnit | None:
         return self._parent
 
     @property
-    def name(self):
+    def name(self) -> str | None:
         return self._name
 
     @property
-    def unit_type(self):
+    def unit_type(self) -> str:
         return self._unit_type
 
     @property
@@ -78,7 +78,7 @@ class EDLUnit:
         return self._time_created
 
     @time_created.setter
-    def time_created(self, v: datetime):
+    def time_created(self, v: datetime) -> None:
         self._time_created = v
 
     @property
@@ -86,11 +86,11 @@ class EDLUnit:
         return self._collection_id
 
     @collection_id.setter
-    def collection_id(self, v: uuid.UUID):
+    def collection_id(self, v: uuid.UUID) -> None:
         self._collection_id = v
 
     @property
-    def path(self) -> str:
+    def path(self) -> str | None:
         if not self._root_path:
             return None
         return os.path.join(self._root_path, self._name)
@@ -100,11 +100,11 @@ class EDLUnit:
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str):
+    def root_path(self, path: str) -> None:
         self._root_path = path
 
     @property
-    def authors(self):
+    def authors(self) -> list[T.Any]:
         return self._authors
 
     @property
@@ -112,10 +112,10 @@ class EDLUnit:
         return self._attrs
 
     @attributes.setter
-    def attributes(self, v: dict):
+    def attributes(self, v: dict[str, T.Any]) -> None:
         self._attrs = v
 
-    def change_name(self, new_name: str):
+    def change_name(self, new_name: str) -> None:
         old_dir_path = self.path
         old_name = self.name
 
@@ -129,7 +129,7 @@ class EDLUnit:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
-    def load(self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None):
+    def load(self, path: str | os.PathLike, mf: T.MutableMapping[str, T.Any] | None = None) -> None:
         '''
         Load an EDL unit from a path or path/data combination.
 
@@ -182,15 +182,17 @@ class EDLUnit:
             with open(os.path.join(self.path, 'attributes.toml'), 'r', encoding='utf-8') as f:
                 self._attrs = toml.load(f)
 
-        self._time_created = mf['time_created']
+        raw_time_created = mf['time_created']
+        if raw_time_created:
+            self._time_created = datetime.fromisoformat(str(raw_time_created))
         if 'collection_id' in mf:
             self._collection_id = uuid.UUID(str(mf['collection_id']))
         if 'generator' in mf:
-            self._generator_id = mf['generator']
+            self._generator_id = str(mf['generator'])
         if 'authors' in mf:
-            self._authors = mf['authors']
+            self._authors = listify(mf['authors'])
 
-    def _type_as_unittype(self):
+    def _type_as_unittype(self) -> str:
         from .group import EDLGroup
         from .dataset import EDLDataset
         from .collection import EDLCollection
@@ -203,12 +205,12 @@ class EDLUnit:
             return 'dataset'
         raise NotImplementedError('An abstract EDL object does not have a defined type.')
 
-    def _make_manifest_dict(self):
+    def _make_manifest_dict(self) -> dict[str, T.Any]:
         if not self._time_created:
             # set default creation time, with second-resolution (milliseconds are stripped)
             self._time_created = datetime.now().replace(microsecond=0)
 
-        doc = {}
+        doc: dict[str, T.Any] = {}
         doc['format_version'] = self._format_version
         doc['type'] = self._type_as_unittype()
 
@@ -225,7 +227,7 @@ class EDLUnit:
 
         return doc
 
-    def _save_metadata(self, manifest, attributes):
+    def _save_metadata(self, manifest: dict[str, T.Any], attributes: dict[str, T.Any]) -> None:
         if not self.path:
             raise EDLError('No path is set for this EDL unit')
         os.makedirs(self.path, exist_ok=True)
@@ -236,3 +238,6 @@ class EDLUnit:
         if attributes:
             with open(os.path.join(self.path, 'attributes.toml'), 'w', encoding='utf-8') as f:
                 toml.dump(attributes, f)
+
+    def save(self) -> None:
+        raise NotImplementedError('Subclasses need to implement save().')

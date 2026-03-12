@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -25,7 +25,7 @@ class EDLCollection(EDLGroup):
     An EDL Collection
     '''
 
-    def __init__(self, name=None):
+    def __init__(self, name: str | None = None):
         '''
         Create a new EDL collection.
 
@@ -40,12 +40,12 @@ class EDLCollection(EDLGroup):
         EDLGroup.__init__(self, name)
 
     @property
-    def generator_id(self) -> str:
+    def generator_id(self) -> str | None:
         '''Identification string of the software which generated this EDL unit.'''
         return self._generator_id
 
     @generator_id.setter
-    def generator_id(self, v: str):
+    def generator_id(self, v: str) -> None:
         self._generator_id = v
 
     @property

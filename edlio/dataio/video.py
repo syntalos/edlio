@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2021 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -32,8 +32,8 @@ class Frame:
     time: int
     index: int
 
-    def __init__(self, mat, time, index):
-        '''Create a new frame representation for a video file.
+    def __init__(self, mat: np.ndarray, time: int, index: int):
+        """Create a new frame representation for a video file.
 
         Parameters
         ----------
@@ -43,18 +43,20 @@ class Frame:
             Time as quantity (usually in milliseconds)
         index
             An optional frame index that increases monotonically.
-        '''
+        """
         self.mat = mat
         self.time = time
         self.index = index
 
 
-def load_data(part_paths, aux_data_entries: T.Sequence[EDLDataFile]):
-    '''Entry point for automatic dataset loading.
+def load_data(
+    part_paths: T.Iterable[str], aux_data_entries: T.Sequence[EDLDataFile]
+) -> T.Iterator[Frame]:
+    """Entry point for automatic dataset loading.
 
     This function is used internally to load data from a video and expose
     it as stream of frames.
-    '''
+    """
     sync_map: T.Optional[T.Any] = None
 
     aux_data: T.Optional[EDLDataFile] = None

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2024 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -26,8 +26,9 @@ import edlio
 from edlio import ureg
 
 
-def test_load_intan_raw(samples_dir):
+def test_load_intan_raw(samples_dir: str) -> None:
     test_coll = edlio.load(os.path.join(samples_dir, 'blink1'))
+    assert isinstance(test_coll, edlio.EDLCollection)
     assert test_coll.collection_idname == 'blink1_21-02-08_a87011'
 
     dset = test_coll.dataset_by_name('intan-signals')
@@ -46,8 +47,9 @@ def test_load_intan_raw(samples_dir):
         assert intan._nosync_ts[0] == 6.196 * ureg.ms
 
 
-def test_load_tsync_only(samples_dir):
+def test_load_tsync_only(samples_dir: str) -> None:
     test_coll = edlio.load(os.path.join(samples_dir, 'blink1'))
+    assert isinstance(test_coll, edlio.EDLCollection)
     assert test_coll.collection_idname == 'blink1_21-02-08_a87011'
 
     dset = test_coll.group_by_name('videos').dataset_by_name('miniscope')
@@ -65,8 +67,9 @@ def test_load_tsync_only(samples_dir):
     assert tsync.times.size == 2574
 
 
-def test_load_json_csv(samples_dir):
+def test_load_json_csv(samples_dir: str) -> None:
     jcstore = edlio.load(os.path.join(samples_dir, 'jsoncsv1'))
+    assert isinstance(jcstore, edlio.EDLCollection)
     assert jcstore.collection_idname == 'jsoncsv1_24-02-18_336077'
 
     # check reading a pandas-extended JSON integer numbers set

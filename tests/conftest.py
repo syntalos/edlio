@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2019-2020 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2019-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -18,12 +18,13 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import typing as T
 
 import pytest
 
 
 @pytest.fixture(scope='session')
-def samples_dir():
+def samples_dir() -> T.Iterator[str]:
     """
     Prepare samples in the samples directory and return full path to the directory.
     """
