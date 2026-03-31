@@ -93,7 +93,7 @@ def load_data(
                         'video files.'
                     )
                 if tsf.time_units[1] == ureg.msec:
-                    sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.msec
+                    sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.usec
                 elif tsf.time_units[1] == ureg.usec:
                     sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
                 else:
