@@ -3,3 +3,4 @@ pytest
 neo>=0.9
 pandas
 zstandard
+opencv-python
