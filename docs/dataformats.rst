@@ -49,7 +49,7 @@ Tables may be stored as text in `text/comma-separated-values` (.csv) files. CSV 
 UTF-8 encoded text documents. Numbers encoded in text must not be padded with zeros or use abbreviations. The machine locale `C`
 (`English/UnitedStates`) should be used for encoding. Decimal separator is the dot, digit group separators must not be used.
 
-Dates must and times must be stored in RFC 822 compliant form. Duration integers are assumed to be milliseconds unless the unit
+Dates must and times must be stored in RFC 822 compliant form. Duration integers are assumed to be microseconds unless the unit
 is explicitly specified in a table header.
 
 JSON

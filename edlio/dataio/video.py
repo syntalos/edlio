@@ -40,7 +40,7 @@ class Frame:
         mat
             OpenCV matrix containing the image data.
         time
-            Time as quantity (usually in milliseconds)
+            Time as quantity (usually in microseconds)
         index
             An optional frame index that increases monotonically.
         """
