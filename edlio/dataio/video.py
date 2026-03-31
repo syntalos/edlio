@@ -49,6 +49,49 @@ class Frame:
         self.index = index
 
 
+def _read_video_aux_data(
+    aux_data: EDLDataFile,
+) -> np.ndarray[tuple[int, T.Any]] | list[tuple[int, T.Any]]:
+    if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':
+        tab_sync_map = []
+        for row in aux_data.read():
+            if row[0] == 'frame':
+                # we have a table header, skip it
+                continue
+            tab_sync_map.append((int(row[0]), int(row[1]) * ureg.usec))
+
+        return tab_sync_map
+
+    if aux_data.file_type == 'tsync':
+        sync_map = np.empty([0, 2])
+        for tsf in aux_data.read():
+            if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
+                raise ValueError(
+                    'Can not synchronize video timestamps using a non-continuous tsync file.'
+                )
+            if tsf.time_units[0] != ureg.dimensionless:
+                raise ValueError(
+                    'Unit of first time in tsync mapping has to be \'index\' for video files.'
+                )
+            if tsf.time_units[1] == ureg.msec:
+                sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.usec
+            elif tsf.time_units[1] == ureg.usec:
+                sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
+            else:
+                raise ValueError(
+                    'We currently expect video timestamps to be in '
+                    'microseconds or milliseconds (unit was {}).'.format(tsf.time_units[1])
+                )
+
+        return sync_map
+
+    raise ValueError(
+        'Unknown auxiliary data type ({}|{}) for video file.'.format(
+            aux_data.file_type, aux_data.media_type
+        )
+    )
+
+
 def load_data(
     part_paths: T.Iterable[str], aux_data_entries: T.Sequence[EDLDataFile]
 ) -> T.Iterator[Frame]:
@@ -57,9 +100,9 @@ def load_data(
     This function is used internally to load data from a video and expose
     it as stream of frames.
     """
-    sync_map: T.Optional[T.Any] = None
+    sync_map: T.Any | None = None
 
-    aux_data: T.Optional[EDLDataFile] = None
+    aux_data: EDLDataFile | None = None
     valid_timestamp_aux_keys = ['tsync', 'csv']
     for adf in aux_data_entries:
         for vtak in valid_timestamp_aux_keys:
@@ -70,43 +113,7 @@ def load_data(
             break
 
     if aux_data:
-        if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':
-            sync_map = []
-            for row in aux_data.read():
-                if row[0] == 'frame':
-                    # we have a table header, skip it
-                    continue
-                sync_map.append((int(row[0]), int(row[1])))
-        elif aux_data.file_type == 'tsync':
-            sync_map = np.empty([0, 2])
-            for tsf in aux_data.read():
-                if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
-                    raise ValueError(
-                        (
-                            'Can not synchronize video timestamps using a '
-                            'non-continuous tsync file.'
-                        )
-                    )
-                if tsf.time_units[0] != ureg.dimensionless:
-                    raise ValueError(
-                        'Unit of first time in tsync mapping has to be \'index\' for '
-                        'video files.'
-                    )
-                if tsf.time_units[1] == ureg.msec:
-                    sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.usec
-                elif tsf.time_units[1] == ureg.usec:
-                    sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
-                else:
-                    raise ValueError(
-                        'We currently expect video timestamps to be in '
-                        'microseconds or milliseconds (unit was {}).'.format(tsf.time_units[1])
-                    )
-        else:
-            raise ValueError(
-                'Unknown auxiliary data type ({}|{}) for video file.'.format(
-                    aux_data.file_type, aux_data.media_type
-                )
-            )
+        sync_map = _read_video_aux_data(aux_data)
 
     frame_index = 0
     for fname in part_paths:

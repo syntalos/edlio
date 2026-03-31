@@ -34,10 +34,10 @@ EDL_FORMAT_VERSION: str = '1'
 
 def make_collection_uuid() -> uuid.UUID:
     """Create an UUID for use in an EDL collection."""
-    try:
-        return uuid.uuid7()
-    except AttributeError:
-        return uuid.uuid4()
+    f = getattr(uuid, 'uuid7', None)
+    if f is not None:
+        return f()
+    return uuid.uuid4()
 
 
 class EDLError(Exception):
