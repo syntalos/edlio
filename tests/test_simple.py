@@ -21,6 +21,7 @@ import os
 from datetime import datetime, timezone
 
 import numpy as np
+
 import edlio
 from edlio import ureg
 from edlio.dataset import EDLDataFile, EDLDataPart
@@ -71,7 +72,9 @@ def test_load_tsync_only(samples_dir: str) -> None:
 
 
 def test_load_video_tsync_preserves_millisecond_timestamp_scale() -> None:
-    dataset_path = os.path.join(source_root, 'tests', 'samples', 'blink1', 'videos', 'generic-camera')
+    dataset_path = os.path.join(
+        source_root, 'tests', 'samples', 'blink1', 'videos', 'generic-camera'
+    )
 
     aux_data = EDLDataFile(dataset_path, file_type='tsync')
     aux_data.parts.append(EDLDataPart('video_timestamps.tsync', 0))
@@ -81,6 +84,20 @@ def test_load_video_tsync_preserves_millisecond_timestamp_scale() -> None:
     frame = next(frames)
     expected_time_msec = tsync.times[0, 1]
     assert frame.time.to(tsync.time_units[1]).magnitude == expected_time_msec
+
+
+def test_load_video_tsync_keeps_frame_index_unitless() -> None:
+    dataset_path = os.path.join(
+        source_root, 'tests', 'samples', 'blink1', 'videos', 'generic-camera'
+    )
+
+    aux_data = EDLDataFile(dataset_path, file_type='tsync')
+    aux_data.parts.append(EDLDataPart('video_timestamps.tsync', 0))
+    tsync = next(aux_data.read())
+
+    frame = next(load_video_data([os.path.join(dataset_path, 'video.mkv')], [aux_data]))
+    assert frame.index == tsync.times[0, 0]
+    assert not hasattr(frame.index, 'units')
 
 
 def test_load_json_csv(samples_dir: str) -> None:
