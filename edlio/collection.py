@@ -66,6 +66,6 @@ class EDLCollection(EDLGroup):
         if self.time_created:
             parts.append(self.time_created.strftime('%y-%m-%d'))
         if self.collection_id:
-            parts.append(str(self.collection_id)[:6])
+            parts.append(str(self.collection_id)[-8:])
 
         return '_'.join(parts).replace(' ', '')

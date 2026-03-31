@@ -32,6 +32,14 @@ from .utils import listify, sanitize_name
 EDL_FORMAT_VERSION: str = '1'
 
 
+def make_collection_uuid() -> uuid.UUID:
+    """Create an UUID for use in an EDL collection."""
+    try:
+        return uuid.uuid7()
+    except AttributeError:
+        return uuid.uuid4()
+
+
 class EDLError(Exception):
     """Exception raised for errors in the input.
 
@@ -52,7 +60,7 @@ class EDLUnit:
     def __init__(self, name: str | None = None):
         self._parent: EDLUnit | None = None
         self._name = sanitize_name(name)
-        self._collection_id = uuid.uuid4()
+        self._collection_id = make_collection_uuid()
         self._root_path = ''
         self._authors: list[T.Any] = []
         self._attrs: dict[str, T.Any] = {}

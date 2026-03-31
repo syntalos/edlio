@@ -56,7 +56,7 @@ on the respective unit type. Some unit types may require the presence of additio
 ``collection_id``
 -----------------
 
-*[required, string]* A Universally unique identifier (UUID) version 4 which is unique for the collection that the respective unit is part of.
+*[required, string]* A Universally unique identifier (UUID) version 7 which is unique for the collection that the respective unit is part of.
 This ID is purposefully not human-readable. It is intended as a unique identifier for the given experiment, to be used
 by data processing pipelines and other programs handling the data.
 
