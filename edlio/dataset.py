@@ -60,7 +60,7 @@ class EDLDataFile:
 
     def __init__(
         self,
-        base_path: str,
+        base_path: str | None,
         media_type: str | None = None,
         file_type: str | None = None,
         unit_attrs: dict[str, T.Any] | None = None,
@@ -124,6 +124,8 @@ class EDLDataFile:
         Return a generator for the path of each file-part, in their correct
         sorting order.
         """
+        if not self._base_path:
+            raise RuntimeError('Base path for this data file is not set.')
         for part in self.parts:
             yield os.path.join(self._base_path, part.fname)
 
@@ -143,6 +145,10 @@ class EDLDataFile:
                     self._file_type
                 )
             )
+
+        if not self._base_path:
+            raise RuntimeError('Can not add data part: Base path is not set.')
+
         for ep in self.parts:
             if ep.fname == fname:
                 if allow_exists:
@@ -212,7 +218,7 @@ class EDLDataset(EDLUnit):
             Name of this dataset, or None
         """
         EDLUnit.__init__(self, name)
-        self._data = EDLDataFile(self.path, unit_attrs=self.attributes)
+        self._data = EDLDataFile(None, unit_attrs=self.attributes)
         self._aux_data: list[EDLDataFile] = []
 
     @property
