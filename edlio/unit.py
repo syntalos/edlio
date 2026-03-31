@@ -61,7 +61,7 @@ class EDLUnit:
         self._parent: EDLUnit | None = None
         self._name = sanitize_name(name)
         self._collection_id = make_collection_uuid()
-        self._root_path = ''
+        self._root_path: str | None = None
         self._authors: list[T.Any] = []
         self._attrs: dict[str, T.Any] = {}
         self._format_version = EDL_FORMAT_VERSION
@@ -98,13 +98,13 @@ class EDLUnit:
         self._collection_id = v
 
     @property
-    def path(self) -> str | None:
-        if not self._root_path:
-            return None
+    def path(self) -> str:
+        if not self._root_path or not self._name:
+            raise RuntimeError('Path of this unit was empty.')
         return os.path.join(self._root_path, self._name)
 
     @property
-    def root_path(self) -> str:
+    def root_path(self) -> str | None:
         return self._root_path
 
     @root_path.setter
@@ -132,6 +132,8 @@ class EDLUnit:
 
         if old_dir_path and os.path.exists(old_dir_path):
             try:
+                if not self.path:
+                    raise RuntimeError('New path was empty.')
                 os.rename(old_dir_path, self.path)
             except Exception as e:
                 self._name = old_name

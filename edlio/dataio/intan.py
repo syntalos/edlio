@@ -95,6 +95,10 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
             self._digin_channels = np.zeros((digin_chan_n, ts_len), dtype=bool)
             for i in range(0, digin_chan_n):
                 self._digin_channels[i, :] = np.not_equal(np.bitwise_and(digin_raw, (1 << i)), 0)
+        else:
+            # empty dummy value, so we don't try to load this again
+            self._digin_channels = np.zeros((0, 0), dtype=bool)
+
         return self._digin_channels
 
 
@@ -199,7 +203,9 @@ def load_data(
 
     aux_data: EDLDataFile | None = None
     for adf in aux_data_entries:
-        if 'tsync' in adf.file_type or 'tsync' in adf.media_type:
+        if (adf.file_type and 'tsync' in adf.file_type) or (
+            adf.media_type and 'tsync' in adf.media_type
+        ):
             aux_data = adf
             break
 
@@ -258,23 +264,30 @@ def load_data(
         reader._timestamp_len = reader._raw_data['timestamp'].size
         recording_data_len += reader._timestamp_len
 
+    if sample_rate is None:
+        raise ValueError('Unable to determine sample rate from Intan data.')
+
     # convert to seconds and multiply with sampling rate to obtain sample indices
     intan_sync_idx = (sync_map[:, 0].to(ureg.seconds) * sample_rate).magnitude
     intan_sync_idx = intan_sync_idx.astype(np.int32)
 
-    tvec_noadj = None  # silence pylint
-    if include_nosync_time or not do_timesync:
+    tvec_noadj: pint.Quantity[np.ndarray] | None = None  # silence pylint
+    if include_nosync_time:
         tvec_noadj = _make_nosync_tsvec(recording_data_len, sample_rate, start_offset)
     if do_timesync:
         tvec = _make_synced_tsvec(recording_data_len, sample_rate, intan_sync_idx, sync_map)
     else:
-        tvec = tvec_noadj
+        tvec = (
+            tvec_noadj
+            if tvec_noadj is not None
+            else _make_nosync_tsvec(recording_data_len, sample_rate, start_offset)
+        )
 
     last_ts_idx = 0
     for reader in intan_readers:
         ts_len = reader._timestamp_len
 
-        if include_nosync_time:
+        if tvec_noadj is not None:
             reader._nosync_ts = tvec_noadj[last_ts_idx : last_ts_idx + ts_len]
 
         reader._sync_ts = tvec[last_ts_idx : last_ts_idx + ts_len]

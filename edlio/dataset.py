@@ -32,7 +32,7 @@ class EDLDataPart:
     """Describes a part of a data block that has been split into multiple files."""
 
     index: int = -1
-    fname: str = None
+    fname: str
 
     def __init__(self, fname: str, index: int = -1):
         self.fname = fname
@@ -60,7 +60,7 @@ class EDLDataFile:
 
     def __init__(
         self,
-        base_path: str | None,
+        base_path: str,
         media_type: str | None = None,
         file_type: str | None = None,
         unit_attrs: dict[str, T.Any] | None = None,
@@ -72,7 +72,7 @@ class EDLDataFile:
         self._media_type = media_type
         self._file_type = file_type
         self._unit_attrs = unit_attrs
-        self._summary: T.Optional[str] = None
+        self._summary: str | None = None
         self.parts = []
 
     @property
@@ -80,35 +80,35 @@ class EDLDataFile:
         return (self._media_type, self._file_type)
 
     @property
-    def media_type(self) -> T.Optional[str]:
+    def media_type(self) -> str | None:
         """The media (MIME) type of this data."""
         return self._media_type
 
     @media_type.setter
-    def media_type(self, mime: T.Optional[str]) -> None:
+    def media_type(self, mime: str | None) -> None:
         self._media_type = mime
 
     @property
-    def file_type(self) -> T.Optional[str]:
+    def file_type(self) -> str | None:
         """The filetype, in case no media type was available."""
         return self._file_type
 
     @file_type.setter
-    def file_type(self, ftype: T.Optional[str]) -> None:
+    def file_type(self, ftype: str | None) -> None:
         self._file_type = ftype
 
     @property
-    def summary(self) -> T.Optional[str]:
+    def summary(self) -> str | None:
         """A human-readable summary of what this data is about."""
         return self._summary
 
     @summary.setter
-    def summary(self, text: T.Optional[str]) -> None:
+    def summary(self, text: str | None) -> None:
         """Set the summary text for this data."""
         self._summary = text
 
     def __repr__(self) -> str:
-        data_type = self._media_type if self._media_type else self._file_type
+        data_type = str(self._media_type if self._media_type else self._file_type)
         return (
             'EDLDataFile(type='
             + data_type
@@ -335,9 +335,11 @@ class EDLDataset(EDLUnit):
         if not key:
             return self._aux_data[0].read()
         for adf in self._aux_data:
-            if key in adf.file_type or key in adf.media_type:
+            if (adf.file_type and key in adf.file_type) or (
+                adf.media_type and key in adf.media_type
+            ):
                 return adf.read()
         for adf in self._aux_data:
-            if key in adf.summary:
+            if adf.summary and key in adf.summary:
                 return adf.read()
         return None

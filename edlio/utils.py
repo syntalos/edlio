@@ -25,7 +25,7 @@ import collections
 _T = T.TypeVar('_T')
 
 
-def sanitize_name(name: str) -> str:
+def sanitize_name(name: str | None) -> str | None:
     """
     Sanitize a string for use as an EDL unit name,
     by stripping or replacing invalid characters.

@@ -106,7 +106,9 @@ def load_data(
     valid_timestamp_aux_keys = ['tsync', 'csv']
     for adf in aux_data_entries:
         for vtak in valid_timestamp_aux_keys:
-            if vtak in adf.file_type or vtak in adf.media_type:
+            if (adf.file_type and vtak in adf.file_type) or (
+                adf.media_type and vtak in adf.media_type
+            ):
                 aux_data = adf
                 break
         if aux_data is not None:

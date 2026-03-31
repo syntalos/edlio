@@ -54,7 +54,7 @@ class EDLGroup(EDLUnit):
         return self._children
 
     @property
-    def root_path(self) -> str:
+    def root_path(self) -> str | None:
         return self._root_path
 
     @root_path.setter
@@ -107,25 +107,31 @@ class EDLGroup(EDLUnit):
                 yield child
 
     def group_by_name(self, name: str, *, create: bool = False) -> EDLGroup | None:
+        group: EDLGroup | None
         for group in self.groups:
             if group.name == name:
                 return group
+
         group = None
         if create:
             group = EDLGroup(name)
             self.add_child(group)
             group.save()
+
         return group
 
     def dataset_by_name(self, name: str, *, create: bool = False) -> EDLDataset | None:
+        dset: EDLDataset | None
         for dset in self.datasets:
             if dset.name == name:
                 return dset
+
         dset = None
         if create:
             dset = EDLDataset(name)
             self.add_child(dset)
             dset.save()
+
         return dset
 
     def save(self) -> None:
