@@ -18,9 +18,11 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import typing as T
+from collections.abc import Generator
 
 import cv2 as cv
 import numpy as np
+from pint.facets.plain import PlainQuantity
 
 from .. import ureg
 from ..dataset import EDLDataFile
@@ -29,10 +31,10 @@ from .tsyncfile import TSyncFileMode
 
 class Frame:
     mat: np.ndarray
-    time: int
+    time: int | PlainQuantity[int]
     index: int
 
-    def __init__(self, mat: np.ndarray, time: int, index: int):
+    def __init__(self, mat: np.ndarray, time: int | PlainQuantity[int], index: int):
         """Create a new frame representation for a video file.
 
         Parameters
@@ -51,19 +53,16 @@ class Frame:
 
 def _read_video_aux_data(
     aux_data: EDLDataFile,
-) -> np.ndarray[tuple[int, T.Any]] | list[tuple[int, T.Any]]:
+) -> Generator[tuple[int, PlainQuantity[int]], None, None]:
     if aux_data.file_type == 'csv' or aux_data.media_type == 'text/csv':
-        tab_sync_map = []
-        for row in aux_data.read():
-            if row[0] == 'frame':
+        for index, timestamp in aux_data.read():
+            if index == 'frame':
                 # we have a table header, skip it
                 continue
-            tab_sync_map.append((int(row[0]), int(row[1]) * ureg.usec))
-
-        return tab_sync_map
+            yield int(index), int(timestamp) * ureg.usec
+        return
 
     if aux_data.file_type == 'tsync':
-        sync_map = np.empty([0, 2])
         for tsf in aux_data.read():
             if tsf.sync_mode != TSyncFileMode.CONTINUOUS:
                 raise ValueError(
@@ -73,17 +72,15 @@ def _read_video_aux_data(
                 raise ValueError(
                     'Unit of first time in tsync mapping has to be \'index\' for video files.'
                 )
-            if tsf.time_units[1] == ureg.msec:
-                sync_map = np.vstack((sync_map, tsf.times * 1000)) * ureg.usec
-            elif tsf.time_units[1] == ureg.usec:
-                sync_map = np.vstack((sync_map, tsf.times)) * ureg.usec
-            else:
+            if tsf.time_units[1] not in (ureg.msec, ureg.usec):
                 raise ValueError(
                     'We currently expect video timestamps to be in '
-                    'microseconds or milliseconds (unit was {}).'.format(tsf.time_units[1])
+                    + f'microseconds or milliseconds (unit was {tsf.time_units[1]}).'
                 )
+            for index, timestamp in tsf.times:
+                yield int(index), (int(timestamp) * tsf.time_units[1]).to(ureg.usec)
 
-        return sync_map
+        return
 
     raise ValueError(
         'Unknown auxiliary data type ({}|{}) for video file.'.format(
@@ -100,8 +97,6 @@ def load_data(
     This function is used internally to load data from a video and expose
     it as stream of frames.
     """
-    sync_map: T.Any | None = None
-
     aux_data: EDLDataFile | None = None
     valid_timestamp_aux_keys = ['tsync', 'csv']
     for adf in aux_data_entries:
@@ -114,8 +109,9 @@ def load_data(
         if aux_data is not None:
             break
 
+    sync_map_gen = None
     if aux_data:
-        sync_map = _read_video_aux_data(aux_data)
+        sync_map_gen = _read_video_aux_data(aux_data)
 
     frame_index = 0
     for fname in part_paths:
@@ -124,10 +120,10 @@ def load_data(
             ret, mat = vc.read()
             if not ret:
                 break
-            frame = (
-                Frame(mat, sync_map[frame_index][1], sync_map[frame_index][0])
-                if sync_map is not None
-                else Frame(mat, -1, frame_index)
-            )
+            if sync_map_gen is None:
+                frame = Frame(mat, time=-1, index=frame_index)
+            else:
+                index, time = next(sync_map_gen)
+                frame = Frame(mat, time=time, index=index)
             yield frame
             frame_index += 1
