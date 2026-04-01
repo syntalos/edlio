@@ -1,64 +1,64 @@
 Version 0.2.1
-~~~~~~~~~~~~~
+-------------
 Released: 2024-10-01
 
-Features:
+### Features:
  * Accept microsecond-precision video timestamps
 
-Bugfixes:
+### Bugfixes:
  * intan: Load digital input channel even if it has an alternative name
 
-Documentation:
+### Documentation:
  * docs: Add project comparison section
  * docs: Expand the ephys reader example
 
 Version 0.2.0
-~~~~~~~~~~~~~
+-------------
 Released: 2024-02-18
 
-Features:
+### Features:
  * ci: Test with Python 3.11
  * csv: Allow loading CSV as Pandas dataframe
  * tests: Add JSON/CSV example data
  * Implement support for reading JSON table/array data
  * Bump minimum required Python version
 
-Bugfixes:
+### Bugfixes:
  * Add test dependencies and optional dependencies
  * Modernize type-hints slightly
 
-Documentation:
+### Documentation:
  * docs: Add more descriptions to example code
  * docs: Add an example for reading raw tsync files
  * Add readthedocs.yaml file for documentation build
  * docs: Allow JSON for table/array storage
 
 Version 0.1.2
-~~~~~~~~~~~~~
+-------------
 Released: 2022-08-06
 
-Features:
+### Features:
  * Switch to tomlkit for TOML read/write support
  * Format code with Black
  * tests: Add example recording in EDL format
 
-Bugfixes:
+### Bugfixes:
  * intan: Don't extrapolate to the beginning
  * intan: Never apply the initial offset twice
 
 Version 0.1.1
-~~~~~~~~~~~~~
+-------------
 Released: 2021-12-16
 
-Bugfixes:
+### Bugfixes:
   * Print bad tsync format version in case there was a mismatch
   * Make sure the wheel build always contains dependency data
   * Always explicitly specify encoding when opening text files
   * intan: Offset-correct raw time vector if we did not have enough sync points
 
 Version 0.1.0
-~~~~~~~~~~~~~
+-------------
 Released: 2021-05-18
 
-Notes:
+### Notes:
   * Initial release
