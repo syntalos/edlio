@@ -74,8 +74,9 @@ def _read_video_aux_data(
                 )
             if tsf.time_units[1] not in (ureg.msec, ureg.usec):
                 raise ValueError(
-                    'We currently expect video timestamps to be in '
-                    + f'microseconds or milliseconds (unit was {tsf.time_units[1]}).'
+                    'We currently expect video timestamps to be in microseconds or milliseconds (unit was {}).'.format(
+                        tsf.time_units[1]
+                    )
                 )
             for index, timestamp in tsf.times:
                 yield int(index), (int(timestamp) * tsf.time_units[1]).to(ureg.usec)
