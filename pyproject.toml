@@ -26,6 +26,11 @@ test = [
     "neo",
     "pandas",
     "zstandard",
+    "opencv-python",
+]
+dev = [
+    "isort",
+    "black",
 ]
 
 [project.urls]
