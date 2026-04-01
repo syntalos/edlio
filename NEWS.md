@@ -1,3 +1,27 @@
+Version 0.3.0
+-------------
+Released: 2026-04-01
+
+### Features:
+ * Modernize & update type annotations
+
+### Bugfixes:
+ * Fix tests to work with more recent versions of pandas
+ * Fix datetime.utcfromtimestamp deprecation warning
+ * Fix wrong unit when loading video timestamps from an older tsync file
+ * Use the right UUID version, if possible
+ * More typing fixes, make MyPy stricter
+ * typing: Mark package as typed according to PEP 561
+ * Ensure Frame.index has no units
+
+### Miscellaneous:
+ * Expand README with some brief usage information
+ * ci: Test on Python 3.13 and 3.14
+ * Add missing dependencies in pyproject.toml, add dev dependencies
+
+### Contributors:
+ Matthias Klumpp, Victor Negîrneac
+
 Version 0.2.1
 -------------
 Released: 2024-10-01
