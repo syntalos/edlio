@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2026 Matthias Klumpp <matthias@tenstral.net>
+# Copyright (C) 2025-2026 Matthias Klumpp <matthias@tenstral.net>
 #
 # Licensed under the GNU Lesser General Public License Version 3
 #
@@ -18,20 +18,24 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import typing as T
-import importlib
 
-# Determine which loader is responsible for which file type.
-DATA_LOADERS = {
-    'csv': 'edlio.dataio.csvdata',
-    'json': 'edlio.dataio.jsondata',
-    'rhd': 'edlio.dataio.intan',
-    'tsync': 'edlio.dataio.tsyncfile',
-    'video': 'edlio.dataio.video',
-    'zarr': 'edlio.dataio.zarr',
-}
+from ..dataset import EDLDataFile
 
 
-def load_dataio_module(what: str) -> T.Callable[..., T.Any]:
-    path = DATA_LOADERS[what]
-    mod = importlib.import_module(path)
-    return T.cast(T.Callable[..., T.Any], mod.load_data)
+def load_data(
+    part_paths: T.Iterable[str], aux_data_entries: T.Sequence[EDLDataFile]
+) -> T.Iterator[T.Any]:
+    """Entry point for automatic dataset loading.
+
+    Opens each Zarr store and yields its root group. Callers can access
+    arrays and attributes directly via the zarr API.
+    """
+    try:
+        import zarr
+    except ImportError as e:
+        raise ImportError(
+            'Missing optional dependency "zarr". Please install it with pip!'
+        ) from e
+
+    for store_path in part_paths:
+        yield zarr.open(store_path, mode='r')

@@ -60,9 +60,19 @@ in its ``split`` variant. The JSON file may be compressed using the Zstd compres
 Arrays
 ======
 
+Zarr
+----
+Multi-dimensional arrays should preferably be stored stored as `Zarr <https://zarr.dev/>`_ v3 stores (file type ``zarr``).
+Zarr provides chunked, compressed N-dimensional array storage and is well-suited for large time-series
+matrices. Each ``.zarr`` store may contain multiple named arrays (e.g. ``data`` and ``timestamps``),
+accessible directly through the standard zarr Python API after loading.
+
+``edlio`` opens each Zarr store and returns the root group, so callers can traverse the hierarchy and
+read arrays as needed using the zarr library.
+
 NumPy (.npz)
 ------------
-Arrays/Matrices should preferrably be stored as NumPy .npz files (multiple arrays) or .npy binary files.
+Arrays/Matrices may be stored as NumPy .npz files (multiple arrays) or .npy binary files.
 The document `numpy.lib.format <https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html>`_
 describes the binary format in detail.
 
@@ -74,7 +84,7 @@ JSON
 Time-series data can also be saved in the JSON format used by `Pandas <https://pandas.pydata.org/>`_
 in its ``split`` variant.
 Using the values ``Infinity``/``-Infinity`` for positive/negative infinite values, as well as ``NaN``
-for non-numbers is permitted as a divergency from the JSON specification.
+for non-numbers is permitted as a divergence from the JSON specification.
 
 The JSON file may be `Zstd <https://en.wikipedia.org/wiki/Zstd>`_-compressed.
 

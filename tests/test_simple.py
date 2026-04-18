@@ -154,3 +154,43 @@ def test_load_json_csv(samples_dir: str) -> None:
     assert len(rows) == 6
     assert rows[0] == ['Time', 'Tag', 'Value']
     assert rows[-1] == ['20015', 'beta', 'eLcwGIFVu1A9NV']
+
+
+def test_load_zarr(samples_dir: str) -> None:
+    import zarr
+
+    zcoll = edlio.load(os.path.join(samples_dir, 'zarrtest1'))
+    assert isinstance(zcoll, edlio.EDLCollection)
+
+    # 1D integer signal
+    dset = zcoll.dataset_by_name('numbersource')
+    stores = list(dset.read_data())
+    assert len(stores) == 1
+    root = stores[0]
+    assert isinstance(root, zarr.Group)
+
+    data = root['data']
+    assert data.shape == (2030,)
+    assert data.dtype == np.int32
+    assert data.attrs['signal_names'] == ['Int 1']
+    assert data.attrs['time_unit'] == 'microseconds'
+
+    timestamps = root['timestamps']
+    assert timestamps.shape == (2030,)
+    assert timestamps.dtype == np.uint64
+
+    # 2D multi-channel float signal
+    dset = zcoll.dataset_by_name('sinesource')
+    stores = list(dset.read_data())
+    assert len(stores) == 1
+    root = stores[0]
+    assert isinstance(root, zarr.Group)
+
+    data = root['data']
+    assert data.shape == (2102, 3)
+    assert data.dtype == np.float64
+    assert data.attrs['signal_names'] == ['Sine 1', 'Sine 2', 'Sine 3']
+
+    timestamps = root['timestamps']
+    assert timestamps.shape == (2102,)
+    assert timestamps.dtype == np.uint64

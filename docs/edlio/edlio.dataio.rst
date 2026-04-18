@@ -36,6 +36,14 @@ edlio.dataio.video module
    :undoc-members:
    :show-inheritance:
 
+edlio.dataio.zarr module
+------------------------
+
+.. automodule:: edlio.dataio.zarr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

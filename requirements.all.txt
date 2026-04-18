@@ -1,6 +1,7 @@
 -r requirements.txt
-pytest
 neo>=0.9
-pandas
-zstandard
 opencv-python
+pandas
+pytest
+zarr
+zstandard

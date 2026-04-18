@@ -25,6 +25,7 @@ dependencies = [
 test = [
     "neo",
     "pandas",
+    "zarr",
     "zstandard",
     "opencv-python",
 ]
