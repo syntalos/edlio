@@ -1,0 +1,74 @@
+{
+    "attributes": {
+        "collection_id": "019da03e-32a0-735b-9ca7-c2daed044dfe",
+        "data_unit": "au",
+        "signal_names": [
+            "Sine 1",
+            "Sine 2",
+            "Sine 3"
+        ],
+        "time_unit": "microseconds"
+    },
+    "chunk_grid": {
+        "configuration": {
+            "chunk_shape": [
+                10000,
+                3
+            ]
+        },
+        "name": "regular"
+    },
+    "chunk_key_encoding": {
+        "configuration": {
+            "separator": "/"
+        },
+        "name": "default"
+    },
+    "codecs": [
+        {
+            "configuration": {
+                "chunk_shape": [
+                    10000,
+                    3
+                ],
+                "codecs": [
+                    {
+                        "configuration": {
+                            "endian": "little"
+                        },
+                        "name": "bytes"
+                    },
+                    {
+                        "configuration": {
+                            "checksum": true,
+                            "level": 3
+                        },
+                        "name": "zstd"
+                    }
+                ],
+                "index_codecs": [
+                    {
+                        "configuration": {
+                            "endian": "little"
+                        },
+                        "name": "bytes"
+                    }
+                ],
+                "index_location": "end"
+            },
+            "name": "sharding_indexed"
+        }
+    ],
+    "data_type": "float64",
+    "dimension_names": [
+        "time",
+        "channel"
+    ],
+    "fill_value": 0,
+    "node_type": "array",
+    "shape": [
+        2102,
+        3
+    ],
+    "zarr_format": 3
+}

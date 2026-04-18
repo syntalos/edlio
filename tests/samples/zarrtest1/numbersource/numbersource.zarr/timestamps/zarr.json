@@ -1,0 +1,63 @@
+{
+    "attributes": {
+        "time_unit": "microseconds"
+    },
+    "chunk_grid": {
+        "configuration": {
+            "chunk_shape": [
+                10000
+            ]
+        },
+        "name": "regular"
+    },
+    "chunk_key_encoding": {
+        "configuration": {
+            "separator": "/"
+        },
+        "name": "default"
+    },
+    "codecs": [
+        {
+            "configuration": {
+                "chunk_shape": [
+                    10000
+                ],
+                "codecs": [
+                    {
+                        "configuration": {
+                            "endian": "little"
+                        },
+                        "name": "bytes"
+                    },
+                    {
+                        "configuration": {
+                            "checksum": true,
+                            "level": 3
+                        },
+                        "name": "zstd"
+                    }
+                ],
+                "index_codecs": [
+                    {
+                        "configuration": {
+                            "endian": "little"
+                        },
+                        "name": "bytes"
+                    }
+                ],
+                "index_location": "end"
+            },
+            "name": "sharding_indexed"
+        }
+    ],
+    "data_type": "uint64",
+    "dimension_names": [
+        "time"
+    ],
+    "fill_value": 0,
+    "node_type": "array",
+    "shape": [
+        2030
+    ],
+    "zarr_format": 3
+}

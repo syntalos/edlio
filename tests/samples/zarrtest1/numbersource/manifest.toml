@@ -1,0 +1,10 @@
+collection_id = '019da03e-32a0-735b-9ca7-c2daed044dfe'
+format_version = '1'
+time_created = 2026-04-18T12:58:44+02:00
+type = 'dataset'
+
+[data]
+file_type = 'zarr'
+
+    [[data.parts]]
+    fname = 'numbersource.zarr'

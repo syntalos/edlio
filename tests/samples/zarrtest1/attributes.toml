@@ -1,0 +1,20 @@
+collection_name = '2026-04-18_ZarrTest'
+machine_node = 'sirius [debian 14]'
+recording_length_msec = 9076
+success = true
+
+[[modules]]
+id = 'devel.datasource'
+name = 'NumberSource'
+
+[[modules]]
+id = 'devel.datasource'
+name = 'SineSource'
+
+[[modules]]
+id = 'zarrwriter'
+name = 'Zarr Writer'
+
+[[modules]]
+id = 'zarrwriter'
+name = 'Zarr Writer 2'
