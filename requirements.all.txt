@@ -1,5 +1,5 @@
 -r requirements.txt
-neo>=0.9
+neo>=0.14.4
 opencv-python
 pandas
 pytest
