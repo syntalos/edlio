@@ -1,0 +1,4 @@
+data_unit = 'au'
+signal_names = [ 'Int 1' ]
+src_mod_type = 'devel.datasource'
+time_unit = 'microseconds'

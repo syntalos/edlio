@@ -1,0 +1,4 @@
+data_unit = 'au'
+signal_names = [ 'Sine 1', 'Sine 2', 'Sine 3' ]
+src_mod_type = 'devel.datasource'
+time_unit = 'microseconds'

@@ -1,6 +1,10 @@
 {
     "attributes": {
-        "time_unit": "microseconds"
+        "collection_id": "019e949f-45b1-7210-ac25-6d4bc8e6ed3a",
+        "data_unit": "au",
+        "signal_names": [
+            "Int 1"
+        ]
     },
     "chunk_grid": {
         "configuration": {
@@ -50,14 +54,14 @@
             "name": "sharding_indexed"
         }
     ],
-    "data_type": "uint64",
+    "data_type": "int32",
     "dimension_names": [
         "time"
     ],
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        11366
+        11368
     ],
     "zarr_format": 3
 }

@@ -7,4 +7,4 @@ type = 'dataset'
 file_type = 'zarr'
 
     [[data.parts]]
-    fname = 'sinesource.zarr'
+    fname = 'hs-a1.zarr'

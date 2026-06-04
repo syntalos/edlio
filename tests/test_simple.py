@@ -163,21 +163,22 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(zcoll, edlio.EDLCollection)
 
     # 1D integer signal
-    dset = zcoll.dataset_by_name('numbersource')
+    dset = zcoll.dataset_by_name('numbers_i32')
     stores = list(dset.read_data())
     assert len(stores) == 1
     root = stores[0]
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (2030,)
+    assert data.shape == (11368,)
     assert data.dtype == np.int32
     assert data.attrs['signal_names'] == ['Int 1']
-    assert data.attrs['time_unit'] == 'microseconds'
+    assert data.attrs['data_unit'] == 'au'
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (2030,)
+    assert timestamps.shape == (11368,)
     assert timestamps.dtype == np.uint64
+    assert timestamps.attrs['time_unit'] == 'microseconds'
 
     # 2D multi-channel float signal
     dset = zcoll.dataset_by_name('sinesource')
@@ -187,10 +188,49 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (2102, 3)
-    assert data.dtype == np.float64
+    assert data.shape == (11366, 3)
+    assert data.dtype == np.float32
     assert data.attrs['signal_names'] == ['Sine 1', 'Sine 2', 'Sine 3']
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (2102,)
+    assert timestamps.shape == (11366,)
     assert timestamps.dtype == np.uint64
+    assert timestamps.attrs['time_unit'] == 'microseconds'
+
+    # 2D multi-channel integer signal with scale/offset metadata
+    dset = zcoll.dataset_by_name('oe-acq-hs-a1')
+    stores = list(dset.read_data())
+    assert len(stores) == 1
+    root = stores[0]
+    assert isinstance(root, zarr.Group)
+
+    data = root['data']
+    assert data.shape == (170752, 32)
+    assert data.dtype == np.uint16
+    assert data.attrs['signal_names'] == ['CH{:02d}'.format(i) for i in range(1, 33)]
+    assert data.attrs['data_unit'] == 'µV'
+    assert data.attrs['data_scale'] == 0.19499999284744263
+    assert data.attrs['data_offset'] == -6389.759765625
+
+    timestamps = root['timestamps']
+    assert timestamps.shape == (170752,)
+    assert timestamps.dtype == np.uint64
+    assert timestamps.attrs['time_unit'] == 'index'
+
+    # 2D event signal
+    dset = zcoll.dataset_by_name('oe-acq-ttl')
+    stores = list(dset.read_data())
+    assert len(stores) == 1
+    root = stores[0]
+    assert isinstance(root, zarr.Group)
+
+    data = root['data']
+    assert data.shape == (109, 2)
+    assert data.dtype == np.uint64
+    assert data.attrs['signal_names'] == ['line_id', 'value']
+    assert data.attrs['data_unit'] == 'ttl'
+
+    timestamps = root['timestamps']
+    assert timestamps.shape == (109,)
+    assert timestamps.dtype == np.uint64
+    assert timestamps.attrs['time_unit'] == 'microseconds'

@@ -1,0 +1,3 @@
+data_unit = 'ttl'
+src_mod_type = 'open-ephys-acq'
+time_unit = 'microseconds'

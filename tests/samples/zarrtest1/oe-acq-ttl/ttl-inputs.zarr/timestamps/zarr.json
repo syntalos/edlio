@@ -52,12 +52,12 @@
     ],
     "data_type": "uint64",
     "dimension_names": [
-        "time"
+        "event"
     ],
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        2030
+        109
     ],
     "zarr_format": 3
 }
