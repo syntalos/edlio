@@ -38,4 +38,9 @@ def load_data(
         ) from e
 
     for store_path in part_paths:
-        yield zarr.open(store_path, mode='r')
+        # We need to open from a local store explicitly, because otherwise, if the local
+        # path string contains any URL element like "#" or "?", the Zarr parser will drop
+        # it. On newer Zarr versions, passing in a pathlib.Path will work, but we don't
+        # want to rely on that just yet.
+        store = zarr.storage.LocalStore(store_path)
+        yield zarr.open(store, mode='r')
