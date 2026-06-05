@@ -22,6 +22,7 @@ from __future__ import annotations
 import os
 import uuid
 import typing as T
+from pathlib import Path
 
 import tomlkit as toml
 
@@ -54,12 +55,12 @@ class EDLGroup(EDLUnit):
         return self._children
 
     @property
-    def root_path(self) -> str | None:
+    def root_path(self) -> Path | None:
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str) -> None:
-        self._root_path = path
+    def root_path(self, path: os.PathLike[str]) -> None:
+        self._root_path = Path(path)
         for c in self._children:
             c.root_path = self.path
 
@@ -90,8 +91,8 @@ class EDLGroup(EDLUnit):
         child.root_path = self.path
         child.collection_id = self.collection_id
 
-        if old_path and os.path.isdir(old_path):
-            os.rename(old_path, child.path)
+        if old_path and old_path.is_dir():
+            old_path.rename(child.path)
         self._children.append(child)
 
     @property
@@ -137,27 +138,26 @@ class EDLGroup(EDLUnit):
     def save(self) -> None:
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
-        os.makedirs(self.path, exist_ok=True)
+        self.path.mkdir(parents=True, exist_ok=True)
 
         mf = self._make_manifest_dict()
         self._save_metadata(mf, self.attributes)
         for child in self._children:
             child.save()
 
-    def load(self, path: str | os.PathLike, mf: T.MutableMapping[str, T.Any] | None = None) -> None:
+    def load(self, path: os.PathLike[str], mf: T.MutableMapping[str, T.Any] | None = None) -> None:
         if not mf:
             mf = {}
         EDLUnit.load(self, path, mf)
 
-        for d in os.listdir(self.path):
-            unit_path = os.path.join(self.path, d)
-            if not os.path.isdir(unit_path):
+        for unit_path in self.path.iterdir():
+            if not unit_path.is_dir():
                 continue
-            mf_path = os.path.join(unit_path, 'manifest.toml')
-            if not os.path.isfile(mf_path):
+            mf_path = unit_path / 'manifest.toml'
+            if not mf_path.is_file():
                 continue
 
-            with open(os.path.join(mf_path), 'r', encoding='utf-8') as f:
+            with open(mf_path, 'r', encoding='utf-8') as f:
                 mf = toml.load(f)
 
             unit_type = mf.get('type')

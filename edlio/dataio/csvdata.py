@@ -21,13 +21,14 @@ from __future__ import annotations
 
 import csv
 import typing as T
+from pathlib import Path
 
 if T.TYPE_CHECKING:
     import pandas as pd
 
 
 def load_data(
-    part_paths: T.Iterable[str], aux_data_entries: T.Any, as_dataframe: bool = False
+    part_paths: T.Iterable[Path], aux_data_entries: T.Any, as_dataframe: bool = False
 ) -> T.Iterator[pd.DataFrame | list[str]]:
     """Entry point for automatic dataset loading.
 

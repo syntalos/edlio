@@ -22,6 +22,7 @@ from __future__ import annotations
 import os
 import uuid
 import typing as T
+from pathlib import Path
 from datetime import datetime
 
 import tomlkit as toml
@@ -61,7 +62,7 @@ class EDLUnit:
         self._parent: EDLUnit | None = None
         self._name = sanitize_name(name)
         self._collection_id = make_collection_uuid()
-        self._root_path: str | None = None
+        self._root_path: Path | None = None
         self._authors: list[T.Any] = []
         self._attrs: dict[str, T.Any] = {}
         self._format_version = EDL_FORMAT_VERSION
@@ -98,18 +99,18 @@ class EDLUnit:
         self._collection_id = v
 
     @property
-    def path(self) -> str:
+    def path(self) -> Path:
         if not self._root_path or not self._name:
             raise RuntimeError('Path of this unit was empty.')
-        return os.path.join(self._root_path, self._name)
+        return self._root_path / self._name
 
     @property
-    def root_path(self) -> str | None:
+    def root_path(self) -> Path | None:
         return self._root_path
 
     @root_path.setter
-    def root_path(self, path: str) -> None:
-        self._root_path = path
+    def root_path(self, path: os.PathLike[str]) -> None:
+        self._root_path = Path(path)
 
     @property
     def authors(self) -> list[T.Any]:
@@ -130,16 +131,16 @@ class EDLUnit:
         # set new name, but sanitize it to be portable across many filesystems
         self._name = sanitize_name(new_name)
 
-        if old_dir_path and os.path.exists(old_dir_path):
+        if old_dir_path and old_dir_path.exists():
             try:
                 if not self.path:
                     raise RuntimeError('New path was empty.')
-                os.rename(old_dir_path, self.path)
+                old_dir_path.rename(self.path)
             except Exception as e:
                 self._name = old_name
                 raise ValueError('Unable to set new unit name: {}'.format(str(e))) from e
 
-    def load(self, path: str | os.PathLike, mf: T.MutableMapping[str, T.Any] | None = None) -> None:
+    def load(self, path: os.PathLike[str], mf: T.MutableMapping[str, T.Any] | None = None) -> None:
         """
         Load an EDL unit from a path or path/data combination.
 
@@ -150,7 +151,8 @@ class EDLUnit:
         mf
             Manifest file data as dictionary, if data from :path should not be used.
         """
-        if not os.path.isdir(path):
+        path = Path(path)
+        if not path.is_dir():
             raise EDLError(
                 (
                     'Can not load unit from path "{}": Does not specify an ' 'existing directory'
@@ -159,13 +161,12 @@ class EDLUnit:
         if not mf:
             mf = {}
 
-        path = str(path)
-        self._name = os.path.basename(path.rstrip('/\\'))
-        self._root_path = os.path.abspath(os.path.join(path, '..'))
+        self._name = path.name
+        self._root_path = path.resolve().parent
 
         self._attrs = {}
         if not mf:
-            with open(os.path.join(self.path, 'manifest.toml'), 'r', encoding='utf-8') as f:
+            with open(self.path / 'manifest.toml', 'r', encoding='utf-8') as f:
                 mf = toml.load(f)
 
         self._format_version = str(mf.get('format_version', 'unknown'))
@@ -188,8 +189,8 @@ class EDLUnit:
             )
             raise EDLError(msg)
 
-        if os.path.isfile(os.path.join(self.path, 'attributes.toml')):
-            with open(os.path.join(self.path, 'attributes.toml'), 'r', encoding='utf-8') as f:
+        if (self.path / 'attributes.toml').is_file():
+            with open(self.path / 'attributes.toml', 'r', encoding='utf-8') as f:
                 self._attrs = toml.load(f)
 
         raw_time_created = mf['time_created']
@@ -240,13 +241,13 @@ class EDLUnit:
     def _save_metadata(self, manifest: dict[str, T.Any], attributes: dict[str, T.Any]) -> None:
         if not self.path:
             raise EDLError('No path is set for this EDL unit')
-        os.makedirs(self.path, exist_ok=True)
+        self.path.mkdir(parents=True, exist_ok=True)
 
-        with open(os.path.join(self.path, 'manifest.toml'), 'w', encoding='utf-8') as f:
+        with open(self.path / 'manifest.toml', 'w', encoding='utf-8') as f:
             toml.dump(manifest, f)
 
         if attributes:
-            with open(os.path.join(self.path, 'attributes.toml'), 'w', encoding='utf-8') as f:
+            with open(self.path / 'attributes.toml', 'w', encoding='utf-8') as f:
                 toml.dump(attributes, f)
 
     def save(self) -> None:

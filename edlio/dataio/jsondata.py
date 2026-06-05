@@ -19,15 +19,15 @@
 
 from __future__ import annotations
 
-import os
 import json
 import typing as T
+from pathlib import Path
 
 if T.TYPE_CHECKING:
     import pandas as pd
 
 
-def _read_pandas_extended_json(fname: str | os.PathLike) -> pd.DataFrame:
+def _read_pandas_extended_json(fname: Path) -> pd.DataFrame:
     import pandas as pd
 
     if str(fname).endswith('.zst'):
@@ -55,7 +55,7 @@ def _read_pandas_extended_json(fname: str | os.PathLike) -> pd.DataFrame:
 
 
 def load_data(
-    part_paths: T.Iterable[str], aux_data_entries: T.Any, json_schema: str | None = None
+    part_paths: T.Iterable[Path], aux_data_entries: T.Any, json_schema: str | None = None
 ) -> T.Iterator[pd.DataFrame]:
     """Entry point for automatic dataset loading.
 

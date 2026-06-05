@@ -18,6 +18,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import typing as T
+from pathlib import Path
 from collections.abc import Generator
 
 import cv2 as cv
@@ -91,7 +92,7 @@ def _read_video_aux_data(
 
 
 def load_data(
-    part_paths: T.Iterable[str], aux_data_entries: T.Sequence[EDLDataFile]
+    part_paths: T.Iterable[Path], aux_data_entries: T.Sequence[EDLDataFile]
 ) -> T.Iterator[Frame]:
     """Entry point for automatic dataset loading.
 
@@ -116,7 +117,7 @@ def load_data(
 
     frame_index = 0
     for fname in part_paths:
-        vc = cv.VideoCapture(fname)
+        vc = cv.VideoCapture(str(fname))
         while True:
             ret, mat = vc.read()
             if not ret:

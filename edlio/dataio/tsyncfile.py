@@ -24,6 +24,7 @@ import typing as T
 import logging as log
 from enum import IntEnum
 from uuid import UUID
+from pathlib import Path
 from datetime import datetime, timezone
 
 import pint
@@ -126,7 +127,7 @@ class TSyncFile:
     Syntalos DAQ system.
     """
 
-    def __init__(self, fname: str | None = None):
+    def __init__(self, fname: os.PathLike[str] | None = None):
         self._format_version = '1.0'
         self._time_created: datetime | None = None
         self._generator_name = ''
@@ -227,7 +228,7 @@ class TSyncFile:
     def _read_utf8_xxh_from_file(self, f: T.BinaryIO) -> str:
         return read_utf8_xxh_from_file(f, self._xxh)
 
-    def open(self, fname: str) -> None:
+    def open(self, fname: os.PathLike[str]) -> None:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<Q', f.read(8))
             if magic_number != TSYNC_MAGIC:
@@ -391,7 +392,7 @@ class LegacyTSyncFile:
     version of this file format that was briefly in use).
     """
 
-    def __init__(self, fname: str | None = None):
+    def __init__(self, fname: os.PathLike[str] | None = None):
         self._format_version = 1
         self._time_created: datetime | None = None
         self._tolerance_us = 0
@@ -470,12 +471,12 @@ class LegacyTSyncFile:
         self._times = v
 
     @staticmethod
-    def is_legacy(fname: str) -> bool:
+    def is_legacy(fname: os.PathLike[str]) -> bool:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<I', f.read(4))
             return bool(magic_number == int('C6BBDFBC', 16))
 
-    def open(self, fname: str) -> None:
+    def open(self, fname: os.PathLike[str]) -> None:
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<I', f.read(4))
             if magic_number != int('C6BBDFBC', 16):
@@ -541,7 +542,7 @@ class LegacyTSyncFile:
                 print('WARNING: Indices in time sync file were not continuous.')
 
 
-def load_data(part_paths: T.Iterable[str], aux_data_list: T.Any) -> T.Iterator[T.Any]:
+def load_data(part_paths: T.Iterable[Path], aux_data_list: T.Any) -> T.Iterator[T.Any]:
     """Entry point for automatic dataset loading.
 
     This function is used internally to Syntalos' .tsync files

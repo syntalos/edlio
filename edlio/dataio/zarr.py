@@ -18,12 +18,13 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import typing as T
+from pathlib import Path
 
 from ..dataset import EDLDataFile
 
 
 def load_data(
-    part_paths: T.Iterable[str], aux_data_entries: T.Sequence[EDLDataFile]
+    part_paths: T.Iterable[Path], aux_data_entries: T.Sequence[EDLDataFile]
 ) -> T.Iterator[T.Any]:
     """Entry point for automatic dataset loading.
 
@@ -33,9 +34,7 @@ def load_data(
     try:
         import zarr
     except ImportError as e:
-        raise ImportError(
-            'Missing optional dependency "zarr". Please install it with pip!'
-        ) from e
+        raise ImportError('Missing optional dependency "zarr". Please install it with pip!') from e
 
     for store_path in part_paths:
         # We need to open from a local store explicitly, because otherwise, if the local

@@ -27,6 +27,7 @@ __appname__ = 'edlio'
 __version__ = '0.3.1'
 
 import os
+from pathlib import Path
 
 import pint
 import tomlkit as toml
@@ -64,11 +65,12 @@ def load(path: str | os.PathLike[str]) -> EDLCollection | EDLGroup | EDLDataset:
         An EDL unit.
     """
 
-    mf_path = os.path.join(path, 'manifest.toml')
-    if not os.path.isfile(mf_path):
+    path = Path(path)
+    mf_path = path / 'manifest.toml'
+    if not mf_path.is_file():
         raise EDLError('The directory "{}" is no valid EDL unit.'.format(path))
 
-    with open(os.path.join(mf_path), 'r', encoding='utf-8') as f:
+    with open(mf_path, 'r', encoding='utf-8') as f:
         mf = toml.load(f)
 
     unit_type = mf.get('type')

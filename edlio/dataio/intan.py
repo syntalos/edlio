@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import typing as T
 import logging as log
+from pathlib import Path
 
 import pint
 import numpy as np
@@ -48,7 +50,7 @@ class SyncIntanReader(IntanRawIO, BaseFromRaw):
 
     _prefered_signal_group_mode = 'group-by-same-units'
 
-    def __init__(self, intan_filename: str):
+    def __init__(self, intan_filename: os.PathLike[str]):
         IntanRawIO.__init__(self, filename=intan_filename)
         BaseFromRaw.__init__(self, intan_filename)
         self._sync_ts = None
@@ -187,7 +189,7 @@ def _make_synced_tsvec(
 
 
 def load_data(
-    part_paths: T.Iterable[str],
+    part_paths: T.Iterable[Path],
     aux_data_entries: T.Sequence[EDLDataFile],
     do_timesync: bool = True,
     include_nosync_time: bool = False,

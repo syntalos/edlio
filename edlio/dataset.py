@@ -22,6 +22,7 @@ from __future__ import annotations
 import os
 import typing as T
 import functools
+from pathlib import Path
 
 from .unit import EDLUnit, EDLError
 from .dataio import DATA_LOADERS, load_dataio_module
@@ -32,10 +33,10 @@ class EDLDataPart:
     """Describes a part of a data block that has been split into multiple files."""
 
     index: int = -1
-    fname: str
+    fname: Path
 
-    def __init__(self, fname: str, index: int = -1):
-        self.fname = fname
+    def __init__(self, fname: os.PathLike[str], index: int = -1):
+        self.fname = Path(fname)
         self.index = index
 
     def __lt__(self, other: object) -> bool:
@@ -50,7 +51,7 @@ class EDLDataPart:
 
     def __repr__(self) -> str:
         idx_str = '' if self.index < 0 else ', index=' + (str(self.index))
-        return 'EDLDataPart(' + self.fname + idx_str + ')'
+        return 'EDLDataPart(' + str(self.fname) + idx_str + ')'
 
 
 class EDLDataFile:
@@ -60,7 +61,7 @@ class EDLDataFile:
 
     def __init__(
         self,
-        base_path: str | None,
+        base_path: os.PathLike[str] | None,
         media_type: str | None = None,
         file_type: str | None = None,
         unit_attrs: dict[str, T.Any] | None = None,
@@ -68,7 +69,7 @@ class EDLDataFile:
         if not unit_attrs:
             unit_attrs = {}
 
-        self._base_path = base_path
+        self._base_path = Path(base_path) if base_path else None
         self._media_type = media_type
         self._file_type = file_type
         self._unit_attrs = unit_attrs
@@ -119,7 +120,7 @@ class EDLDataFile:
             + ')'
         )
 
-    def part_paths(self) -> T.Iterator[str]:
+    def part_paths(self) -> T.Iterator[os.PathLike[str]]:
         """
         Return a generator for the path of each file-part, in their correct
         sorting order.
@@ -127,14 +128,14 @@ class EDLDataFile:
         if not self._base_path:
             raise RuntimeError('Base path for this data file is not set.')
         for part in self.parts:
-            yield os.path.join(self._base_path, part.fname)
+            yield self._base_path.joinpath(part.fname)
 
     def new_part(
-        self, fname: str, index: int = -1, *, allow_exists: bool = False
-    ) -> tuple[EDLDataPart, str]:
+        self, fname: os.PathLike[str], index: int = -1, *, allow_exists: bool = False
+    ) -> tuple[EDLDataPart, Path]:
         if not fname:
             raise ValueError('File name is not valid.')
-        _, fext = os.path.splitext(fname)
+        _, fext = os.path.splitext(str(fname))
         if fext and fext.startswith('.'):
             fext = fext[1:]
         if not self._file_type:
@@ -150,13 +151,13 @@ class EDLDataFile:
             raise RuntimeError('Can not add data part: Base path is not set.')
 
         for ep in self.parts:
-            if ep.fname == fname:
+            if ep.fname == Path(fname):
                 if allow_exists:
-                    return ep, os.path.join(self._base_path, ep.fname)
+                    return ep, self._base_path.joinpath(ep.fname)
                 raise ValueError('A file part with name "{}" already exists.'.format(fname))
         part = EDLDataPart(fname, index)
         self.parts.append(part)
-        return part, os.path.join(self._base_path, part.fname)
+        return part, self._base_path.joinpath(part.fname)
 
     def read(
         self, aux_data_entries: T.Optional[T.Sequence[EDLDataFile]] = None, **kwargs: T.Any
@@ -248,7 +249,7 @@ class EDLDataset(EDLUnit):
         return df
 
     def load(
-        self, path: str | os.PathLike, mf: T.Optional[T.MutableMapping[str, T.Any]] = None
+        self, path: os.PathLike[str], mf: T.Optional[T.MutableMapping[str, T.Any]] = None
     ) -> None:
         """
         Load an EDL dataset from a path.
@@ -288,7 +289,7 @@ class EDLDataset(EDLUnit):
             d['summary'] = df.summary
         d['parts'] = []
         for part in df.parts:
-            pd: dict[str, T.Any] = {'fname': part.fname}
+            pd: dict[str, T.Any] = {'fname': str(part.fname)}
             if part.index >= 0:
                 pd['index'] = part.index
             d['parts'].append(pd)
@@ -298,7 +299,7 @@ class EDLDataset(EDLUnit):
         """Save dataset changes to their current location on disk."""
         if not self.path:
             raise ValueError('No path set for EDL group "{}"'.format(self.name))
-        os.makedirs(self.path, exist_ok=True)
+        self.path.mkdir(parents=True, exist_ok=True)
 
         mf = self._make_manifest_dict()
         mf['data'] = self._serialize_data_md(self._data)
