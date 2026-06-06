@@ -6,11 +6,11 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'EDL'
-copyright = '2020-2024, Matthias Klumpp'
+copyright = '2020-2026, Matthias Klumpp'
 author = 'Matthias Klumpp'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2'
+release = '0.3'
 
 # -- General configuration ---------------------------------------------------
 thisfile = __file__
