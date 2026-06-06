@@ -1,3 +1,17 @@
+Version 0.3.1
+-------------
+Released: 2026-06-06
+
+### Features:
+ * Implement support for reading Zarr arrays
+ * Support & use pathlib.Path everywhere
+
+### Bugfixes:
+ * zarr: Load data from paths with odd URL elements correctly
+
+### Miscellaneous:
+ * Add Zarr test data
+
 Version 0.3.0
 -------------
 Released: 2026-04-01
