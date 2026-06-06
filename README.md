@@ -1,6 +1,7 @@
 # EDL - Experiment Directory Layout
 
 [![QA](https://github.com/bothlab/edlio/actions/workflows/python-qa.yml/badge.svg)](https://github.com/bothlab/edlio/actions/workflows/python-qa.yml)
+![PyPI - Version](https://img.shields.io/pypi/v/edlio)
 
 This repository contains specifications for the "Experiment Directory Layout" (EDL) storage layout as
 used by the [Syntalos](https://github.com/bothlab/syntalos) data acquisition tool.
