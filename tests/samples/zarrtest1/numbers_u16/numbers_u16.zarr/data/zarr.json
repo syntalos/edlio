@@ -1,16 +1,17 @@
 {
     "attributes": {
         "collection_id": "019ebcc6-ca1a-74a2-8492-d0c4af93b7a1",
-        "data_unit": "ttl",
+        "data_unit": "au",
+        "sample_rate": 2000,
         "signal_names": [
-            "line_id",
-            "value"
+            "U16 Low",
+            "U16 High"
         ]
     },
     "chunk_grid": {
         "configuration": {
             "chunk_shape": [
-                10000,
+                24000,
                 2
             ]
         },
@@ -26,7 +27,7 @@
         {
             "configuration": {
                 "chunk_shape": [
-                    10000,
+                    2000,
                     2
                 ],
                 "codecs": [
@@ -57,15 +58,15 @@
             "name": "sharding_indexed"
         }
     ],
-    "data_type": "uint32",
+    "data_type": "uint16",
     "dimension_names": [
-        "line",
-        "value"
+        "time",
+        "channel"
     ],
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        86,
+        22476,
         2
     ],
     "zarr_format": 3

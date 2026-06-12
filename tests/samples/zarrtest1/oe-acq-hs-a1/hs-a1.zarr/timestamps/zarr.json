@@ -57,7 +57,7 @@
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        170752
+        168576
     ],
     "zarr_format": 3
 }

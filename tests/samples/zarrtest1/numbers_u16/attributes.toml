@@ -1,5 +1,5 @@
 data_unit = 'au'
 sample_rate = 2000.0
-signal_names = [ 'Int Low' ]
+signal_names = [ 'U16 Low', 'U16 High' ]
 src_mod_type = 'devel.datasource'
 time_unit = 'microseconds'

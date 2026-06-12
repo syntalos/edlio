@@ -1,6 +1,6 @@
-collection_name = '2026-06-04_ZarrTest'
-machine_node = 'sirius [debian 14]'
-recording_length_msec = 11386
+collection_name = '2026-06-12_ZarrTest1'
+machine_node = 'sydevtest [debian 14]'
+recording_length_msec = 11239
 success = true
 
 [[modules]]
@@ -21,12 +21,16 @@ name = 'Zarr Writer'
 
 [[modules]]
 id = 'zarrwriter'
-name = 'Zarr Writer 3'
-
-[[modules]]
-id = 'zarrwriter'
 name = 'Zarr Writer 2'
 
 [[modules]]
 id = 'zarrwriter'
+name = 'Zarr Writer 3'
+
+[[modules]]
+id = 'zarrwriter'
 name = 'Zarr Writer 4'
+
+[[modules]]
+id = 'zarrwriter'
+name = 'Zarr Writer 5'

@@ -2,39 +2,6 @@ data_offset = -6389.759765625
 data_scale = 0.19499999284744263
 data_unit = 'µV'
 sample_rate = 15000.0
-signal_names = [
-    'CH01',
-    'CH02',
-    'CH03',
-    'CH04',
-    'CH05',
-    'CH06',
-    'CH07',
-    'CH08',
-    'CH09',
-    'CH10',
-    'CH11',
-    'CH12',
-    'CH13',
-    'CH14',
-    'CH15',
-    'CH16',
-    'CH17',
-    'CH18',
-    'CH19',
-    'CH20',
-    'CH21',
-    'CH22',
-    'CH23',
-    'CH24',
-    'CH25',
-    'CH26',
-    'CH27',
-    'CH28',
-    'CH29',
-    'CH30',
-    'CH31',
-    'CH32'
-]
+signal_names = [ 'CH01', 'CH02', 'CH03', 'CH04', 'CH05', 'CH06', 'CH07', 'CH08' ]
 src_mod_type = 'open-ephys-acq'
 time_unit = 'index'

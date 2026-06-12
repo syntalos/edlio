@@ -1,15 +1,16 @@
 {
     "attributes": {
-        "collection_id": "019e949f-45b1-7210-ac25-6d4bc8e6ed3a",
+        "collection_id": "019ebcc6-ca1a-74a2-8492-d0c4af93b7a1",
         "data_unit": "au",
+        "sample_rate": 2000,
         "signal_names": [
-            "Int 1"
+            "Int Low"
         ]
     },
     "chunk_grid": {
         "configuration": {
             "chunk_shape": [
-                20000
+                24000
             ]
         },
         "name": "regular"
@@ -24,7 +25,7 @@
         {
             "configuration": {
                 "chunk_shape": [
-                    10000
+                    2000
                 ],
                 "codecs": [
                     {
@@ -61,7 +62,7 @@
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        11368
+        22476
     ],
     "zarr_format": 3
 }

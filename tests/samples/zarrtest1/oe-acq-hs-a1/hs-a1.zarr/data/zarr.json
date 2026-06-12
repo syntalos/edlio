@@ -1,6 +1,6 @@
 {
     "attributes": {
-        "collection_id": "019e949f-45b1-7210-ac25-6d4bc8e6ed3a",
+        "collection_id": "019ebcc6-ca1a-74a2-8492-d0c4af93b7a1",
         "data_offset": -6389.759765625,
         "data_scale": 0.19499999284744263,
         "data_unit": "µV",
@@ -13,38 +13,14 @@
             "CH05",
             "CH06",
             "CH07",
-            "CH08",
-            "CH09",
-            "CH10",
-            "CH11",
-            "CH12",
-            "CH13",
-            "CH14",
-            "CH15",
-            "CH16",
-            "CH17",
-            "CH18",
-            "CH19",
-            "CH20",
-            "CH21",
-            "CH22",
-            "CH23",
-            "CH24",
-            "CH25",
-            "CH26",
-            "CH27",
-            "CH28",
-            "CH29",
-            "CH30",
-            "CH31",
-            "CH32"
+            "CH08"
         ]
     },
     "chunk_grid": {
         "configuration": {
             "chunk_shape": [
                 180000,
-                32
+                8
             ]
         },
         "name": "regular"
@@ -60,7 +36,7 @@
             "configuration": {
                 "chunk_shape": [
                     15000,
-                    32
+                    8
                 ],
                 "codecs": [
                     {
@@ -98,8 +74,8 @@
     "fill_value": 0,
     "node_type": "array",
     "shape": [
-        170752,
-        32
+        168576,
+        8
     ],
     "zarr_format": 3
 }

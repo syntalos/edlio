@@ -1,5 +1,10 @@
 collection_id = '019ebcc6-ca1a-74a2-8492-d0c4af93b7a1'
 format_version = '1'
-generator = 'Syntalos 3.1.1 (10-g8282d2f6)'
 time_created = 2026-06-12T19:00:22+02:00
-type = 'collection'
+type = 'dataset'
+
+[data]
+file_type = 'zarr'
+
+    [[data.parts]]
+    fname = 'numbers_u16.zarr'

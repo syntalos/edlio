@@ -170,13 +170,13 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (11368,)
+    assert data.shape == (22476,)
     assert data.dtype == np.int32
-    assert data.attrs['signal_names'] == ['Int 1']
+    assert data.attrs['signal_names'] == ['Int Low']
     assert data.attrs['data_unit'] == 'au'
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (11368,)
+    assert timestamps.shape == (22476,)
     assert timestamps.dtype == np.uint64
     assert timestamps.attrs['time_unit'] == 'microseconds'
 
@@ -188,12 +188,12 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (11366, 3)
+    assert data.shape == (22476, 3)
     assert data.dtype == np.float32
-    assert data.attrs['signal_names'] == ['Sine 1', 'Sine 2', 'Sine 3']
+    assert data.attrs['signal_names'] == ['Low', 'High', 'Low+High']
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (11366,)
+    assert timestamps.shape == (22476,)
     assert timestamps.dtype == np.uint64
     assert timestamps.attrs['time_unit'] == 'microseconds'
 
@@ -205,15 +205,15 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (170752, 32)
+    assert data.shape == (168576, 8)
     assert data.dtype == np.uint16
-    assert data.attrs['signal_names'] == ['CH{:02d}'.format(i) for i in range(1, 33)]
+    assert data.attrs['signal_names'] == ['CH{:02d}'.format(i) for i in range(1, 9)]
     assert data.attrs['data_unit'] == 'µV'
     assert data.attrs['data_scale'] == 0.19499999284744263
     assert data.attrs['data_offset'] == -6389.759765625
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (170752,)
+    assert timestamps.shape == (168576,)
     assert timestamps.dtype == np.uint64
     assert timestamps.attrs['time_unit'] == 'index'
 
@@ -225,12 +225,12 @@ def test_load_zarr(samples_dir: str) -> None:
     assert isinstance(root, zarr.Group)
 
     data = root['data']
-    assert data.shape == (109, 2)
-    assert data.dtype == np.uint64
+    assert data.shape == (86, 2)
+    assert data.dtype == np.uint32
     assert data.attrs['signal_names'] == ['line_id', 'value']
     assert data.attrs['data_unit'] == 'ttl'
 
     timestamps = root['timestamps']
-    assert timestamps.shape == (109,)
+    assert timestamps.shape == (86,)
     assert timestamps.dtype == np.uint64
     assert timestamps.attrs['time_unit'] == 'microseconds'

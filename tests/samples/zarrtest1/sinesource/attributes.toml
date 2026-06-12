@@ -1,4 +1,5 @@
 data_unit = 'au'
-signal_names = [ 'Sine 1', 'Sine 2', 'Sine 3' ]
+sample_rate = 2000.0
+signal_names = [ 'Low', 'High', 'Low+High' ]
 src_mod_type = 'devel.datasource'
 time_unit = 'microseconds'
