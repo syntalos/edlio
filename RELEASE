@@ -2,10 +2,10 @@ EDLIO Release Notes
 
 1. Write NEWS entries for EDLIO in the same format as usual.
 
-git shortlog v0.3.1.. | grep -i -v trivial | grep -v Merge > NEWS.new
+git shortlog v0.3.2.. | grep -i -v trivial | grep -v Merge > NEWS.new
 
 --------------------------------------------------------------------------------
-Version 0.3.2
+Version 0.3.3
 -------------
 Released: 2026-xx-xx
 
@@ -22,8 +22,8 @@ Released: 2026-xx-xx
 
 2. Commit changes in Git:
 
-git commit -a -m "Release version 0.3.2"
-git tag -s -f -m "Release 0.3.2" v0.3.2 <gpg password>
+git commit -a -m "Release version 0.3.3"
+git tag -s -f -m "Release 0.3.3" v0.3.3 <gpg password>
 git push && git push --tags
 
 3. Upload to PyPI:
