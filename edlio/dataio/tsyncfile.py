@@ -66,13 +66,11 @@ class TSyncDataType(IntEnum):
     UINT64 = 8
 
 
-TSYNC_MAGIC = int('F223434E5953548A', 16)
-
+TSYNC_MAGIC = int('B28FE2434E53548A', 16)
 TSYNC_VERSION_MAJOR = 1
 TSYNC_VERSION_MINOR = 2
 
-TSYNC_BLOCK_TERM = int('1126000000000000', 16)
-TSYNC_BLOCK_TERM_32 = int('11260000', 16)
+TSYNC_BLOCK_TERM = int('00000000009198E2', 16)
 
 
 def tsync_dtype_to_pack_fmt_len(dtype: TSyncDataType) -> tuple[str, int]:
@@ -106,10 +104,27 @@ def tsync_time_unit_to_punit(unit: TSyncTimeUnit) -> pint.Unit:
     raise ValueError('Can not convert tsync time unit type "{}" to Pint unit type.'.format(unit))
 
 
+def read_utf8_xxh_from_file_legacy(f: T.BinaryIO, xxh: T.Any) -> str:
+    """Read UTF-8 encoded string from binary .tsync file, old version where length wasn't checksummed."""
+
+    (length,) = struct.unpack('<I', f.read(4))
+    if length == int('ffffffff', 16):
+        return ''
+
+    if length > (os.fstat(f.fileno()).st_size - f.tell() + 1):
+        raise ValueError('String length in binary too long ({}).'.format(length))
+
+    data = f.read(length)
+    xxh.update(data)
+    return str(data, 'utf-8')
+
+
 def read_utf8_xxh_from_file(f: T.BinaryIO, xxh: T.Any) -> str:
     """Read UTF-8 encoded string from binary .tsync file"""
 
-    (length,) = struct.unpack('<I', f.read(4))
+    raw_len = f.read(4)
+    xxh.update(raw_len)
+    (length,) = struct.unpack('<I', raw_len)
     if length == int('ffffffff', 16):
         return ''
 
@@ -141,6 +156,7 @@ class TSyncFile:
             tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
         )
         self._times = np.empty((0, 2))
+        self._legacy_mode = False
         if fname:
             self.open(fname)
 
@@ -226,13 +242,28 @@ class TSyncFile:
         return int(v)
 
     def _read_utf8_xxh_from_file(self, f: T.BinaryIO) -> str:
-        return read_utf8_xxh_from_file(f, self._xxh)
+        if self._legacy_mode:
+            return read_utf8_xxh_from_file_legacy(f, self._xxh)
+        else:
+            return read_utf8_xxh_from_file(f, self._xxh)
 
     def open(self, fname: os.PathLike[str]) -> None:
+        """Open a tsync file."""
+
+        self._legacy_mode = False
         with open(fname, 'rb') as f:
             (magic_number,) = struct.unpack('<Q', f.read(8))
             if magic_number != TSYNC_MAGIC:
-                raise ValueError('Unrecognized file type: This file is no tsync file.')
+                if magic_number == int('F223434E5953548A', 16):
+                    # we have an older file format from pre-3.0 Syntalos versions
+                    self._legacy_mode = True
+                else:
+                    raise ValueError('Unrecognized file type: This file is no tsync file.')
+
+            if self._legacy_mode:
+                self._BLOCK_TERM = int('1126000000000000', 16)
+            else:
+                self._BLOCK_TERM = TSYNC_BLOCK_TERM
 
             # read file header block
             self._xxh = xxh3_64()
@@ -249,8 +280,8 @@ class TSyncFile:
             check_xxh = major_version >= 1 and minor_version >= 2
             if not check_xxh:
                 log.warning(
-                    'Tsync file version ({}) is too old, checksum validation for '
-                    'integrity checks will be skipped.'.format(self._format_version)
+                    'Tsync file version ({}) is too old, header checksum validation for '
+                    'file integrity will be skipped.'.format(self._format_version)
                 )
 
             self._time_created = datetime.fromtimestamp(
@@ -289,7 +320,7 @@ class TSyncFile:
                 term_bytecount = 16
                 (block_term,) = struct.unpack('<Q', f.read(8))
                 (expected_header_cs,) = struct.unpack('<Q', f.read(8))
-                if block_term != TSYNC_BLOCK_TERM:
+                if block_term != self._BLOCK_TERM:
                     raise ValueError(
                         'Header block terminator not found: The file is either '
                         'invalid or its header block was damaged.'
@@ -303,12 +334,12 @@ class TSyncFile:
                 term_bytecount = 8
                 (block_term,) = struct.unpack('<I', f.read(4))
                 f.read(4)
-                if block_term != TSYNC_BLOCK_TERM_32:
+                if block_term != int('11260000', 16):
                     # check if we maybe had no padding due to an erroneous writer
                     f.seek((padding + 4 + 4) * -1, os.SEEK_CUR)
                     (block_term,) = struct.unpack('<I', f.read(4))
                     f.read(4)
-                    if block_term != TSYNC_BLOCK_TERM_32:
+                    if block_term != int('11260000', 16):
                         raise ValueError(
                             'Header block terminator not found: The file is either '
                             'invalid or its header block was damaged.'
@@ -364,7 +395,7 @@ class TSyncFile:
                     if not check_xxh:
                         (block_term,) = struct.unpack('<I', f.read(4))
                         f.read(4)
-                        if block_term != TSYNC_BLOCK_TERM_32:
+                        if block_term != int('11260000', 16):
                             raise ValueError(
                                 'Block terminator not found: Some data may be corrupted.'
                             )
@@ -374,7 +405,7 @@ class TSyncFile:
                     # check validity of the block we read last
                     (block_term,) = struct.unpack('<Q', f.read(8))
                     (expected_cs,) = struct.unpack('<Q', f.read(8))
-                    if block_term != TSYNC_BLOCK_TERM:
+                    if block_term != self._BLOCK_TERM:
                         raise ValueError(
                             'Block terminator not found: Some data is likely corrupted.'
                         )
@@ -385,163 +416,6 @@ class TSyncFile:
             del self._xxh
 
 
-class LegacyTSyncFile:
-    """
-    Read a legacy TimeSync (.tsync) binary file as generated by the
-    Syntalos DAQ system (legacy variant for an older, experimental
-    version of this file format that was briefly in use).
-    """
-
-    def __init__(self, fname: os.PathLike[str] | None = None):
-        self._format_version = 1
-        self._time_created: datetime | None = None
-        self._tolerance_us = 0
-        self._generator_name = ''
-        self._custom: dict[str, T.Any] = {}
-        self._time_labels = ('A', 'B')
-        self._time_units = (
-            tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
-            tsync_time_unit_to_punit(TSyncTimeUnit.MICROSECONDS),
-        )
-        self._times = np.empty((0, 2))
-        if fname:
-            self.open(fname)
-
-    @property
-    def time_created(self) -> datetime | None:
-        return self._time_created
-
-    @property
-    def tolerance(self) -> int:
-        """The tolerance range value, in microseconds"""
-        return self._tolerance_us
-
-    @tolerance.setter
-    def tolerance(self, usec: int) -> None:
-        self._tolerance_us = usec
-
-    @property
-    def generator_name(self) -> str:
-        """Name of the module that generated this file."""
-        return self._generator_name
-
-    @generator_name.setter
-    def generator_name(self, name: str) -> None:
-        self._generator_name = name
-
-    @property
-    def sync_mode(self) -> TSyncFileMode:
-        """Time data storage mode.."""
-        return TSyncFileMode.SYNCPOINTS
-
-    @property
-    def custom(self) -> dict[str, T.Any]:
-        """User-defined custom properties of this file."""
-        return self._custom
-
-    @custom.setter
-    def custom(self, v: dict[str, T.Any]) -> None:
-        self._custom = v
-
-    @property
-    def time_labels(self) -> tuple[str, str]:
-        """Labels of the two encoded times."""
-        return self._time_labels
-
-    @time_labels.setter
-    def time_labels(self, v: tuple[str, str]) -> None:
-        self._time_labels = v
-
-    @property
-    def time_units(self) -> tuple[T.Any, T.Any]:
-        """Units of the two encoded times."""
-        return self._time_units
-
-    @time_units.setter
-    def time_units(self, v: tuple[T.Any, T.Any]) -> None:
-        self._time_units = v
-
-    @property
-    def times(self) -> np.ndarray:
-        """The actual time values of the two clocks."""
-        return self._times
-
-    @times.setter
-    def times(self, v: np.ndarray) -> None:
-        self._times = v
-
-    @staticmethod
-    def is_legacy(fname: os.PathLike[str]) -> bool:
-        with open(fname, 'rb') as f:
-            (magic_number,) = struct.unpack('<I', f.read(4))
-            return bool(magic_number == int('C6BBDFBC', 16))
-
-    def open(self, fname: os.PathLike[str]) -> None:
-        with open(fname, 'rb') as f:
-            (magic_number,) = struct.unpack('<I', f.read(4))
-            if magic_number != int('C6BBDFBC', 16):
-                raise ValueError('Unrecognized file type.')
-
-            (self._format_version,) = struct.unpack('<I', f.read(4))
-            if self._format_version != 1:
-                raise ValueError(
-                    'Can not read TSync format version {}'.format(self._format_version)
-                )
-            log.debug('Reading legacy tsync file: {}'.format(fname))
-
-            (ts,) = struct.unpack('<q', f.read(8))
-            self._time_created = datetime.fromtimestamp(ts, tz=timezone.utc)
-            (self._tolerance_us,) = struct.unpack('<I', f.read(4))
-
-            xxh = xxh3_64()
-            try:
-                self._generator_name = read_utf8_xxh_from_file(f, xxh)
-            except UnicodeDecodeError as uni_e:
-                raise ValueError(
-                    'This legacy tsync file is damaged and can not be read.'
-                ) from uni_e
-
-            json_raw = read_utf8_xxh_from_file(f, xxh)
-            self._custom = {}
-            if json_raw:
-                self._custom = json.loads(json_raw)
-
-            tlabel1 = read_utf8_xxh_from_file(f, xxh)
-            tlabel2 = read_utf8_xxh_from_file(f, xxh)
-            self._time_labels = (tlabel1, tlabel2)
-
-            (tuv1,) = struct.unpack('<H', f.read(2))
-            (tuv2,) = struct.unpack('<H', f.read(2))
-            self._time_units = (
-                tsync_time_unit_to_punit(TSyncTimeUnit(tuv1)),
-                tsync_time_unit_to_punit(TSyncTimeUnit(tuv2)),
-            )
-
-            self._times = np.empty((0, 2))
-            bytes_per_block = 4 + 8 + 8
-            bytes_remaining = os.fstat(f.fileno()).st_size - f.tell()
-            if bytes_remaining <= 0:
-                # no data is present
-                return
-
-            if bytes_remaining % bytes_per_block != 0:
-                raise ValueError('File may be corrupt: Not a whole number of data blocks found!')
-
-            num_data_blocks = int(bytes_remaining / bytes_per_block)
-            indices_continuous = True
-            self._times = np.zeros((num_data_blocks, 2), dtype=np.int64)
-            for i in range(num_data_blocks):
-                (index,) = struct.unpack('<I', f.read(4))
-                (time1,) = struct.unpack('<q', f.read(8))
-                (time2,) = struct.unpack('<q', f.read(8))
-                if index != i:
-                    indices_continuous = False
-                self._times[i] = np.array([time1, time2])
-
-            if not indices_continuous:
-                print('WARNING: Indices in time sync file were not continuous.')
-
-
 def load_data(part_paths: T.Iterable[Path], aux_data_list: T.Any) -> T.Iterator[T.Any]:
     """Entry point for automatic dataset loading.
 
@@ -549,9 +423,5 @@ def load_data(part_paths: T.Iterable[Path], aux_data_list: T.Any) -> T.Iterator[
     as data or auxiliary data.
     """
     for fname in part_paths:
-        tsync: LegacyTSyncFile | TSyncFile
-        if LegacyTSyncFile.is_legacy(fname):
-            tsync = LegacyTSyncFile(fname)
-        else:
-            tsync = TSyncFile(fname)
+        tsync = TSyncFile(fname)
         yield tsync
