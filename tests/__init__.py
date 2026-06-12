@@ -20,10 +20,10 @@
 import sys
 from pathlib import Path
 
-source_root = str(Path(__file__).resolve().parent.parent)
-if source_root not in sys.path:
+source_root = Path(__file__).resolve().parent.parent
+if str(source_root) not in sys.path:
     # Prefer local project imports over globally installed packages.
-    sys.path.insert(0, source_root)
+    sys.path.insert(0, str(source_root))
 
 
 __all__ = ['source_root']

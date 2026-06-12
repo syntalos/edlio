@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import typing as T
+from pathlib import Path
 
 import pytest
 
 
 @pytest.fixture(scope='session')
-def samples_dir() -> T.Iterator[str]:
+def samples_dir() -> T.Iterator[Path]:
     """
     Prepare samples in the samples directory and return full path to the directory.
     """
@@ -33,19 +33,19 @@ def samples_dir() -> T.Iterator[str]:
 
     from . import source_root
 
-    smpldir = os.path.join(source_root, 'tests', 'samples')
-    if not os.path.isdir(smpldir):
+    smpldir = source_root / 'tests' / 'samples'
+    if not smpldir.is_dir():
         raise RuntimeError('Unable to find test samples directory in {}'.format(smpldir))
 
     # unpack any xz files that we just compress for efficient storage,
     # but need in their raw form for testing
-    raw_fnames = [os.path.join(smpldir, 'blink1', 'intan-signals', 'a870_data_210208_181726.rhd')]
+    raw_fnames = [smpldir / 'blink1' / 'intan-signals' / 'a870_data_210208_181726.rhd']
     for raw_fname in raw_fnames:
-        with open(raw_fname, 'wb') as f:
-            f.write(lzma.open(raw_fname + '.xz').read())
+        xz_fname = raw_fname.with_suffix(raw_fname.suffix + '.xz')
+        raw_fname.write_bytes(lzma.open(xz_fname).read())
 
     yield smpldir
 
     # cleanup
     for raw_fname in raw_fnames:
-        os.remove(raw_fname)
+        raw_fname.unlink()

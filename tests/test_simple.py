@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+from pathlib import Path
 from datetime import datetime, timezone
 
 import numpy as np
@@ -31,11 +31,11 @@ from edlio.dataio.video import load_data as load_video_data
 from . import source_root
 
 
-def _can_decode_video(fname: str) -> bool:
+def _can_decode_video(fname: Path) -> bool:
     """Check whether the installed OpenCV can actually decode the given video."""
     import cv2 as cv
 
-    cap = cv.VideoCapture(fname)
+    cap = cv.VideoCapture(str(fname))
     try:
         ok, _ = cap.read()
         return bool(ok)
@@ -43,8 +43,8 @@ def _can_decode_video(fname: str) -> bool:
         cap.release()
 
 
-def test_load_intan_raw(samples_dir: str) -> None:
-    test_coll = edlio.load(os.path.join(samples_dir, 'blink1'))
+def test_load_intan_raw(samples_dir: Path) -> None:
+    test_coll = edlio.load(samples_dir / 'blink1')
     assert isinstance(test_coll, edlio.EDLCollection)
     assert test_coll.collection_idname == 'blink1_21-02-08_608bc0ea'
 
@@ -64,8 +64,8 @@ def test_load_intan_raw(samples_dir: str) -> None:
         assert intan._nosync_ts[0] == 6.196 * ureg.ms
 
 
-def test_load_tsync_only(samples_dir: str) -> None:
-    test_coll = edlio.load(os.path.join(samples_dir, 'blink1'))
+def test_load_tsync_only(samples_dir: Path) -> None:
+    test_coll = edlio.load(samples_dir / 'blink1')
     assert isinstance(test_coll, edlio.EDLCollection)
     assert test_coll.collection_idname == 'blink1_21-02-08_608bc0ea'
 
@@ -84,10 +84,10 @@ def test_load_tsync_only(samples_dir: str) -> None:
     assert tsync.times.size == 2574
 
 
-def test_load_crop1(samples_dir: str) -> None:
+def test_load_crop1(samples_dir: Path) -> None:
     from uuid import UUID
 
-    test_coll = edlio.load(os.path.join(samples_dir, 'crop1'))
+    test_coll = edlio.load(samples_dir / 'crop1')
     assert isinstance(test_coll, edlio.EDLCollection)
     assert test_coll.collection_idname == 'crop1_26-06-12_37301b2c'
     assert test_coll.collection_id == UUID('019ebcd3-adfe-7f14-9723-692237301b2c')
@@ -107,16 +107,16 @@ def test_load_crop1(samples_dir: str) -> None:
         assert tsync.times.shape == (82, 2)
 
 
-def test_load_crop1_video_frames(samples_dir: str) -> None:
+def test_load_crop1_video_frames(samples_dir: Path) -> None:
     # The crop1 videos are AV1-encoded. The opencv-python wheels do not bundle a
     # software AV1 decoder yet (opencv/opencv-python#1209), so skip the frame
     # decoding checks when the installed OpenCV can not decode them.
-    crop1_dir = os.path.join(samples_dir, 'crop1', 'videos')
-    raw_mkv = os.path.join(crop1_dir, 'raw-video', '37301b2c-raw-video.mkv')
+    crop1_dir = samples_dir / 'crop1' / 'videos'
+    raw_mkv = crop1_dir / 'raw-video' / '37301b2c-raw-video.mkv'
     if not _can_decode_video(raw_mkv):
         pytest.skip('Installed OpenCV has no working AV1 decoder (opencv/opencv-python#1209)')
 
-    test_coll = edlio.load(os.path.join(samples_dir, 'crop1'))
+    test_coll = edlio.load(samples_dir / 'crop1')
     videos = test_coll.group_by_name('videos')
 
     # raw and cropped variants share frame count and timing, but the cropped
@@ -135,36 +135,32 @@ def test_load_crop1_video_frames(samples_dir: str) -> None:
 
 
 def test_load_video_tsync_preserves_millisecond_timestamp_scale() -> None:
-    dataset_path = os.path.join(
-        source_root, 'tests', 'samples', 'blink1', 'videos', 'generic-camera'
-    )
+    dataset_path = source_root / 'tests' / 'samples' / 'blink1' / 'videos' / 'generic-camera'
 
     aux_data = EDLDataFile(dataset_path, file_type='tsync')
     aux_data.parts.append(EDLDataPart('video_timestamps.tsync', 0))
     tsync = next(aux_data.read())
 
-    frames = load_video_data([os.path.join(dataset_path, 'video.mkv')], [aux_data])
+    frames = load_video_data([dataset_path / 'video.mkv'], [aux_data])
     frame = next(frames)
     expected_time_msec = tsync.times[0, 1]
     assert frame.time.to(tsync.time_units[1]).magnitude == expected_time_msec
 
 
 def test_load_video_tsync_keeps_frame_index_unitless() -> None:
-    dataset_path = os.path.join(
-        source_root, 'tests', 'samples', 'blink1', 'videos', 'generic-camera'
-    )
+    dataset_path = source_root / 'tests' / 'samples' / 'blink1' / 'videos' / 'generic-camera'
 
     aux_data = EDLDataFile(dataset_path, file_type='tsync')
     aux_data.parts.append(EDLDataPart('video_timestamps.tsync', 0))
     tsync = next(aux_data.read())
 
-    frame = next(load_video_data([os.path.join(dataset_path, 'video.mkv')], [aux_data]))
+    frame = next(load_video_data([dataset_path / 'video.mkv'], [aux_data]))
     assert frame.index == tsync.times[0, 0]
     assert not hasattr(frame.index, 'units')
 
 
-def test_load_json_csv(samples_dir: str) -> None:
-    jcstore = edlio.load(os.path.join(samples_dir, 'jsoncsv1'))
+def test_load_json_csv(samples_dir: Path) -> None:
+    jcstore = edlio.load(samples_dir / 'jsoncsv1')
     assert isinstance(jcstore, edlio.EDLCollection)
     assert jcstore.collection_idname == 'jsoncsv1_24-02-18_1779a25f'
 
@@ -219,10 +215,10 @@ def test_load_json_csv(samples_dir: str) -> None:
     assert rows[-1] == ['20015', 'beta', 'eLcwGIFVu1A9NV']
 
 
-def test_load_zarr(samples_dir: str) -> None:
+def test_load_zarr(samples_dir: Path) -> None:
     import zarr
 
-    zcoll = edlio.load(os.path.join(samples_dir, 'zarrtest1'))
+    zcoll = edlio.load(samples_dir / 'zarrtest1')
     assert isinstance(zcoll, edlio.EDLCollection)
 
     # 1D integer signal
