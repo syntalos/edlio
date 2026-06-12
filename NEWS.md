@@ -1,3 +1,15 @@
+Version 0.3.2
+-------------
+Released: 2026-06-12
+
+### Bugfixes:
+ * tsync: Parse legacy data all in one class, drop support for ancient files
+
+### Miscellaneous:
+ * Update Zarr test data
+ * tests: Add sample with AV1 video
+ * tests: Convert to using pathlib.Path as well
+
 Version 0.3.1
 -------------
 Released: 2026-06-06
