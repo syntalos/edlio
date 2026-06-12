@@ -1,0 +1,19 @@
+collection_id = '019ebcd3-adfe-7f14-9723-692237301b2c'
+format_version = '1'
+time_created = 2026-06-12T19:14:14+02:00
+type = 'dataset'
+
+[data]
+file_type = 'mkv'
+media_type = 'video/x-matroska'
+summary = 'Video recording from Aravis Camera'
+
+    [[data.parts]]
+    fname = '37301b2c-raw-video.mkv'
+
+[[data_aux]]
+file_type = 'tsync'
+summary = 'Video timestamps'
+
+    [[data_aux.parts]]
+    fname = '37301b2c-raw-video_timestamps.tsync'

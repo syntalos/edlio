@@ -21,6 +21,7 @@ import os
 from datetime import datetime, timezone
 
 import numpy as np
+import pytest
 
 import edlio
 from edlio import ureg
@@ -28,6 +29,18 @@ from edlio.dataset import EDLDataFile, EDLDataPart
 from edlio.dataio.video import load_data as load_video_data
 
 from . import source_root
+
+
+def _can_decode_video(fname: str) -> bool:
+    """Check whether the installed OpenCV can actually decode the given video."""
+    import cv2 as cv
+
+    cap = cv.VideoCapture(fname)
+    try:
+        ok, _ = cap.read()
+        return bool(ok)
+    finally:
+        cap.release()
 
 
 def test_load_intan_raw(samples_dir: str) -> None:
@@ -69,6 +82,56 @@ def test_load_tsync_only(samples_dir: str) -> None:
     )
     assert tsync.times.shape == (1287, 2)
     assert tsync.times.size == 2574
+
+
+def test_load_crop1(samples_dir: str) -> None:
+    from uuid import UUID
+
+    test_coll = edlio.load(os.path.join(samples_dir, 'crop1'))
+    assert isinstance(test_coll, edlio.EDLCollection)
+    assert test_coll.collection_idname == 'crop1_26-06-12_37301b2c'
+    assert test_coll.collection_id == UUID('019ebcd3-adfe-7f14-9723-692237301b2c')
+
+    videos = test_coll.group_by_name('videos')
+    for name, generator in (('raw-video', 'VR Raw'), ('cropped-video', 'VR Crop')):
+        dset = videos.dataset_by_name(name)
+
+        tsync_data = [tsync for tsync in dset.read_aux_data('tsync')]
+        assert len(tsync_data) == 1
+        tsync = tsync_data[0]
+
+        assert tsync.generator_name == generator
+        assert tsync.collection_id == test_coll.collection_id
+        assert tsync.time_labels == ('frame-no', 'master-time')
+        assert tsync.time_units == (ureg.dimensionless, ureg.microsecond)
+        assert tsync.times.shape == (82, 2)
+
+
+def test_load_crop1_video_frames(samples_dir: str) -> None:
+    # The crop1 videos are AV1-encoded. The opencv-python wheels do not bundle a
+    # software AV1 decoder yet (opencv/opencv-python#1209), so skip the frame
+    # decoding checks when the installed OpenCV can not decode them.
+    crop1_dir = os.path.join(samples_dir, 'crop1', 'videos')
+    raw_mkv = os.path.join(crop1_dir, 'raw-video', '37301b2c-raw-video.mkv')
+    if not _can_decode_video(raw_mkv):
+        pytest.skip('Installed OpenCV has no working AV1 decoder (opencv/opencv-python#1209)')
+
+    test_coll = edlio.load(os.path.join(samples_dir, 'crop1'))
+    videos = test_coll.group_by_name('videos')
+
+    # raw and cropped variants share frame count and timing, but the cropped
+    # video has smaller frame dimensions (height, width, channels)
+    for name, frame_shape in (('raw-video', (512, 512, 3)), ('cropped-video', (119, 128, 3))):
+        dset = videos.dataset_by_name(name)
+        tsync = next(dset.read_aux_data('tsync'))
+
+        frames = list(dset.read_data())
+        assert len(frames) == 82
+        first = frames[0]
+        assert first.mat.shape == frame_shape
+        assert first.index == 0
+        assert first.time == tsync.times[0, 1] * ureg.microsecond
+        assert frames[-1].index == 81
 
 
 def test_load_video_tsync_preserves_millisecond_timestamp_scale() -> None:

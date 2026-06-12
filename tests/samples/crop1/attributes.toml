@@ -1,0 +1,24 @@
+collection_name = '2026-06-12_Crop1'
+machine_node = 'sydevtest [debian 14]'
+recording_length_msec = 3292
+success = true
+
+[[modules]]
+id = 'camera-arv'
+name = 'Aravis Camera'
+
+[[modules]]
+id = 'videotransform'
+name = 'Video Transformer'
+
+[[modules]]
+id = 'videorecorder'
+name = 'VR Raw'
+
+[[modules]]
+id = 'canvas'
+name = 'Canvas'
+
+[[modules]]
+id = 'videorecorder'
+name = 'VR Crop'

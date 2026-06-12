@@ -1,0 +1,11 @@
+[encoder]
+lossless = false
+name = 'libsvtav1'
+target_quality = 24
+thread_count = 20
+
+[video]
+colored = true
+frame_height = 512
+frame_width = 512
+framerate = 25.0
