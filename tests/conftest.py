@@ -39,7 +39,12 @@ def samples_dir() -> T.Iterator[Path]:
 
     # unpack any xz files that we just compress for efficient storage,
     # but need in their raw form for testing
-    raw_fnames = [smpldir / 'blink1' / 'intan-signals' / 'a870_data_210208_181726.rhd']
+    raw_fnames = [
+        smpldir / 'blink1' / 'intan-signals' / 'a870_data_210208_181726.rhd',
+        smpldir / 'tsync' / 'syntalos-2.x-valid.tsync',
+        smpldir / 'tsync' / 'syntalos-3.0-temp-broken.tsync',
+        smpldir / 'tsync' / 'syntalos-3.x-valid.tsync',
+    ]
     for raw_fname in raw_fnames:
         xz_fname = raw_fname.with_suffix(raw_fname.suffix + '.xz')
         raw_fname.write_bytes(lzma.open(xz_fname).read())

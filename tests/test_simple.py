@@ -84,6 +84,36 @@ def test_load_tsync_only(samples_dir: Path) -> None:
     assert tsync.times.size == 2574
 
 
+def test_load_tsync_variants(samples_dir: Path) -> None:
+    from edlio.dataio.tsyncfile import TSyncFile, LegacyTSyncFile
+
+    tsync_dir = samples_dir / 'tsync'
+
+    valid_2x = LegacyTSyncFile(tsync_dir / 'syntalos-2.x-valid.tsync')
+    assert valid_2x.generator_name == 'Overview Recorder'
+    assert valid_2x.time_labels == ('frame-no', 'master-time')
+    assert valid_2x.time_units == (ureg.dimensionless, ureg.microsecond)
+    assert valid_2x.times.shape == (36064, 2)
+    assert tuple(valid_2x.times[0]) == (1, 274135)
+    assert tuple(valid_2x.times[-1]) == (36064, 1204758385)
+
+    broken_3x = LegacyTSyncFile(tsync_dir / 'syntalos-3.0-temp-broken.tsync')
+    assert broken_3x.generator_name == 'Video Recorder'
+    assert broken_3x.time_labels == ('frame-no', 'master-time')
+    assert broken_3x.time_units == (ureg.dimensionless, ureg.microsecond)
+    assert broken_3x.times.shape == (27060, 2)
+    assert tuple(broken_3x.times[0]) == (0, 167896)
+    assert tuple(broken_3x.times[-1]) == (27059, 903756703)
+
+    valid_3x = TSyncFile(tsync_dir / 'syntalos-3.x-valid.tsync')
+    assert valid_3x.generator_name == 'VR Raw'
+    assert valid_3x.time_labels == ('frame-no', 'master-time')
+    assert valid_3x.time_units == (ureg.dimensionless, ureg.microsecond)
+    assert valid_3x.times.shape == (3125, 2)
+    assert tuple(valid_3x.times[0]) == (0, 46911)
+    assert tuple(valid_3x.times[-1]) == (3124, 125006924)
+
+
 def test_load_crop1(samples_dir: Path) -> None:
     from uuid import UUID
 
