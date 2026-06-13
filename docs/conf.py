@@ -22,7 +22,7 @@ html_theme = 'pydata_sphinx_theme'
 html_theme_options = {
     'show_nav_level': 2,
     'collapse_navigation': True,
-    'github_url': 'https://github.com/bothlab/edlio',
+    'github_url': 'https://github.com/syntalos/edlio',
 }
 
 html_css_files = [

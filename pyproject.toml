@@ -36,7 +36,7 @@ dev = [
 
 [project.urls]
 Documentation = "https://edl.readthedocs.io/"
-Source = "https://github.com/bothlab/edlio"
+Source = "https://github.com/syntalos/edlio"
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]

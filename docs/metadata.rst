@@ -217,7 +217,7 @@ actual dataset (such as explanations for an array dataset, or additional informa
 Syntalos Metadata
 =================
 
-The `Syntalos <https://github.com/bothlab/syntalos>`_ DAQ system uses the ``attributes.toml`` file of the `collection` root node it creates to add a
+The `Syntalos <https://github.com/syntalos/syntalos>`_ DAQ system uses the ``attributes.toml`` file of the `collection` root node it creates to add a
 bunch of additional metadata.
 This behavior is restricted to the ``attributes.toml`` file of the main collection, all other attributes files are exclusively in the domain of Syntalos
 modules without interference from the main engine.
