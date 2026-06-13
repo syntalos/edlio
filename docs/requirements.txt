@@ -1,5 +1,5 @@
 -r ../requirements.txt
-sphinx>=6.0
+sphinx>=9.1.0
 pygments>=2.6
 pydata-sphinx-theme
 sphinx-autodoc-typehints
