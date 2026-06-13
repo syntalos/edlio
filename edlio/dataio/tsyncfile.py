@@ -133,13 +133,16 @@ class TSyncFile:
         return self._time_created
 
     @property
-    def tolerance(self) -> int:
-        """The tolerance range value, in microseconds"""
-        return int(self._custom.get('tolerance_us', 0))
+    def tolerance(self) -> pint.Quantity[int]:
+        """The tolerance range, as a time duration (usually usec)."""
+        return int(self._custom.get('tolerance_us', 0)) * ureg.usec
 
     @tolerance.setter
-    def tolerance(self, usec: int) -> None:
-        self._custom['tolerance_us'] = usec
+    def tolerance(self, value: pint.Quantity[int] | int) -> None:
+        # accept a dimensioned quantity, or a bare number interpreted as microseconds
+        if isinstance(value, ureg.Quantity):
+            value = value.to(ureg.usec).magnitude
+        self._custom['tolerance_us'] = int(value)
 
     @property
     def generator_name(self) -> str:
@@ -392,13 +395,16 @@ class LegacyTSyncFile:
         return self._time_created
 
     @property
-    def tolerance(self) -> int:
-        """The tolerance range value, in microseconds"""
-        return int(self._custom.get('tolerance_us', 0))
+    def tolerance(self) -> pint.Quantity[int]:
+        """The tolerance range, as a time duration (usually usec)."""
+        return int(self._custom.get('tolerance_us', 0)) * ureg.usec
 
     @tolerance.setter
-    def tolerance(self, usec: int) -> None:
-        self._custom['tolerance_us'] = usec
+    def tolerance(self, value: pint.Quantity[int] | int) -> None:
+        # accept a dimensioned quantity, or a bare number interpreted as microseconds
+        if isinstance(value, ureg.Quantity):
+            value = value.to(ureg.usec).magnitude
+        self._custom['tolerance_us'] = int(value)
 
     @property
     def generator_name(self) -> str:
