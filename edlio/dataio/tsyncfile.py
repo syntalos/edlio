@@ -513,7 +513,7 @@ class LegacyTSyncFile:
             # (the 2.x variant). Both share the same magic and format version,
             # so we can only tell them apart by which checksum matches below.
             self._xxh = xxh3_64()
-            self._xxh_nolen = xxh3_64()
+            self._xxh_nolen: T.Any = xxh3_64()
             major_version = self._read_xxh_unpack('<H', f.read(2))
             minor_version = self._read_xxh_unpack('<H', f.read(2))
             self._format_version = '{}.{}'.format(major_version, minor_version)
