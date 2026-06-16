@@ -1,3 +1,13 @@
+Version 0.3.3
+-------------
+Released: 2026-06-16
+
+### Features:
+ * tsync: Provide tolerance values as Pint quantities
+
+### Bugfixes:
+ * tsync: Properly read inconsistent tsync files from Syntalos 3.0.0
+
 Version 0.3.2
 -------------
 Released: 2026-06-12
