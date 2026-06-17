@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import typing as T
 from pathlib import Path
 from collections.abc import Generator
