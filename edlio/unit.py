@@ -125,8 +125,10 @@ class EDLUnit:
         self._attrs = v
 
     def change_name(self, new_name: str) -> None:
-        old_dir_path = self.path
         old_name = self.name
+        # An in-memory unit may not have a path yet (no root_path/name set);
+        # in that case there is no directory to rename, we just update the name.
+        old_dir_path = self.path if (self._root_path and self._name) else None
 
         # set new name, but sanitize it to be portable across many filesystems
         self._name = sanitize_name(new_name)
