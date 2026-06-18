@@ -281,9 +281,9 @@ class EDLDataset(EDLUnit):
         d: dict[str, T.Any] = {}
         if not df.parts:
             return {}
-        if self._data.media_type:
+        if df.media_type:
             d['media_type'] = df.media_type
-        elif self._data.file_type:
+        elif df.file_type:
             d['file_type'] = df.file_type
         if df.summary:
             d['summary'] = df.summary
