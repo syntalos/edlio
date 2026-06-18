@@ -127,7 +127,20 @@ def load_data(
             if sync_map_gen is None:
                 frame = Frame(mat, time=-1, index=frame_index)
             else:
-                index, time = next(sync_map_gen)
+                try:
+                    index, time = next(sync_map_gen)
+                except StopIteration:
+                    # The auxiliary timestamp data ran out before the video did,
+                    # so the sync information does not cover all frames. We raise
+                    # an error rather than letting StopIteration escape this
+                    # generator (PEP 479).
+                    raise ValueError(
+                        'Video timestamp data is shorter than the video: the auxiliary '
+                        'timing information ran out at frame {}. The sync data likely does '
+                        'not belong to this video, or the video has extra frames.'.format(
+                            frame_index
+                        )
+                    ) from None
                 frame = Frame(mat, time=time, index=index)
             yield frame
             frame_index += 1
