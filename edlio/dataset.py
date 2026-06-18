@@ -57,7 +57,7 @@ class EDLDataPart:
 class EDLDataFile:
     """A data file, associated with a dataset"""
 
-    parts: list[EDLDataPart] = []
+    parts: list[EDLDataPart]
 
     def __init__(
         self,
@@ -321,7 +321,7 @@ class EDLDataset(EDLUnit):
             return None
         return self._data.read(self._aux_data, **kwargs)
 
-    def read_aux_data(self, key: str | None = None) -> T.Any | None:
+    def read_aux_data(self, key: str | None = None, **kwargs: T.Any) -> T.Any | None:
         """
         Read auxiliary data from this dataset.
 
@@ -333,6 +333,9 @@ class EDLDataset(EDLUnit):
             properties of the data first, then look for a summary text match
             to determine which data was requested. If not set, the first dataset
             is loaded.
+        kwargs
+            Additional keyword arguments forwarded to the data loader
+            (e.g. ``as_dataframe`` for CSV/JSON aux data).
         Returns
         -------
         The data, or None in case no aux-data or aux-data entry was found.
@@ -340,13 +343,13 @@ class EDLDataset(EDLUnit):
         if not self._aux_data:
             return None
         if not key:
-            return self._aux_data[0].read()
+            return self._aux_data[0].read(**kwargs)
         for adf in self._aux_data:
             if (adf.file_type and key in adf.file_type) or (
                 adf.media_type and key in adf.media_type
             ):
-                return adf.read()
+                return adf.read(**kwargs)
         for adf in self._aux_data:
             if adf.summary and key in adf.summary:
-                return adf.read()
+                return adf.read(**kwargs)
         return None
