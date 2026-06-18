@@ -81,6 +81,15 @@ class EDLDataFile:
         return (self._media_type, self._file_type)
 
     @property
+    def base_path(self) -> Path | None:
+        """Directory that the file parts are stored in, relative to which part names resolve."""
+        return self._base_path
+
+    @base_path.setter
+    def base_path(self, path: os.PathLike[str] | None) -> None:
+        self._base_path = Path(path) if path else None
+
+    @property
     def media_type(self) -> str | None:
         """The media (MIME) type of this data."""
         return self._media_type
@@ -223,12 +232,27 @@ class EDLDataset(EDLUnit):
         self._aux_data: list[EDLDataFile] = []
 
     @property
+    def root_path(self) -> Path | None:
+        return self._root_path
+
+    @root_path.setter
+    def root_path(self, path: os.PathLike[str]) -> None:
+        self._root_path = Path(path)
+        # keep the main data file's base path in sync, so that parts can be
+        # added to a freshly created dataset (e.g. via data.new_part()) once
+        # the dataset has been given a location.
+        if self._name:
+            self._data.base_path = self.path
+
+    @property
     def data(self) -> EDLDataFile:
         return self._data
 
     @data.setter
     def data(self, df: EDLDataFile) -> None:
         self._data = df
+        if self._root_path and self._name and df.base_path is None:
+            df.base_path = self.path
 
     @property
     def aux_data(self) -> list[EDLDataFile]:

@@ -143,3 +143,44 @@ was processed from the raw video (e.g. by tools like Minian or MIN1PIPE).
     # get a (X, 2) matrix mapping frame numbers to time stamps (in this case,
     # ensure your tsync units and labels match your expectations!)
     print(tsync.times)
+
+
+Writing an EDL structure
+========================
+
+`edlio` can also create EDL structures on disk. You build the
+collection/group/dataset hierarchy in memory, register the data files that
+belong to each dataset, write their raw bytes to the paths `edlio` hands you,
+and finally call ``save()`` to write out all manifests and attributes.
+
+Note that a unit's ``root_path`` is its *parent* directory: a collection named
+``myrec`` with ``root_path = '/data'`` is written to ``/data/myrec``.
+
+.. code-block:: python
+
+    import edlio
+
+    # create a collection and give it a location on disk
+    coll = edlio.EDLCollection('myrec')
+    coll.root_path = '/path/to/output'  # collection ends up in /path/to/output/myrec
+    coll.generator_id = 'my-tool/1.0'
+    coll.attributes['subject_id'] = 'mouse01'
+
+    # create a nested group and dataset (create=True adds & saves them)
+    videos = coll.group_by_name('videos', create=True)
+    dset = videos.dataset_by_name('camera', create=True)
+
+    # describe the main data and register a file part. new_part() returns the
+    # part and the absolute path you should write the actual bytes to.
+    dset.data.media_type = 'video/x-matroska'
+    _, video_path = dset.data.new_part('camera.mkv')
+    # ... write your encoded video to `video_path` here ...
+
+    # attach auxiliary data of a different kind (e.g. timestamps)
+    aux = edlio.EDLDataFile(dset.path, file_type='tsync')
+    _, tsync_path = aux.new_part('camera.tsync')
+    # ... write the tsync bytes to `tsync_path` here ...
+    dset.add_aux_data(aux)
+
+    # write all manifests and attributes to disk
+    coll.save()
