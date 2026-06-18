@@ -1,3 +1,20 @@
+Version 0.3.4
+-------------
+Released: 2026-06-18
+
+### Bugfixes:
+ * Import annotations, fixing an issue with older Pint
+ * Fix aux-data mediatype serialization on save
+ * Properly listify single string/bytes items
+ * video: Guard against video length / timesync-data length mismatches
+ * dataset: Pass kwargs to aux-data loaders
+ * Allow name-changes on not-yet-persisted units
+
+### Miscellaneous:
+ * Unconditionally depend on zstandard
+ * Add small example how to write an EDL data structure
+ * tests: Add tests for writing EDL metadata
+
 Version 0.3.3
 -------------
 Released: 2026-06-16
