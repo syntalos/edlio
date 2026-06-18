@@ -34,10 +34,20 @@ import tomlkit as toml
 
 from .unit import EDLError
 from .group import EDLGroup
-from .dataset import EDLDataset
+from .dataset import EDLDataset, EDLDataFile, EDLDataPart
 from .collection import EDLCollection
 
-__all__ = ['ureg', 'Q_', 'EDLError', 'EDLGroup', 'EDLCollection', 'EDLDataset', 'load']
+__all__ = [
+    'ureg',
+    'Q_',
+    'EDLError',
+    'EDLGroup',
+    'EDLCollection',
+    'EDLDataset',
+    'EDLDataFile',
+    'EDLDataPart',
+    'load',
+]
 
 
 # Pint default registry for unit conversions
