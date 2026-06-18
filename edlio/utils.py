@@ -66,6 +66,9 @@ def listify(item: T.Any) -> list[T.Any]:
         return []
     if type(item) is list:
         return item
+    # strings/bytes are Sequences, but should be treated as single scalar items
+    if isinstance(item, (str, bytes)):
+        return [item]
     if isinstance(item, collections.abc.Sequence):
         return list(item)
     return [item]
