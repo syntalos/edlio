@@ -4,4 +4,3 @@ opencv-python
 pandas
 pytest
 zarr
-zstandard
