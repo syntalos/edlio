@@ -91,8 +91,23 @@ class EDLGroup(EDLUnit):
         child.root_path = self.path
         child.collection_id = self.collection_id
 
-        if old_path and old_path.is_dir():
+        # Windows Path equality ignores case even in case-sensitive directories.
+        # https://docs.python.org/3.12/library/pathlib.html#general-properties
+        # https://learn.microsoft.com/en-us/windows/wsl/case-sensitivity
+        # Compare directory identity; samefile() requires an existing target.
+        # https://docs.python.org/3.12/library/pathlib.html#pathlib.Path.samefile
+        # Known limitation (also in Python 3.12): Windows drives (e.g. WebDAV) with
+        # zero device/file IDs can make distinct directories compare as identical.
+        # https://github.com/python/cpython/blob/3.12/Lib/genericpath.py
+        # https://github.com/python/cpython/issues/78116
+        if (
+            old_path
+            and old_path.is_dir()
+            and not child.path.exists()
+            or not old_path.samefile(child.path)
+        ):
             old_path.rename(child.path)
+
         self._children.append(child)
 
     @property
