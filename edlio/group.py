@@ -91,7 +91,7 @@ class EDLGroup(EDLUnit):
         child.root_path = self.path
         child.collection_id = self.collection_id
 
-        if old_path and old_path.is_dir():
+        if old_path and old_path != child.path and old_path.is_dir():
             old_path.rename(child.path)
         self._children.append(child)
 
