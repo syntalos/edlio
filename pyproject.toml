@@ -27,7 +27,7 @@ test = [
     "neo",
     "pandas",
     "zarr",
-    "opencv-python",
+    "opencv-python>=4.14.0.94",
 ]
 dev = [
     "isort",
