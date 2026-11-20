@@ -103,8 +103,7 @@ class EDLGroup(EDLUnit):
         if (
             old_path
             and old_path.is_dir()
-            and not child.path.exists()
-            or not old_path.samefile(child.path)
+            and (not child.path.exists() or not old_path.samefile(child.path))
         ):
             old_path.rename(child.path)
 
